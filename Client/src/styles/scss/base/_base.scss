@@ -1,0 +1,9 @@
+@use "../abstracts" as *;
+
+body {
+  // font-family: $ff-sans;
+  // background-color: var(--background-primary);
+  background: $backgroundPrimary;
+  background-color: #1e1e1e;
+  color: var(--text-primary);
+}

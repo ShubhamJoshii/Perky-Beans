@@ -1,0 +1,63 @@
+@use "../abstracts/" as *;
+
+.carousel {
+  width: 95vw !important;
+  height: 480px;
+  border-radius: 10px;
+  top: 80px;
+  margin-inline: auto !important;
+
+  .slide {
+    div {
+      img {
+        width: 100%;
+        height: 480px;
+        // height: 100%;
+        object-fit: cover;
+        object-position: center;
+        // object-position: ;
+        opacity: 0.8;
+      }
+    }
+  }
+  .control-dots {
+    bottom: 10px;
+    .dot {
+      margin: 5px;
+      box-shadow: none;
+    }
+    .selected {
+      width: 20px !important;
+      border-radius: 5px !important;
+    }
+  }
+}
+
+@include responsive(tab-port) {
+  .carousel {
+    width: 100vw !important;
+    height: 380px;
+    top: 60px;
+    border-radius: 0;
+    .slide {
+      div {
+        height: 380px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+    .control-dots {
+      // bottom: 0;
+      .dot {
+        margin: 4px;
+      }
+      .selected {
+        width: 15px !important;
+        border-radius: 5px !important;
+      }
+    }
+  }
+}
