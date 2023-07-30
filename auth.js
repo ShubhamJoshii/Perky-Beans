@@ -20,17 +20,17 @@ const Mailgen = require("mailgen");
 
 
 
-router.get("/home", Authenication, async (req, res) => {
+router.get("/api/home", Authenication, async (req, res) => {
     res.send(req.rootUser);
 });
 
-router.get("/logout", Authenication, async (req, res) => {
+router.get("/api/logout", Authenication, async (req, res) => {
     res.clearCookie("perkyBeansToken", { path: "/" });
     res.status(200).send("User Logout");
     // res.send(req.rootUser);
 });
 
-router.post("/register", async (req, res) => {
+router.post("/api/register", async (req, res) => {
     const { Full_Name, Email, Password, Confirm_Password } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -48,7 +48,7 @@ router.post("/register", async (req, res) => {
     }
 })
 
-router.post("/login", async (req, res) => {
+router.post("/api/login", async (req, res) => {
     const { Email, Password, Login_Date } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -73,7 +73,7 @@ router.post("/login", async (req, res) => {
     } catch (err) { }
 })
 
-router.post("/addToWishlist", Authenication, async (req, res) => {
+router.post("/api/addToWishlist", Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -85,7 +85,7 @@ router.post("/addToWishlist", Authenication, async (req, res) => {
     }
 })
 
-router.post("/removefromWishlist", Authenication, async (req, res) => {
+router.post("/api/removefromWishlist", Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -97,7 +97,7 @@ router.post("/removefromWishlist", Authenication, async (req, res) => {
     }
 })
 
-router.post("/updateBag", Authenication, async (req, res) => {
+router.post("/api/updateBag", Authenication, async (req, res) => {
     const { productID, SmallCount, MediumCount, LargeCount } = req.body;
     // console.log(req.body);
     try {
@@ -110,7 +110,7 @@ router.post("/updateBag", Authenication, async (req, res) => {
         console.log(err);
     }
 })
-router.post("/addtoBag", Authenication, async (req, res) => {
+router.post("/api/addtoBag", Authenication, async (req, res) => {
     const { productID, SmallCount, MediumCount, LargeCount } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -122,7 +122,7 @@ router.post("/addtoBag", Authenication, async (req, res) => {
     }
 })
 
-router.post("/removeFromBag", Authenication, async (req, res) => {
+router.post("/api/removeFromBag", Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -135,7 +135,7 @@ router.post("/removeFromBag", Authenication, async (req, res) => {
 })
 
 
-router.post('/orderNow', Authenication, async (req, res) => {
+router.post('/api/orderNow', Authenication, async (req, res) => {
     // console.log(req.rootUser);
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -147,7 +147,7 @@ router.post('/orderNow', Authenication, async (req, res) => {
         console.log(err);
     }
 })
-router.post('/cancelOrder', Authenication, async (req, res) => {
+router.post('/api/cancelOrder', Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -159,7 +159,7 @@ router.post('/cancelOrder', Authenication, async (req, res) => {
     }
 })
 
-router.post("/forgetPassword/sendOTP", async (req, res) => {
+router.post("/api/forgetPassword/sendOTP", async (req, res) => {
     const { Email } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -218,7 +218,7 @@ router.post("/forgetPassword/sendOTP", async (req, res) => {
     }
 })
 
-router.post("/forgetPassword/otpVerify", async (req, res) => {
+router.post("/api/forgetPassword/otpVerify", async (req, res) => {
     const { Email, OTP } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -241,7 +241,7 @@ router.post("/forgetPassword/otpVerify", async (req, res) => {
     }
 });
 
-router.post("/forgetPassword/updatePassword", async (req, res) => {
+router.post("/api/forgetPassword/updatePassword", async (req, res) => {
     const { Email, OTP, Password, Confirm_Password } = req.body;
     // console.log(req.body);
     try {
