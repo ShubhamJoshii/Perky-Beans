@@ -40,40 +40,8 @@
     .active {
       min-width: 100px;
       border-bottom: 2px solid #ecb014;
-      // width: 50px;
     }
 
-    // #LOGINRegister {
-    //   a {
-    //     background-color: #ecb014;
-    //     border-radius: 5px;
-    //     font-size: 12px;
-    //     font-weight: bold;
-    //     padding: 7px 10px;
-    //     cursor: pointer;
-    //     button {
-    //       cursor: pointer;
-    //       color: white;
-    //       background: none;
-    //     }
-    //     &:hover {
-    //       padding: 7px 10px;
-    //       border-bottom: 0px solid #ecb014;
-    //       background-color: rgba(255, 255, 255, 0.871);
-    //       button {
-    //         color: black;
-    //       }
-    //     }
-    //   }
-    //   .active {
-    //     padding: 7px 10px;
-    //     border-bottom: 0px solid #ecb014;
-    //     background-color: rgba(255, 255, 255, 0.871);
-    //     button {
-    //       color: black;
-    //     }
-    //   }
-    // }
     #LOGINRegister {
       a {
         background-color: #ecb014;
@@ -82,6 +50,7 @@
         font-weight: bold;
         padding: 7px 10px;
         cursor: pointer;
+        display: block;
 
         button {
           cursor: pointer;

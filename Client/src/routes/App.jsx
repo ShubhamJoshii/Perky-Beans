@@ -25,13 +25,16 @@ const Notification = createContext();
 const App = () => {
   const [loadingScreen, setloadingScreen] = useState(false);
   const [userData, setUserData] = useState(null);
+
   const checkUserAlreadyLogin = async () => {
     await axios
       .get("/api/home")
       .then((result) => {
-        setUserData(result.data);
+        if(result.status){
+          setUserData(result.data.data);
+        }
       })
-      .catch(()=>{});
+      .catch(() => {});
   };
 
   useEffect(() => {

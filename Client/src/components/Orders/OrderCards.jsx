@@ -1,26 +1,30 @@
-import { useContext, useState } from "react";
+import {useContext, useState} from "react";
 import Image1 from "../../assets/Beverages/image (1).png";
-import { IoMdClose } from "react-icons/io";
-import { TailSpin,Oval } from 'react-loader-spinner';
+import {IoMdClose} from "react-icons/io";
+import {Oval} from "react-loader-spinner";
 import axios from "axios";
-import { Notification } from "../../routes/App";
-const OrderCards = ({ product, orderData, ids, userData, setUserData }) => {
+import {Notification} from "../../routes/App";
+const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
   const [trackShow, setTrackShow] = useState(null);
-  const [loadingShow,setLoadingShow] = useState(false);
-  const { checkUserAlreadyLogin, notification } = useContext(Notification);
+  const [loadingShow, setLoadingShow] = useState(false);
+  const {checkUserAlreadyLogin, notification} = useContext(Notification);
   const removeMyOrder = async (_id) => {
     setLoadingShow(true);
-    await axios.post("/api/cancelOrder", { productID: _id }).then((result) => {
-      if (result.data === "Product Ordered Cancelled") {
-        checkUserAlreadyLogin();
-      }
-      setLoadingShow(false);
-    }).catch(() => { });
+    await axios
+      .post("/api/cancelOrder", {productID: _id})
+      .then((result) => {
+        if (result.data === "Product Ordered Cancelled") {
+          checkUserAlreadyLogin();
+        }
+        setLoadingShow(false);
+      })
+      .catch(() => {});
   };
+
   return (
     <div id="orderProduct">
       <div id="orderCards">
-        <h4>ORDER ID : {Math.floor(Math.random() * 1000000) + 1000000}</h4>
+        <h4>ORDER ID : {orderData._id.slice(0, 10)}</h4>
         <h2>{product.Name}</h2>
         <div id="orders-Product">
           {orderData.SmallCount > 0 && (
@@ -53,28 +57,10 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData }) => {
         </div>
         <p id="orderDesc">{product.Desc.slice(0, 70)}...</p>
         <div id="btns">
-          <button onClick={() => removeMyOrder(orderData.productID)}>
-            {loadingShow ? 
-            <Oval
-              height="14"
-              width="14"
-              color="white"
-              wrapperStyle={{}}
-              wrapperClass=""
-              visible={true}
-              ariaLabel='oval-loading'
-              secondaryColor="white"
-              strokeWidth={6}
-              strokeWidthSecondary={6}
-            />
-            :
-            <>CANCEL</>
-            }
-          </button>
+          <button onClick={() => removeMyOrder(orderData.productID)}>{loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>CANCEL</>}</button>
           <button
             onClick={() => {
-              setTrackShow(null);
-              setTrackShow(orderData.productID);
+              orderData.productID === trackShow ? setTrackShow(null) : setTrackShow(orderData.productID);
             }}>
             TRACK YOUR ORDER
           </button>

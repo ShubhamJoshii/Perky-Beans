@@ -1,21 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { FaShoppingBag } from "react-icons/fa";
-import { IoIosClose } from "react-icons/io";
-import { MdOutlineArrowBackIos } from "react-icons/md";
-import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/ri";
-import { Oval } from 'react-loader-spinner';
+import {useEffect, useRef, useState} from "react";
+import {FaShoppingBag} from "react-icons/fa";
+import {IoIosClose} from "react-icons/io";
+import {MdOutlineArrowBackIos} from "react-icons/md";
+import {RiArrowDropUpLine, RiArrowDropDownLine} from "react-icons/ri";
+import {Oval} from "react-loader-spinner";
 import Image from "../../assets/Beverages/image (1).png";
-import { Notification, UserData } from "../../routes/App";
-import { useContext } from "react";
-import { Products } from "../../Data/ProductsJSON";
-import { NavLink, useNavigate } from "react-router-dom";
+import {Notification, UserData} from "../../routes/App";
+import {useContext} from "react";
+import {Products} from "../../Data/ProductsJSON";
+import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 const Bags = () => {
   const [showBag, setShowBag] = useState(false);
   const [showAmountDetails, setShowAmountDetail] = useState(null);
-  const { userData, setUserData } = useContext(UserData);
-  const { checkUserAlreadyLogin, notification } = useContext(Notification);
-  const [loadingShow,setloadingShow] = useState(false);
+  const {userData, setUserData} = useContext(UserData);
+  const {checkUserAlreadyLogin, notification} = useContext(Notification);
+  const [loadingShow, setloadingShow] = useState(false);
 
   let GrandTotal = 0;
   const ref = useRef(null);
@@ -33,7 +33,7 @@ const Bags = () => {
   }, [showBag]);
 
   const removeFromBag = async (_id) => {
-    await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
+    await axios.post("/api/removeFromBag", {productID: _id}).then((result) => {
       checkUserAlreadyLogin();
     });
   };
@@ -50,7 +50,7 @@ const Bags = () => {
       });
     }
     // setloadingShow(false);
-  }
+  };
 
   return (
     <>
@@ -99,7 +99,7 @@ const Bags = () => {
                               </div>
                             </div>
                           </div>
-                          <div id="Amount_Info_Show" style={showAmountDetails === ids ? { height: "100%" } : { height: "0" }}>
+                          <div id="Amount_Info_Show" style={showAmountDetails === ids ? {height: "100%"} : {height: "0"}}>
                             <div id="Amount_INFO">
                               <h4>TOTAL :</h4>
                               <div>
@@ -123,7 +123,7 @@ const Bags = () => {
                     })}
                   </>
                 ) : (
-                  <div id="productCart" style={{ textAlign: "center" }}>
+                  <div id="productCart" style={{textAlign: "center"}}>
                     No Item Found in Bag
                   </div>
                 )}
@@ -143,29 +143,17 @@ const Bags = () => {
             <div id="Bag-Total-Price">
               <h4>Grand Total : </h4>
               <h4>&#x20B9; {GrandTotal}</h4>
-
-              <button onClick={orderNow}>
-                {loadingShow ?
-                  <Oval
-                    height="14"
-                    width="14"
-                    color="white"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                    visible={true}
-                    ariaLabel='oval-loading'
-                    secondaryColor="white"
-                    strokeWidth={6}
-                    strokeWidthSecondary={6}
-                  /> :
-                  <>ORDER NOW</>
-                }
+              <button style={userData?.Bag.length > 0 ? {} : {background: "grey"}} onClick={orderNow}>
+                {loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>ORDER NOW</>}
               </button>
             </div>
           </div>
         </div>
       ) : (
-        <FaShoppingBag id="bagBTN" onClick={() => setShowBag(!showBag)} />
+        <div id="bagBTN">
+          <FaShoppingBag onClick={() => setShowBag(!showBag)} />
+          <p>{userData?.Bag.length}</p>
+        </div>
       )}
     </>
   );

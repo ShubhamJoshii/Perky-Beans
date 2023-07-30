@@ -7,8 +7,6 @@ import {LuVegan} from "react-icons/lu";
 import Veg from "../../assets/veg.png";
 import {Products} from "../../Data/ProductsJSON";
 import axios from "axios";
-// import CustomerReview from "../Landing/CustomerReview/CustomerReview";
-// import Footer from "../Footer/Footer";
 import {useParams} from "react-router-dom";
 import {useEffect} from "react";
 import {useState} from "react";
@@ -23,7 +21,7 @@ const ProductPage = () => {
   const [itemDetails, setItemDetails] = useState({});
   let itemShow = useParams().productID;
   const {userData, setUserData} = useContext(UserData);
-  const {checkUserAlreadyLogin} = useContext(Notification);
+  const {checkUserAlreadyLogin, notification} = useContext(Notification);
 
   useEffect(() => {
     // console.log("reload");
@@ -85,21 +83,25 @@ const ProductPage = () => {
 
   const addToBag = async (_id) => {
     let b = userData.Bag.find((e) => e.productID === _id);
-    if (b) {
-      await axios.post("/api/updateBag", {productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2}).then((result) => {
-        checkUserAlreadyLogin();
-      });
-    } else {
-      await axios
-        .post("/api/addtoBag", {
-          productID: _id,
-          SmallCount: 0,
-          MediumCount: 1,
-          LargeCount: 0,
-        })
-        .then((result) => {
+    if (counter0 || counter1 || counter2 > 0) {
+      if (b) {
+        await axios.post("/api/updateBag", {productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2}).then((result) => {
           checkUserAlreadyLogin();
         });
+      } else {
+        await axios
+          .post("/api/addtoBag", {
+            productID: _id,
+            SmallCount: counter0,
+            MediumCount: counter1,
+            LargeCount: counter2,
+          })
+          .then((result) => {
+            checkUserAlreadyLogin();
+          });
+      }
+    } else {
+      notification("firstly, Select Size");
     }
   };
   return (
@@ -165,7 +167,7 @@ const ProductPage = () => {
                   <div className="total">
                     <h1>Total Amount &#x20B9; {total}</h1>
                   </div>
-                  <button className="order" onClick={() => addToBag(itemDetails._id)}>
+                  <button className="order" style={counter0 || counter1 || counter2 > 0 ? {} : {background: "grey"}} onClick={() => addToBag(itemDetails._id)}>
                     Add to Bag
                   </button>
                 </div>

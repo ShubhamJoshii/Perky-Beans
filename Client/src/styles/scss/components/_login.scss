@@ -1,12 +1,11 @@
 @use "../abstracts/" as *;
 
 #Login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include flexMixin();
   min-height: 100vh;
   margin-top: 10px;
   flex-direction: column;
+  
 
   h1 {
     text-align: center;
@@ -80,7 +79,10 @@
       }
     }
 
-    input[type="button"] {
+    input[type="button"],
+    .loading {
+      // ma
+      @include flexMixin();
       background-color: #ecb014;
       color: #ffffff;
       width: 100%;
@@ -97,6 +99,9 @@
       }
     }
 
+    .loading {
+      padding: 10px 0 !important;
+    }
     .no-account {
       @include flexMixin();
       font-size: 12px;

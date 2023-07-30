@@ -7,30 +7,24 @@ const Authenication = require("./Authenication");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
-// host: "smtp-m/ail.outlook.com",
+// let addRoute = "/";
+let addRoute = "/api/";
 
-// let transporter = nodemailer.createTransport({
-//     host: "smtp.forwardemail.net",
-//     auth: {
-//         user: process.env.AUTH_EMAIL,
-//         pass: process.env.AUTH_PASS,
-//     }
-// })
-
-
-
-
-router.get("/api/home", Authenication, async (req, res) => {
-    res.send(req.rootUser);
+router.get(`${addRoute}home`, Authenication, async (req, res) => {
+    if(req.rootUser){
+        res.send({data:req.rootUser,status:true});
+    }else{
+        res.send({status:false});
+    }
 });
 
-router.get("/api/logout", Authenication, async (req, res) => {
+router.get(`${addRoute}logout`, Authenication, async (req, res) => {
     res.clearCookie("perkyBeansToken", { path: "/" });
     res.status(200).send("User Logout");
     // res.send(req.rootUser);
 });
 
-router.post("/api/register", async (req, res) => {
+router.post(`${addRoute}register`, async (req, res) => {
     const { Full_Name, Email, Password, Confirm_Password } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -48,7 +42,7 @@ router.post("/api/register", async (req, res) => {
     }
 })
 
-router.post("/api/login", async (req, res) => {
+router.post(`${addRoute}login`, async (req, res) => {
     const { Email, Password, Login_Date } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -73,7 +67,7 @@ router.post("/api/login", async (req, res) => {
     } catch (err) { }
 })
 
-router.post("/api/addToWishlist", Authenication, async (req, res) => {
+router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -85,7 +79,7 @@ router.post("/api/addToWishlist", Authenication, async (req, res) => {
     }
 })
 
-router.post("/api/removefromWishlist", Authenication, async (req, res) => {
+router.post(`${addRoute}removefromWishlist`, Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -97,7 +91,7 @@ router.post("/api/removefromWishlist", Authenication, async (req, res) => {
     }
 })
 
-router.post("/api/updateBag", Authenication, async (req, res) => {
+router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
     const { productID, SmallCount, MediumCount, LargeCount } = req.body;
     // console.log(req.body);
     try {
@@ -110,7 +104,7 @@ router.post("/api/updateBag", Authenication, async (req, res) => {
         console.log(err);
     }
 })
-router.post("/api/addtoBag", Authenication, async (req, res) => {
+router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
     const { productID, SmallCount, MediumCount, LargeCount } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -122,7 +116,7 @@ router.post("/api/addtoBag", Authenication, async (req, res) => {
     }
 })
 
-router.post("/api/removeFromBag", Authenication, async (req, res) => {
+router.post(`${addRoute}removeFromBag`, Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -135,8 +129,9 @@ router.post("/api/removeFromBag", Authenication, async (req, res) => {
 })
 
 
-router.post('/api/orderNow', Authenication, async (req, res) => {
-    // console.log(req.rootUser);
+router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
+    console.log(Date.now());
+    let orderedAt = Date.now();
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
         userExist.Orders = await userExist.Orders.concat(...userExist.Bag);
@@ -147,7 +142,7 @@ router.post('/api/orderNow', Authenication, async (req, res) => {
         console.log(err);
     }
 })
-router.post('/api/cancelOrder', Authenication, async (req, res) => {
+router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
     const { productID } = req.body;
     try {
         const userExist = await DBModel.findOne({ _id: req.userID });
@@ -159,7 +154,7 @@ router.post('/api/cancelOrder', Authenication, async (req, res) => {
     }
 })
 
-router.post("/api/forgetPassword/sendOTP", async (req, res) => {
+router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
     const { Email } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
@@ -202,12 +197,14 @@ router.post("/api/forgetPassword/sendOTP", async (req, res) => {
                 subject: "Verify Your Email",
                 html: mail
             }
-
+            
             await otpDBSave.save();
-            await transporter.sendMail(message).then(() => {
-                return res.json({ status: true, message: "Verification OTP email sent" })
-            }).catch(() => {
-                return res.json({ message: "OTP Generation Error" })
+            await new Promise((resolve, reject) => {
+                transporter.sendMail(message).then(() => {
+                    return res.json({ status: true, message: "Verification OTP email sent" })
+                }).catch(() => {
+                    return res.json({ message: "OTP Generation Error" })
+                });
             });
         } else {
             res.send({ message: "Email is not Registered" })
@@ -218,22 +215,25 @@ router.post("/api/forgetPassword/sendOTP", async (req, res) => {
     }
 })
 
-router.post("/api/forgetPassword/otpVerify", async (req, res) => {
+router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
     const { Email, OTP } = req.body;
     try {
         const userExist = await DBModel.findOne({ Email });
         const userOTPFind = await OTPVerfication.find({ userID: userExist._id })
         const { expiresAt } = userOTPFind[0];
+        // console.log(userExist,userOTPFind);
         const hashedOTP = userOTPFind[0].OTP;
         if (expiresAt < Date.now()) {
             await OTPVerfication.deleteMany({ userID: userExist._id });
             res.send({ status: false, message: "OTP is expired. Please request Again" })
         } else {
-            let validOTP = bcrypt.compare(OTP, hashedOTP);
-            if (!validOTP) {
-                res.send({ status: false, message: "Invalid OTP. Please Try Again" });
-            } else {
+            // const password_Match = await bcrypt.compare(Password, userExist.Password);
+            let validOTP = await bcrypt.compare(OTP, hashedOTP);
+            console.log(validOTP,hashedOTP,OTP);
+            if (validOTP) {
                 res.send({ status: true, message: "Valid OTP. Enter New Password" });
+            } else {
+                res.send({ status: false, message: "Invalid OTP. Please Try Again" });
             }
         }
     } catch (error) {
@@ -241,7 +241,7 @@ router.post("/api/forgetPassword/otpVerify", async (req, res) => {
     }
 });
 
-router.post("/api/forgetPassword/updatePassword", async (req, res) => {
+router.post(`${addRoute}forgetPassword/updatePassword`, async (req, res) => {
     const { Email, OTP, Password, Confirm_Password } = req.body;
     // console.log(req.body);
     try {

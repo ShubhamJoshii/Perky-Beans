@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect, useContext} from "react";
 import RandomUser from "../../assets/RandomUser.png";
 import Logo from "../../assets/PerkyBeansLogo.png";
-
+import {Oval} from "react-loader-spinner";
 import {IoMdMenu} from "react-icons/io";
 import {MdClose} from "react-icons/md";
 import {NavLink} from "react-router-dom";
@@ -10,6 +10,7 @@ import axios from "axios";
 import {Notification, UserData} from "../../routes/App";
 const Header = () => {
   const [menuShown, setMenuShow] = useState(false);
+  const [loadingShow, setLoadingShow] = useState(false);
   const menuRef = useRef(0);
   const {userData, setUserData} = useContext(UserData);
   const {notification} = useContext(Notification);
@@ -18,10 +19,16 @@ const Header = () => {
   }, [menuShown]);
 
   const logoutBTN = async () => {
+    setLoadingShow(true);
     await axios.get("/api/logout").then((result) => {
-      notification(result.data);
-      setUserData(null);
+      if (result.data) {
+        notification(result.data);
+        setUserData(null);
+      }
     });
+    setTimeout(() => {
+      setLoadingShow(false);
+    }, 1000);
   };
 
   return (
@@ -47,7 +54,7 @@ const Header = () => {
           <div id="LOGINRegister">
             {userData ? (
               <a onClick={logoutBTN}>
-                <button id="loginRegisterHeader">LOGOUT</button>
+                <button id="loginRegisterHeader">{loadingShow ? <Oval height="16" width="16" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>LOGOUT</>}</button>
               </a>
             ) : (
               <NavLink to="/login" ClassName="active">

@@ -90,6 +90,10 @@ const DBSchema = new mongoose.Schema({
         type: Number,
         require: true,
       },
+      orderedAt:{
+        type:Date,
+        require:true
+      }
     },
   ],
   Tokens: [

@@ -16,7 +16,7 @@ const Authenication = async (req,res,next)=>{
         next();
     }catch(err){
         console.log("Authenication Error User is Not Logged-in");
-        res.status(401).send("Unauthorized:No token provided");
+        res.status(401).send({message:"Unauthorized:No token provided"});
     }
 }
 

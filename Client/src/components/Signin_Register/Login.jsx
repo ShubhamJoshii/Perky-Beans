@@ -6,6 +6,7 @@ import Header from "../Header/Header";
 import {UserData, Notification} from "../../routes/App";
 import {useContext} from "react";
 import {useNavigate} from "react-router-dom";
+import {Oval} from "react-loader-spinner";
 import axios from "axios";
 const Login = () => {
   const [loginData, setLoginData] = useState({
@@ -13,8 +14,8 @@ const Login = () => {
     Password: "",
   });
   const [passwordShow, setPasswordShow] = useState(false);
-  const {userData, setUserData} = useContext(UserData);
   const {notification, checkUserAlreadyLogin} = useContext(Notification);
+  const [loadingShow, setloadingShow] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     passwordShow ? (document.getElementById("Password").type = "text") : (document.getElementById("Password").type = "password");
@@ -28,6 +29,7 @@ const Login = () => {
 
   const submitLogin = async (e) => {
     e.perventDefault;
+    setloadingShow(true);
     if (loginData.Email && loginData.Password.length >= 8) {
       await axios
         .post("/api/login", loginData)
@@ -37,11 +39,13 @@ const Login = () => {
             setTimeout(() => {
               checkUserAlreadyLogin();
               navigate("/");
+              setloadingShow(false);
             }, 1000);
           }
         })
         .catch((err) => {
-          console.log(err);
+          // console.log(err);
+          setloadingShow(false);
         });
     }
     if (loginData.Password.length < 8) {
@@ -73,7 +77,7 @@ const Login = () => {
             <NavLink to="./forgetpassword">Forgot Password?</NavLink>
             {/* <a href="#" className="forgot-password">Forgot Password?</a> */}
           </div>
-          <input type="button" value="LOGIN" onClick={submitLogin} />
+          {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> : <input type="button" value="LOGIN" onClick={submitLogin} />}
           <div className="no-account">
             <p>Don't have an account?</p>
             <NavLink to="/Register" ClassName="active">

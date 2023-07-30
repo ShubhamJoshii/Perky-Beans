@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { AiOutlineClose, AiOutlineRight } from "react-icons/ai";
+import {useState} from "react";
+import {AiOutlineClose, AiOutlineRight} from "react-icons/ai";
 
 const FilterTypes = [
   {
@@ -59,7 +59,7 @@ const FilterTypes = [
   },
 ];
 
-const Filter = ({ showFilterBox, setShowFilterBox }) => {
+const Filter = ({showFilterBox, setShowFilterBox}) => {
   const [showFilters, setShowFilters] = useState(1);
   // const [showFilterBox, setShowFilterBox] = useState(false);
   return (
@@ -97,7 +97,7 @@ const Filter = ({ showFilterBox, setShowFilterBox }) => {
                         <div className="filter-types-options-item" key={option}>
                           {type.input.map((input) => {
                             return (
-                              <div className="filter-types-options-item-input" key={input.name} style={showFilters === type.id ? { display: "block" } : { display: "none" }}>
+                              <div className="filter-types-options-item-input" key={input.name} style={showFilters === type.id ? {display: "block"} : {display: "none"}}>
                                 <input type={input.type} name={input.name} id={option} className="checkmark" />
                                 <label htmlFor={option}>{option}</label>
                               </div>

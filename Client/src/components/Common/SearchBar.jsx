@@ -40,7 +40,7 @@ const SearchBar = ({position, currPlace, bgColor}) => {
       </div>
       <Filter showFilterBox={showFilterBox} setShowFilterBox={setShowFilterBox} />
       <div id="SearchProductsContainer">
-        {searchOutput?.map((curr,id) => {
+        {searchOutput?.map((curr, id) => {
           let a;
           currPlace === "home" ? (a = `/products/${curr.Category}/${curr._id}`) : (a = `/products/${curr.Category}/${curr._id}`);
           return (

@@ -50,7 +50,7 @@ const Orders = () => {
               <>
                 {userData?.Orders.length > 0 ? (
                   <div id="orderCardsContainer">
-                    {userData?.Orders?.map((curr, ids) => {
+                    {userData?.Orders?.toReversed().map((curr, ids) => {
                       const product = Products.find((e) => e._id === curr.productID);
                       return <OrderCards product={product} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
                     })}
@@ -64,7 +64,7 @@ const Orders = () => {
                 {userData?.Wishlist.length > 0 ? (
                   <div id="wishlist">
                     <div id="orderCardsContainer">
-                      {userData?.Wishlist?.map((curr, ids) => {
+                      {userData?.Wishlist?.toReversed().map((curr, ids) => {
                         // console.log(curr);
                         const product = Products.find((e) => e._id === curr.productID);
                         return <WishlistCards product={product} orderData={curr} key={curr + ids} userData={userData} setUserData={setUserData} />;

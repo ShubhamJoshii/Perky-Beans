@@ -4,13 +4,28 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  font-size: 45px;
-  background-color: #ecb014;
-  border-radius: 50%;
-  padding: 10px;
-  cursor: pointer;
   z-index: 99;
-  transition: all 3s ease-in-out;
+  cursor: pointer;
+  svg {
+    font-size: 45px;
+    background-color: #ecb014;
+    border-radius: 50%;
+    padding: 10px;
+    transition: all 3s ease-in-out;
+  }
+  p {
+    @include flexMixin();
+    width: 14px;
+    height: 14px;
+    letter-spacing: 0;
+    font-size: 10px;
+    // aspect-ratio: 1;
+    position: absolute;
+    top: -0px;
+    right: 0px;
+    background-color: red;
+    border-radius: 50%;
+  }
 }
 
 #BagSliderContainer {
