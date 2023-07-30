@@ -8,6 +8,9 @@ import {useContext} from "react";
 import {Loading, Notification, UserData} from "../../routes/App";
 import axios from "axios";
 
+import {LuVegan} from "react-icons/lu";
+import Veg from "../../assets/veg.png";
+
 function shuffleArray(array) {
   for (var i = array.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -124,9 +127,10 @@ const ProductsCatalogue = () => {
           } else {
             a = `./${product.Category}/${product._id}`;
           }
-
+          // console.log(product.type);
           return (
             <div className="product-card" key={product._id}>
+              {product.type === "Veg" ? <img id="veg" src={Veg} alt="Veg" /> : <LuVegan id="LuVegan" />}
               <div id="product-img-BTN">
                 <AiFillHeart onClick={() => addToWishlist(product._id)} className={userData?.Wishlist.find((e) => e.productID === product._id) ? "active-Heart heart" : " heart"} />
                 <br />

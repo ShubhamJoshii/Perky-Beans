@@ -1,11 +1,21 @@
-import {useState} from "react";
+import { useContext, useState } from "react";
 import Image1 from "../../assets/Beverages/image (1).png";
-import {IoMdClose} from "react-icons/io";
-const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
+import { IoMdClose } from "react-icons/io";
+import { TailSpin,Oval } from 'react-loader-spinner';
+import axios from "axios";
+import { Notification } from "../../routes/App";
+const OrderCards = ({ product, orderData, ids, userData, setUserData }) => {
   const [trackShow, setTrackShow] = useState(null);
-  const removeMyOrder = () => {
-    let a = userData.Orders.filter((e) => e._id !== product._id);
-    setUserData({...userData, Orders: a});
+  const [loadingShow,setLoadingShow] = useState(false);
+  const { checkUserAlreadyLogin, notification } = useContext(Notification);
+  const removeMyOrder = async (_id) => {
+    setLoadingShow(true);
+    await axios.post("/api/cancelOrder", { productID: _id }).then((result) => {
+      if (result.data === "Product Ordered Cancelled") {
+        checkUserAlreadyLogin();
+      }
+      setLoadingShow(false);
+    }).catch(() => { });
   };
   return (
     <div id="orderProduct">
@@ -13,7 +23,7 @@ const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
         <h4>ORDER ID : {Math.floor(Math.random() * 1000000) + 1000000}</h4>
         <h2>{product.Name}</h2>
         <div id="orders-Product">
-          {orderData.SmallCount && (
+          {orderData.SmallCount > 0 && (
             <div>
               <img src={product.Image} alt="ProductImg" />
               <p>REGULAR</p>
@@ -22,7 +32,7 @@ const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
               </p>
             </div>
           )}
-          {orderData.MediumCount && (
+          {orderData.MediumCount > 0 && (
             <div>
               <img src={product.Image} alt="ProductImg" />
               <p>MEDIUM</p>
@@ -31,7 +41,7 @@ const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
               </p>
             </div>
           )}
-          {orderData.LargeCount && (
+          {orderData.LargeCount > 0 && (
             <div>
               <img src={product.Image} alt="ProductImg" />
               <p>REGULAR</p>
@@ -43,17 +53,34 @@ const OrderCards = ({product, orderData, ids, userData, setUserData}) => {
         </div>
         <p id="orderDesc">{product.Desc.slice(0, 70)}...</p>
         <div id="btns">
-          <button onClick={removeMyOrder}>CANCEL</button>
+          <button onClick={() => removeMyOrder(orderData.productID)}>
+            {loadingShow ? 
+            <Oval
+              height="14"
+              width="14"
+              color="white"
+              wrapperStyle={{}}
+              wrapperClass=""
+              visible={true}
+              ariaLabel='oval-loading'
+              secondaryColor="white"
+              strokeWidth={6}
+              strokeWidthSecondary={6}
+            />
+            :
+            <>CANCEL</>
+            }
+          </button>
           <button
             onClick={() => {
               setTrackShow(null);
-              setTrackShow(orderData._id);
+              setTrackShow(orderData.productID);
             }}>
             TRACK YOUR ORDER
           </button>
         </div>
       </div>
-      {trackShow === orderData._id ? (
+      {trackShow === orderData.productID ? (
         <div className="track-order">
           <IoMdClose id="closeICON" onClick={() => setTrackShow(null)} />
           <h3>TRACK YOUR ORDER</h3>

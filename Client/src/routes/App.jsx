@@ -25,41 +25,20 @@ const Notification = createContext();
 const App = () => {
   const [loadingScreen, setloadingScreen] = useState(false);
   const [userData, setUserData] = useState(null);
-  // const [userData, setUserData] = useState({
-  //   Info: {Name: "Shubahm Joshi", Email: "perkybeans@gmail.com", Password: "11111111", logined: false},
-  //   Wishlist: [
-  //     {_id: "b7a11a2b", SmallCount: "1", MediumCount: "2", LargeCount: "2"},
-  //     {_id: "72743d51", SmallCount: "3", MediumCount: "", LargeCount: ""},
-  //   ],
-  //   Bag: [
-  //     {_id: "c4a9eb73", SmallCount: "1", MediumCount: "2", LargeCount: "2"},
-  //     {_id: "607fd102", SmallCount: "3", MediumCount: "", LargeCount: ""},
-  //   ],
-  //   Orders: [
-  //     {_id: "1c8d2fc3", SmallCount: "1", MediumCount: "2", LargeCount: "2"},
-  //     {_id: "b93d9e0b", SmallCount: "3", MediumCount: "", LargeCount: ""},
-  //     {_id: "26fdd41a", SmallCount: "1", MediumCount: "2", LargeCount: "2"},
-  //     {_id: "80be2cd7", SmallCount: "1", MediumCount: "2", LargeCount: "2"},
-  //   ],
-  // });
-
   const checkUserAlreadyLogin = async () => {
     await axios
       .get("/api/home")
       .then((result) => {
-        console.log(result.data);
         setUserData(result.data);
       })
-      .catch((err) => {
-        // console.log("Error")
-      });
+      .catch(()=>{});
   };
 
   useEffect(() => {
     checkUserAlreadyLogin();
   }, []);
 
-  const notification = (notiText, navigateTO) => {
+  const notification = (notiText) => {
     toast.success(notiText, {
       position: "bottom-right",
       autoClose: 1000,

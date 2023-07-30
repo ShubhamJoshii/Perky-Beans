@@ -55,18 +55,15 @@
       border-radius: 10px;
       overflow: hidden;
       flex-wrap: wrap;
-      // align-self: normal;
       width: 420px;
-      // min-height: 380px;
-      padding-bottom: 45px;
-      position: relative;
+      // padding-bottom: 45px;
       // position: relative;
-      // padding-bottom: 30px;
-
+      
       #orderCards {
         padding: 15px;
+        padding-bottom: 55px;
         width: 400px;
-
+        position: relative;
         h4,
         h2 {
           text-align: center;
@@ -103,13 +100,13 @@
         }
 
         #btns {
-          @include flexMixin();
+          @include flexMixin(normal);
           gap: 20px;
           font-size: 12px;
           margin-top: 20px;
           position: absolute;
           bottom: 10px;
-          width: 100%;
+          width: 94%;
           margin: auto;
           // width: calc(100% - 22px);
           // margin-left: 17px;
@@ -296,8 +293,9 @@
           }
 
           #btns {
+            @include flexMixin(normal);
             font-size: 12px;
-
+            // align-self: normal;
             button {
               padding: 5px 15px;
             }
@@ -368,13 +366,13 @@
   left: 20px;
   width: 80px;
   animation-name: scooterAnimation;
-  animation-duration: 3s;
+  animation-duration: 15s;
   animation-iteration-count: infinite;
 }
 
 @keyframes scooterAnimation {
   from {
-    left: 100px;
+    left: 90vw;
   }
 
   to {

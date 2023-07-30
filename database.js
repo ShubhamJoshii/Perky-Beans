@@ -102,6 +102,13 @@ const DBSchema = new mongoose.Schema({
   ],
 });
 
+const UserOTPVerification = new mongoose.Schema({
+  userID:String,
+  OTP:String,
+  createdAt:Date,
+  expiresAt:Date
+})
+
 
 DBSchema.pre("save", async function (next) {
   if (this.isModified("Password")) {
@@ -136,5 +143,6 @@ DBSchema.methods.generateAuthToken = async function () {
 
 
 const DBModel = mongoose.model("User_Register", DBSchema);
+const OTPVerfication = mongoose.model("OTP_Verification",UserOTPVerification)
 
-module.exports = { DBModel };
+module.exports = { DBModel,OTPVerfication };

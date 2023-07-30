@@ -5,12 +5,55 @@ import {MdEmail} from "react-icons/md";
 import {Notification, UserData} from "../../routes/App";
 import {useContext} from "react";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 const ForgotPassword = () => {
-  const [forgetData, setforgetData] = useState();
+  const [forgetData, setforgetData] = useState({
+    Email:"",
+    OTP:"",
+    Password:"",
+    Confirm_Password:""
+  });
   const [forgetBTN, setforgetBTN] = useState(0);
   const {userData, setUserData} = useContext(UserData);
   const {notification} = useContext(Notification);
   const navigate = useNavigate();
+  const sendOTP = async(e)=>{
+    await axios.post("/api/forgetPassword/sendOTP",{Email:forgetData.Email}).then((result)=>{
+      // alert(result.data);
+      notification(result.data.message);
+      if(result.data?.status){
+        setforgetBTN(1);
+      }
+    }).catch(()=>{})
+  }
+
+  const otpVerify = async() => {
+    await axios.post("/api/forgetPassword/otpVerify",{Email:forgetData.Email,OTP:forgetData.OTP}).then((result)=>{
+      notification(result.data.message);
+      if(result.data?.status){
+        setforgetBTN(2);
+      }
+    })
+  }
+  
+  const updatePassword = async() => {
+    await axios.post("/api/forgetPassword/updatePassword",{Email:forgetData.Email,OTP:forgetData.OTP,Password:forgetData.Password,Confirm_Password:forgetData.Confirm_Password}).then((result)=>{
+      notification(result.data.message);
+      if(result.data?.status){
+        navigate("/login");
+        // setforgetBTN(2);
+      }
+    })  
+    // if (forgetData.Password === forgetData.Confirm_Password && forgetData.Confirm_Password.length >= 8) {
+    //   notification("User Password Change");
+    //   navigate("/Login");
+    // } else if (forgetData.Password !== forgetData.Confirm_Password) {
+    //   notification("User Password and Confirm Password not Matched");
+    // } else if (forgetData.Password.length < 8) {
+    //   notification("Password length should be greater than and equal to 8");
+    // }
+  };
+  
   return (
     <>
       <Header />
@@ -23,50 +66,38 @@ const ForgotPassword = () => {
           <>
             <div>
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" placeholder="Enter your email" onChange={(e) => setforgetData(e.target.value)} />
+              <input type="email" id="email" name="email" placeholder="Enter your email" onChange={(e) => setforgetData({Email:e.target.value})} />
             </div>
             <input
               type="button"
               value="SEND OTP"
               className="otp-link"
-              onClick={() => {
-                if (forgetData === userData.Info.Email) {
-                  notification("OTP send to EMAIL ID");
-                  setforgetBTN(1);
-                } else {
-                  notification("User Not Registered");
-                }
-              }}
+              onClick={sendOTP}
             />
           </>
         )}
         {forgetBTN === 1 && (
           <>
             <span>
-              <MdEmail /> {userData.Info.Email} <pre onClick={() => setforgetBTN(0)}>(edit)</pre>
+              <MdEmail /> {forgetData.Email} <pre onClick={() => setforgetBTN(0)}>(edit)</pre>
             </span>
             <div>
               <label htmlFor="email">OTP:</label>
-              <input type="number" id="otp" name="otp" placeholder="Enter OTP" onChange={(e) => setforgetData(e.target.value)} />
+              <input type="number" id="otp" name="otp" placeholder="Enter OTP" onChange={(e) => setforgetData({...forgetData,OTP:e.target.value})} />
+              <p id="resendOTP" onClick={sendOTP}>RESEND OTP</p>
             </div>
             <input
               type="button"
               value="SEND OTP"
               className="otp-link"
-              onClick={() => {
-                if (forgetData.length === 6) {
-                  setforgetBTN(2);
-                } else {
-                  notification("Entered OTP is wrong");
-                }
-              }}
+              onClick={otpVerify}
             />
           </>
         )}
         {forgetBTN === 2 && (
           <>
             <span>
-              <MdEmail /> {userData.Info.Email} <pre onClick={() => setforgetBTN(0)}>(edit)</pre>
+              <MdEmail /> {forgetData.Email} <pre onClick={() => setforgetBTN(0)}>(edit)</pre>
             </span>
             <div>
               <label htmlFor="email">Enter New Password:</label>
@@ -80,16 +111,7 @@ const ForgotPassword = () => {
               type="button"
               value="CONFIRM PASSWORD"
               className="otp-link"
-              onClick={() => {
-                if (forgetData.Password === forgetData.Confirm_Password && forgetData.Confirm_Password.length >= 8) {
-                  notification("User Password Change");
-                  navigate("/Login");
-                } else if (forgetData.Password !== forgetData.Confirm_Password) {
-                  notification("User Password and Confirm Password not Matched");
-                } else if (forgetData.Password.length < 8) {
-                  notification("Password length should be greater than and equal to 8");
-                }
-              }}
+              onClick={updatePassword}
             />
           </>
         )}

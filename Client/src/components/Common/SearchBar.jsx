@@ -40,11 +40,11 @@ const SearchBar = ({position, currPlace, bgColor}) => {
       </div>
       <Filter showFilterBox={showFilterBox} setShowFilterBox={setShowFilterBox} />
       <div id="SearchProductsContainer">
-        {searchOutput?.map((curr) => {
+        {searchOutput?.map((curr,id) => {
           let a;
           currPlace === "home" ? (a = `/products/${curr.Category}/${curr._id}`) : (a = `/products/${curr.Category}/${curr._id}`);
           return (
-            <div id="SearchProducts">
+            <div id="SearchProducts" key={curr.Category + id}>
               <NavLink to={a}>
                 <div onClick={() => window.scrollTo({top: 0, left: 0, behavior: "smooth"})}>
                   <img src={curr.Image} alt={curr.Name} />
