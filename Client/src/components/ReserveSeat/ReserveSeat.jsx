@@ -1,10 +1,41 @@
-import React from "react";
+import React, {useState, useContext} from "react";
 import MANWOMENDinning from "../../assets/ManWomenDining.png";
 import {BsTelephoneFill} from "react-icons/bs";
 import {BiCalendar, BiSolidTimeFive} from "react-icons/bi";
 import {FaUserAlt} from "react-icons/fa";
-// import <Ba></Ba>ckground from "../../assets/ManWomenDining.png"
+import axios from "axios";
+import {Oval} from "react-loader-spinner";
+import {Notification} from "../../routes/App";
 const ReserveSeat = () => {
+  const [loadingShow, setloadingShow] = useState(false);
+  const [reserveData, setReserveData] = useState({
+    Contact_Number: null,
+    Person_Count: null,
+    Date: null,
+    Timing: null,
+  });
+  const {notification} = useContext(Notification);
+  const handleInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setReserveData({...reserveData, [name]: value});
+  };
+
+  const submitReseveSeat = async (e) => {
+    e.preventDefault();
+    setloadingShow(true);
+    await axios
+      .post("/api/reserveSeat", reserveData)
+      .then((result) => {
+        notification(result.data.message);
+        setloadingShow(false);
+      })
+      .catch(() => {
+        setTimeout(() => setloadingShow(false), [1000]);
+        notification("Please Login before Reserving Seat");
+      });
+  };
+
   return (
     <React.Fragment>
       <div className="ReserveImage">
@@ -12,26 +43,32 @@ const ReserveSeat = () => {
           <div className="ReserveSeat">
             <div className="BlurBackground"></div>
             <div id="ReseverSeatForm">
-              <form>
+              <form onSubmit={submitReseveSeat}>
                 <div>
                   <BsTelephoneFill />
-                  <input type="number" placeholder="YOUR NUMBER" />
+                  <input type="number" placeholder="YOUR NUMBER" name="Contact_Number" value={reserveData.Contact_Number} onChange={handleInput} />
                 </div>
                 <div>
                   <FaUserAlt />
-                  <input type="text" placeholder="PERSONS" />
+                  <input type="text" placeholder="PERSONS" name="Person_Count" value={reserveData.Person_Count} onChange={handleInput} />
                 </div>
                 <div>
                   <BiCalendar />
                   {/* <input type='text' placeholder='SELECT DATE'/> */}
-                  <input type="date" placeholder="SELECT DATE" />
+                  <input type="date" placeholder="SELECT DATE" name="Date" value={reserveData.Date} onChange={handleInput} />
                 </div>
                 <div>
                   <BiSolidTimeFive />
                   {/* <input type='text' placeholder='SELECT TIME'/> */}
-                  <input type="time" placeholder="SELECT TIME" />
+                  <input type="time" placeholder="SELECT TIME" name="Timing" value={reserveData.Timing} onChange={handleInput} />
                 </div>
-                <button>BOOK NOW</button>
+                {loadingShow ? (
+                  <button>
+                    <Oval height="28" width="28" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} />
+                  </button>
+                ) : (
+                  <button>BOOK NOW</button>
+                )}
               </form>
               <div id="SecondHALF">
                 <h2>

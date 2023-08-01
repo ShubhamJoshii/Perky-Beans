@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { DBModel, OTPVerfication } = require("./database");
+const { DBModel, OTPVerfication, ContactModel,ReserveSeatModel } = require("./database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Authenication = require("./Authenication");
@@ -11,10 +11,10 @@ const Mailgen = require("mailgen");
 let addRoute = "/api/";
 
 router.get(`${addRoute}home`, Authenication, async (req, res) => {
-    if(req.rootUser){
-        res.send({data:req.rootUser,status:true});
-    }else{
-        res.send({status:false});
+    if (req.rootUser) {
+        res.send({ data: req.rootUser, status: true });
+    } else {
+        res.send({ status: false });
     }
 });
 
@@ -65,6 +65,44 @@ router.post(`${addRoute}login`, async (req, res) => {
             res.send("User Email is not registed");
         }
     } catch (err) { }
+})
+
+router.post(`${addRoute}contact`, async (req, res) => {
+    const { _id, Name, Email, type, Contact_Number, Description } = req.body;
+    console.log(req.body);
+    let UserRegistered = false;
+    try{
+        const userExist = DBModel.findOne({_id});
+        if(_id && userExist){
+            UserRegistered = true;
+        } else{
+            UserRegistered = false;
+        }
+        const contactData = new ContactModel({ Name, Email, type, Contact_Number, Description,UserRegistered});
+        await contactData.save();
+        res.send({message:"Contact Message"});
+    }catch(err){
+        res.send({message:"Contact Message Error"});
+        console.log(err);
+    }
+})
+
+router.post(`${addRoute}reserveSeat`,Authenication, async (req, res) => {
+    const { Contact_Number, Person_Count, Date, Timing } = req.body;
+    console.log(req.body);
+    try{
+        const userExist = DBModel.findOne({_id:req.userID});
+        if( userExist){
+            const contactData = new ReserveSeatModel({ User_ID:req.userID, Contact_Number, Person_Count, Date, Timing });
+            await contactData.save();
+            res.send({message:"Seat Reserved"});
+        } else{
+            res.send({message:"Please Login"});
+        }
+    }catch(err){
+        res.send({message:"Seat Reserved Error"});
+        // console.log(err);
+    }
 })
 
 router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
@@ -127,7 +165,6 @@ router.post(`${addRoute}removeFromBag`, Authenication, async (req, res) => {
         console.log(err);
     }
 })
-
 
 router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
     console.log(Date.now());
@@ -197,7 +234,7 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
                 subject: "Verify Your Email",
                 html: mail
             }
-            
+
             await otpDBSave.save();
             await new Promise((resolve, reject) => {
                 transporter.sendMail(message).then(() => {
@@ -221,7 +258,6 @@ router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
         const userExist = await DBModel.findOne({ Email });
         const userOTPFind = await OTPVerfication.find({ userID: userExist._id })
         const { expiresAt } = userOTPFind[0];
-        // console.log(userExist,userOTPFind);
         const hashedOTP = userOTPFind[0].OTP;
         if (expiresAt < Date.now()) {
             await OTPVerfication.deleteMany({ userID: userExist._id });
@@ -229,8 +265,9 @@ router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
         } else {
             // const password_Match = await bcrypt.compare(Password, userExist.Password);
             let validOTP = await bcrypt.compare(OTP, hashedOTP);
-            console.log(validOTP,hashedOTP,OTP);
+            console.log(validOTP, hashedOTP, OTP);
             if (validOTP) {
+                await OTPVerfication.deleteMany({ userID: userExist._id });
                 res.send({ status: true, message: "Valid OTP. Enter New Password" });
             } else {
                 res.send({ status: false, message: "Invalid OTP. Please Try Again" });
@@ -256,5 +293,6 @@ router.post(`${addRoute}forgetPassword/updatePassword`, async (req, res) => {
     }
 
 })
+
 
 module.exports = router;

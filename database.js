@@ -18,7 +18,7 @@ mongoose
     console.log("Database ERROR", err);
   });
 
-  
+
 const DBSchema = new mongoose.Schema({
   Full_Name: {
     type: String,
@@ -90,9 +90,9 @@ const DBSchema = new mongoose.Schema({
         type: Number,
         require: true,
       },
-      orderedAt:{
-        type:Date,
-        require:true
+      orderedAt: {
+        type: Date,
+        require: true
       }
     },
   ],
@@ -107,10 +107,56 @@ const DBSchema = new mongoose.Schema({
 });
 
 const UserOTPVerification = new mongoose.Schema({
-  userID:String,
-  OTP:String,
-  createdAt:Date,
-  expiresAt:Date
+  userID: String,
+  OTP: String,
+  createdAt: Date,
+  expiresAt: Date
+})
+
+const ContactDB = new mongoose.Schema({
+  Name: {
+    type: String,
+    require: true
+  },
+  Email: {
+    type: String,
+    require: true
+  },
+  Contact_Number: {
+    type: Number,
+    require: true
+  },
+  type: {
+    type: String,
+    require: true
+  },
+  Description: {
+    type: String,
+    require: true
+  },
+  UserRegistered: {
+    type: Boolean,
+    require: true
+  },
+})
+
+const reserveSeatDB = new mongoose.Schema({
+  User_ID: {
+    type: String,
+    require: true
+  },Contact_Number: {
+    type: String,
+    require: true
+  }, Person_Count: {
+    type: String,
+    require: true
+  }, Date: {
+    type: String,
+    require: true
+  }, Timing: {
+    type: String,
+    require: true
+  }
 })
 
 
@@ -147,6 +193,8 @@ DBSchema.methods.generateAuthToken = async function () {
 
 
 const DBModel = mongoose.model("User_Register", DBSchema);
-const OTPVerfication = mongoose.model("OTP_Verification",UserOTPVerification)
+const OTPVerfication = mongoose.model("OTP_Verification", UserOTPVerification)
+const ContactModel = mongoose.model("Contact", ContactDB)
+const ReserveSeatModel = mongoose.model("Reserve_Seat", reserveSeatDB)
 
-module.exports = { DBModel,OTPVerfication };
+module.exports = { DBModel, OTPVerfication, ContactModel,ReserveSeatModel };

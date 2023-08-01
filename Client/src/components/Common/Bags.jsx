@@ -49,7 +49,6 @@ const Bags = () => {
         setloadingShow(false);
       });
     }
-    // setloadingShow(false);
   };
 
   return (
@@ -133,7 +132,6 @@ const Bags = () => {
                 <p>
                   Sorry,the <strong>ORDER</strong> and <strong>WISHLIST</strong> is restricted to registered users only.
                 </p>
-                {/* <br /> */}
                 <p>
                   please
                   <NavLink to="/register"> register</NavLink> or <NavLink to="/login">login</NavLink> to continue.
@@ -152,7 +150,7 @@ const Bags = () => {
       ) : (
         <div id="bagBTN">
           <FaShoppingBag onClick={() => setShowBag(!showBag)} />
-          <p>{userData?.Bag.length}</p>
+          {userData?.Bag.length > 0 && <p>{userData?.Bag.length}</p>}
         </div>
       )}
     </>

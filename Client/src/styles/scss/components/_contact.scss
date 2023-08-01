@@ -51,7 +51,8 @@
           @include flexMixin();
           gap: 10px;
 
-          input {
+          input,
+          select {
             // width: 22vw;
             width: 280px;
             border: none;

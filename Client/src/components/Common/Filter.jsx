@@ -1,125 +1,234 @@
-import {useState} from "react";
-import {AiOutlineClose, AiOutlineRight} from "react-icons/ai";
+import {useEffect, useRef, useState} from "react";
+import {AiFillStar, AiOutlineCheck, AiOutlineLeft} from "react-icons/ai";
+import {IoIosArrowBack} from "react-icons/io";
+import {BiCheck, BiSolidCircle} from "react-icons/bi";
+import {RiCloseFill, RiArrowDropUpLine} from "react-icons/ri";
+import {GiCheckMark} from "react-icons/gi";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+// import RangeSlider from "re"
+import Image from "../../assets/Beverages/Image (1).png";
 
-const FilterTypes = [
+const FilterData = [
   {
-    id: 1,
-    name: "Categories",
-    options: ["Pizza", "Burger", "Sandwich", "Pasta", "Beverages", "Desserts"],
-    input: [
+    Topic: "Category",
+    subTopic: [
       {
-        type: "checkbox",
-        name: "category",
+        image: Image,
+        text: "Muffins",
+        apiName: "Muffins",
+      },
+      {
+        image: Image,
+        text: "Beverages",
+        apiName: "Beverages",
+      },
+      {
+        image: Image,
+        text: "Pizza",
+        apiName: "Pizza",
+      },
+      {
+        image: Image,
+        text: "Snakes and Slides",
+        apiName: "SnacksAndSides",
+      },
+      {
+        image: Image,
+        text: "Smoothie & Ice Cream",
+        apiName: "Smoothie",
       },
     ],
   },
   {
-    id: 2,
-    name: "Ingredients",
-    options: ["Veg", "Vegan"],
-    input: [
+    Topic: "Ingredients",
+    subTopic: [
       {
-        type: "checkbox",
-        name: "ingredients",
+        image: Image,
+        text: "Vegetarian",
+        apiName: "Veg",
       },
-    ],
-  },
-  {
-    id: 3,
-    name: "Price",
-    options: ["₹00 - ₹100", "₹100 - ₹200", "₹200 - ₹300", "₹300 - ₹400", "₹400 - ₹500", "Above ₹500"],
-    input: [
       {
-        type: "checkbox",
-        name: "price",
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Sort by",
-    options: ["Price: Low to High", "Price: High to Low", "Rating: Low to High", "Rating: High to Low"],
-    input: [
-      {
-        type: "radio",
-        name: "sort",
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: "Reviews",
-    options: ["5 Stars & above", "4 Stars & above", "3 Stars & above", "2 Stars & above", "1 Stars & above"],
-    input: [
-      {
-        type: "radio",
-        name: "reviews",
+        image: Image,
+        text: "Vegan",
+        apiName: "Vegan",
       },
     ],
   },
 ];
 
 const Filter = ({showFilterBox, setShowFilterBox}) => {
-  const [showFilters, setShowFilters] = useState(1);
-  // const [showFilterBox, setShowFilterBox] = useState(false);
+  const [showFilter, setshowFilter] = useState({
+    Category: [],
+    Ingredients: [],
+    PriceRange: 599,
+    RatingUP: 1,
+  });
+  const ref = useRef(null);
+  const navigate = useNavigate();
+  const showFilterProduct = () => {
+    navigate("/products", {state: showFilter});
+    setShowFilterBox(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setShowFilterBox(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside, true);
+    return () => {
+      document.removeEventListener("click", handleClickOutside, true);
+    };
+  }, [showFilterBox]);
+
   return (
     <>
-      {/* <Header/>
-      <SearchBar position="-70" currPlace="ProductPage" /> */}
-      {showFilterBox && (
+      {showFilterBox ? (
         <div className="filter">
-          <div className="filter-title">
-            <h1>Filter by</h1>
-            <div className="filter-title-close">
-              <AiOutlineClose onClick={() => setShowFilterBox(!showFilterBox)} />
+          <div className="box">
+            <div className="header">
+              <IoIosArrowBack className="ArrowBack" onClick={() => setShowFilterBox(!showFilterBox)} />
+              <h3>Filter</h3>
+              <p
+                className="reset"
+                onClick={() =>
+                  setshowFilter({
+                    Category: [],
+                    Ingredients: [],
+                  })
+                }>
+                Reset
+              </p>
             </div>
-          </div>
-          <hr />
-          <div className="filter-box">
-            <div className="filter-box-left">
-              {FilterTypes.map((type) => (
-                <div className={showFilters === type.id ? "active filter-types-titles" : "filter-types-titles"} key={type.id} onClick={() => setShowFilters(type.id)}>
-                  <div className="filter-types-title">
-                    <p>{type.name}</p>
+            {FilterData.map((curr, id) => {
+              return (
+                <div className="category" key={curr + id}>
+                  <div className="topic">
+                    <h4>{curr.Topic}</h4>
+                    <RiArrowDropUpLine className="show-More" />
                   </div>
-                  <div>
-                    <AiOutlineRight id="AiOutlineRight" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="filter-box-right">
-              {FilterTypes.map((type) => {
-                return (
-                  <div className="filter-types-options" key={type.id}>
-                    {type.options.map((option) => {
+                  <div className="category-topic-container">
+                    {curr.subTopic.map((subtext) => {
                       return (
-                        <div className="filter-types-options-item" key={option}>
-                          {type.input.map((input) => {
-                            return (
-                              <div className="filter-types-options-item-input" key={input.name} style={showFilters === type.id ? {display: "block"} : {display: "none"}}>
-                                <input type={input.type} name={input.name} id={option} className="checkmark" />
-                                <label htmlFor={option}>{option}</label>
-                              </div>
-                            );
-                          })}
-                        </div>
+                        <button
+                          className="category-topic"
+                          key={subtext.text}
+                          id={showFilter.Category.concat(showFilter.Ingredients).find((e) => e.text === subtext.text) ? "active" : ""}
+                          onClick={() => {
+                            let Category;
+                            if (curr.Topic === "Category") {
+                              let Category;
+                              showFilter?.Category?.find((e) => e.text === subtext.text) && showFilter.Category.length > 0 ? (Category = showFilter.Category.filter((e) => e.text !== subtext.text)) : (Category = [...showFilter.Category, subtext]);
+                              setshowFilter({...showFilter, Category});
+                            }
+                            if (curr.Topic === "Ingredients") {
+                              let Ingredients;
+                              showFilter?.Ingredients?.find((e) => e.text === subtext.text) && showFilter.Ingredients.length > 0 ? (Ingredients = showFilter.Ingredients.filter((e) => e.text !== subtext.text)) : (Ingredients = [...showFilter.Ingredients, subtext]);
+                              setshowFilter({...showFilter, Ingredients});
+                            }
+                          }}>
+                          <img src={subtext.image} alt="muffinsImage" id="filterProductImage" />
+                          <p>{subtext.text}</p>
+                          {showFilter.Category.concat(showFilter.Ingredients).find((e) => e.text === subtext.text) && <GiCheckMark className="checkLOGO" />}
+                        </button>
                       );
                     })}
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
+
+            <div className="category">
+              <div className="topic">
+                <h4>Price Range</h4>
+                <div>
+                  <p>&#x20B9;80 - &#x20B9;{showFilter.PriceRange}</p>
+                  <RiArrowDropUpLine className="show-More" />
+                </div>
+              </div>
+              <input
+                type="range"
+                name="price"
+                id="price"
+                min="80"
+                defaultValue={showFilter.PriceRange}
+                max="599"
+                onChange={(e) => {
+                  setshowFilter({...showFilter, PriceRange: e.target.value});
+                }}
+              />
+            </div>
+
+            <div className="category">
+              <div className="topic">
+                <h4>Customer Review</h4>
+                <RiArrowDropUpLine className="show-More" />
+              </div>
+              <div className="review-wrapper">
+                <div className="subwrapper">
+                  <label htmlFor="4Star">
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <p>& up</p>
+                  </label>
+                  <input type="radio" name="Star" id="4Star" onClick={() => setshowFilter({...showFilter, RatingUP: 4})} />
+                </div>
+                <div className="subwrapper">
+                  <label htmlFor="3Star">
+                    <AiFillStar />
+                    <AiFillStar />
+                    <AiFillStar />
+                    <p>& up</p>
+                  </label>
+                  <input type="radio" name="Star" id="3Star" onClick={() => setshowFilter({...showFilter, RatingUP: 3})} />
+                </div>
+                <div className="subwrapper">
+                  <label htmlFor="2Star">
+                    <AiFillStar />
+                    <AiFillStar />
+                    <p>& up</p>
+                  </label>
+                  <input type="radio" name="Star" id="2Star" onClick={() => setshowFilter({...showFilter, RatingUP: 2})} />
+                </div>
+                <div className="subwrapper">
+                  <label htmlFor="1Star">
+                    <AiFillStar />
+                    <p>& up</p>
+                  </label>
+                  <input type="radio" name="Star" id="1Star" defaultChecked onClick={() => setshowFilter({...showFilter, RatingUP: 1})} />
+                </div>
+              </div>
             </div>
           </div>
-          <div className="filter-box-btn">
-            <button>Clear All</button>
-            <button>Apply</button>
+
+          <div className="selections">
+            {showFilter.Category.concat(showFilter.Ingredients).map((curr, id) => {
+              return (
+                <button className="btn" key={curr.text + id}>
+                  <img src={curr.image} alt="muffinsImage" />
+                  <p>{curr.text}</p>
+                  <RiCloseFill
+                    className="CutBTN"
+                    onClick={() => {
+                      showFilter.Category.find((e) => e.text === curr.text) ? setshowFilter({Ingredients: showFilter.Ingredients, Category: [...showFilter.Category.filter((e) => e.text !== curr.text)]}) : setshowFilter({Category: showFilter.Category, Ingredients: [...showFilter.Ingredients.filter((e) => e.text !== curr.text)]});
+                    }}
+                  />
+                </button>
+              );
+            })}
           </div>
+          <button className="showResult" onClick={showFilterProduct}>
+            Show results
+          </button>
         </div>
+      ) : (
+        setShowFilterBox(showFilterBox)
       )}
     </>
   );
 };
 
-// setShowFilterBox(showFilterBox)
 export default Filter;

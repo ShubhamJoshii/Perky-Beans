@@ -96,7 +96,7 @@ const FrontJSON = [
       {
         Name: "SMOOTHIE & ICE CREAM",
         Image: Image10,
-        Category: "Beverages",
+        Category: "Smoothie",
       },
       // {
       //     Name:"ICE CREAM",

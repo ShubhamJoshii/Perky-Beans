@@ -3,7 +3,7 @@ import {Products} from "../../Data/ProductsJSON";
 import {AiFillStar, AiFillHeart, AiOutlineLeft, AiOutlineRight} from "react-icons/ai";
 
 import {BsFillBagFill} from "react-icons/bs";
-import {NavLink, useParams} from "react-router-dom";
+import {NavLink, useLocation, useParams} from "react-router-dom";
 import {useContext} from "react";
 import {Loading, Notification, UserData} from "../../routes/App";
 import axios from "axios";
@@ -28,51 +28,88 @@ const ProductsCatalogue = () => {
   const [count, setCount] = useState(0);
   const setloadingScreen = useContext(Loading);
   const {checkUserAlreadyLogin} = useContext(Notification);
-
   const {userData, setUserData} = useContext(UserData);
-
   let lastIndex = currPage * cardPerPage;
   let firstIndex = lastIndex - cardPerPage;
+  const location = useLocation();
 
-  // const [loadedImages, setLoadedImages] = useState(0);
-  // const [totalImages, setTotalImages] = useState(0);
-
-  // useEffect(() => {
-  //   const images = document.querySelectorAll("img");
-  //   setTotalImages(images.length);
-
-  //   const imageLoaded = () => {
-  //     // setLoadedImages(prevCount => prevCount + 1);
-  //     setLoadedImages(loadedImages + 1);
-  //   };
-
-  //   images.forEach((image) => {
-  //     if (image.complete) {
-  //       imageLoaded();
-  //     } else {
-  //       image.addEventListener("load", imageLoaded);
-  //     }
-  //   });
-
-  //   return () => {
-  //     images.forEach((image) => {
-  //       image.removeEventListener("load", imageLoaded);
-  //     });
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (loadedImages === totalImages) {
-  //     // console.log('All images have been loaded!');
-  //     setloadingScreen(false);
-  //   }
-  // }, [loadedImages, totalImages]);
+  useEffect(() => {
+    let a = [];
+    if (location.state !== null) {
+      let filterData = location.state;
+      console.log(filterData);
+      if (a.length <= 0) {
+        Products?.filter((e) => {
+          filterData.Category.filter((find) => {
+            if (find.apiName === e.Category) {
+              a.push(e);
+            }
+          });
+        });
+      }
+      if (a.length <= 0) {
+        Products.filter((e) => {
+          filterData.Ingredients.filter((find) => {
+            if (find.apiName === e.type) {
+              a.push(e);
+            }
+          });
+        });
+      }
+      if (a.length > 0 && filterData.Ingredients.length > 0) {
+        let b = [];
+        a.filter((e, id) => {
+          filterData.Ingredients.filter((find) => {
+            if (find.apiName === e.type) {
+              b.push(e);
+            }
+          });
+        });
+        a = b;
+      }
+      if (a.length <= 0) {
+        Products.filter((e) => {
+          // console.log();
+          if (e.Price <= parseInt(filterData.PriceRange)) {
+            a.push(e);
+          }
+        });
+      }
+      if (a.length > 0) {
+        let b = [];
+        a.filter((e) => {
+          if (e.Price <= parseInt(filterData.PriceRange)) {
+            b.push(e);
+          }
+        });
+        a = b;
+      }
+      if (a.length <= 0) {
+        Products.filter((e) => {
+          if (e.Star >= filterData.RatingUP) {
+            a.push(e);
+          }
+        });
+      }
+      if (a.length > 0) {
+        let b = [];
+        a.filter((e) => {
+          if (e.Star >= filterData.RatingUP) {
+            b.push(e);
+          }
+        });
+        a = b;
+      }
+      setProducts(a);
+      setCurrPage(1);
+    }
+  }, [[], location]);
 
   useEffect(() => {
     let a;
     Object.keys(category).length > 0 ? (a = Products.filter((e) => e.Category === category.categoryID || e._id === category.categoryID)) : (a = Products);
     setProducts(a);
-    shuffleArray(Products);
+    // shuffleArray(Products);
   }, [category]);
 
   let pages = [];

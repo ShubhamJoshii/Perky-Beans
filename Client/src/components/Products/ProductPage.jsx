@@ -104,6 +104,7 @@ const ProductPage = () => {
       notification("firstly, Select Size");
     }
   };
+
   return (
     <React.Fragment>
       <Bags />

@@ -14,7 +14,6 @@ import Preloader from "../components/Common/Preloader";
 import PageNotFound from "../components/PageNotFound/PageNotFound";
 import ForgotPassword from "../components/Signin_Register/ForgotPassword";
 import About_us from "../components/About Us/About_us";
-import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 import axios from "axios";
 
@@ -23,14 +22,14 @@ const UserData = createContext();
 const Notification = createContext();
 
 const App = () => {
-  const [loadingScreen, setloadingScreen] = useState(false);
+  const [loadingScreen, setloadingScreen] = useState(true);
   const [userData, setUserData] = useState(null);
 
   const checkUserAlreadyLogin = async () => {
     await axios
       .get("/api/home")
       .then((result) => {
-        if(result.status){
+        if (result.status) {
           setUserData(result.data.data);
         }
       })
@@ -54,11 +53,11 @@ const App = () => {
     });
   };
 
-  // useEffect(()=>{
-  //   setTimeout(()=>{
-  //     setloadingScreen(false);
-  //   },2000)
-  // },[])
+  useEffect(() => {
+    setTimeout(() => {
+      setloadingScreen(false);
+    }, 500);
+  }, []);
 
   return (
     <Loading.Provider value={setloadingScreen}>

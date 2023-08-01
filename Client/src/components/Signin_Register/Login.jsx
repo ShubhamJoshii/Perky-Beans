@@ -39,9 +39,11 @@ const Login = () => {
             setTimeout(() => {
               checkUserAlreadyLogin();
               navigate("/");
-              setloadingShow(false);
             }, 1000);
           }
+          setTimeout(() => {
+            setloadingShow(false);
+          }, 1000);
         })
         .catch((err) => {
           // console.log(err);

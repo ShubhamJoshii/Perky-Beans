@@ -30,6 +30,9 @@ const Header = () => {
       setLoadingShow(false);
     }, 1000);
   };
+  // .catch((err)=>{
+
+  // })
 
   return (
     <React.Fragment>
