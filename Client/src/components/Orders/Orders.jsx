@@ -85,7 +85,7 @@ const Orders = () => {
             {/* <br /> */}
             <p>
               please
-              <NavLink to="/register"> register</NavLink> or <NavLink to="/login">login</NavLink> to continue.
+              <NavLink to="/auth/register"> register</NavLink> or <NavLink to="/auth/login">login</NavLink> to continue.
             </p>
           </div>
         )}

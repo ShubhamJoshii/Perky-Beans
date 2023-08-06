@@ -2,6 +2,7 @@ import {useState, createContext} from "react";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
@@ -40,19 +41,43 @@ const App = () => {
     checkUserAlreadyLogin();
   }, []);
 
-  const notification = (notiText) => {
-    toast.success(notiText, {
-      position: "bottom-right",
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
+  const notification = (notiText, type) => {
+    if (type === "Success") {
+      toast.success(notiText, {
+        position: "bottom-right",
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    } else if ((type = "Un-Success")) {
+      toast.error(notiText, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    } else if ((type = "Warning")) {
+      toast.warn("🦄 Wow so easy!", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
   };
-
+  
   useEffect(() => {
     setTimeout(() => {
       setloadingScreen(false);
@@ -75,9 +100,10 @@ const App = () => {
               <Route exact path="/Orders/:orders" element={<OrdersPage />} />
               <Route exact path="/ReserveSeat" element={<ReserveSeatPage />} />
               <Route exact path="/Contact" element={<ContactPage />} />
-              <Route exact path="/login" element={<Login />} />
-              <Route exact path="/Register" element={<Register />} />
-              <Route exact path="/login/forgetpassword" element={<ForgotPassword />} />
+              <Route exact path="/auth/login" element={<Login />} />
+              <Route exact path="/auth/Register" element={<Register />} />
+              {/* <Route exact path="/login" element={<Login />} /> */}
+              <Route exact path="/auth/login/forgetpassword" element={<ForgotPassword />} />
               <Route exact path="*" element={<PageNotFound />} />
             </Routes>
           </Router>

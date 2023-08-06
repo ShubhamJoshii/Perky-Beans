@@ -1,10 +1,8 @@
-import React, {useState, useEffect} from "react";
-import {NavLink} from "react-router-dom";
+import React, {useState, useEffect, useContext} from "react";
 import {AiFillEye, AiFillEyeInvisible} from "react-icons/ai";
 import Header from "../Header/Header";
-import {useNavigate} from "react-router-dom";
-import {Notification, UserData} from "../../routes/App";
-import {useContext} from "react";
+import {NavLink, useNavigate} from "react-router-dom";
+import {Notification} from "../../routes/App";
 import axios from "axios";
 
 const Register = () => {
@@ -16,7 +14,6 @@ const Register = () => {
   });
   const [passwordShow, setPasswordShow] = useState(false);
   const [passwordConfirmShow, setPasswordConfirmShow] = useState(false);
-  const {userData, setUserData} = useContext(UserData);
   const {notification} = useContext(Notification);
   const navigate = useNavigate();
 
@@ -42,7 +39,7 @@ const Register = () => {
       await axios
         .post("/api/register", registerData)
         .then((result) => {
-          notification(result.data);
+          notification(result.data,"Success");
           setTimeout(() => {
             navigate("/login");
           }, 1000);
@@ -53,11 +50,11 @@ const Register = () => {
     } else if (registerData.Password.length < 8) {
       a.style.border = "3px solid red";
       b.style.border = "none";
-      notification("Password length should be greater than and equal to 8");
+      notification("Password length should be greater than and equal to 8","Warning");
     } else if (registerData.Password !== registerData.Confirm_Password) {
       a.style.border = "3px solid red";
       b.style.border = "3px solid red";
-      notification("User Password and Confirm Password not Matched");
+      notification("User Password and Confirm Password not Matched","Warning");
     } else {
       a.style.border = "none";
       b.style.border = "none";
@@ -94,7 +91,7 @@ const Register = () => {
           <input type="submit" value="SIGN UP" onClick={registerUser} id="registerBTN" />
           <div className="already-account">
             <p>Already have an account?</p>
-            <NavLink to="/login" ClassName="active">
+            <NavLink to="/auth/login" ClassName="active">
               Sign In
             </NavLink>
           </div>

@@ -23,7 +23,7 @@ const ForgotPassword = () => {
     await axios
       .post("/api/forgetPassword/sendOTP", {Email: forgetData.Email})
       .then((result) => {
-        notification(result.data?.message);
+        notification(result.data?.message,"Success");
         if (result.data?.status) {
           setforgetBTN(1);
         }
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
       .post("/api/forgetPassword/otpVerify", {Email: forgetData.Email, OTP: forgetData.OTP})
       .then((result) => {
         // console.log(result.data.status);
-        notification(result.data?.message);
+        notification(result.data?.message,"Success");
         if (result.data.status) {
           setforgetBTN(2);
         }
@@ -57,7 +57,7 @@ const ForgotPassword = () => {
       await axios
         .post("/api/forgetPassword/updatePassword", {Email: forgetData.Email, OTP: forgetData.OTP, Password: forgetData.Password, Confirm_Password: forgetData.Confirm_Password})
         .then((result) => {
-          notification(result.data.message);
+          notification(result.data.message,"Success");
           if (result.data?.status) {
             navigate("/login");
           }
@@ -65,9 +65,9 @@ const ForgotPassword = () => {
         })
         .catch(() => setlodingshow(false));
     } else if (forgetData.Password !== forgetData.Confirm_Password) {
-      notification("User Password and Confirm Password not Matched");
+      notification("User Password and Confirm Password not Matched","Warning");
     } else if (forgetData.Password.length < 8) {
-      notification("Password length should be greater than and equal to 8");
+      notification("Password length should be greater than and equal to 8","Warning");
     }
   };
 

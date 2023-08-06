@@ -63,7 +63,7 @@ const Bags = () => {
             {!userData && (
               <div id="RegiLogin">
                 <p>100 Reward Points on new registration</p>
-                <button id="Login-Register-BTN" onClick={() => navigate("/login")}>
+                <button id="Login-Register-BTN" onClick={() => navigate("/auth/login")}>
                   LOGIN/ REGISTER
                 </button>
               </div>
@@ -134,7 +134,7 @@ const Bags = () => {
                 </p>
                 <p>
                   please
-                  <NavLink to="/register"> register</NavLink> or <NavLink to="/login">login</NavLink> to continue.
+                  <NavLink to="/auth/register"> register</NavLink> or <NavLink to="/auth/login">login</NavLink> to continue.
                 </p>
               </div>
             )}

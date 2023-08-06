@@ -34,24 +34,25 @@ const Login = () => {
       await axios
         .post("/api/login", loginData)
         .then((result) => {
-          notification(result.data);
           if (result.data === "User Logined") {
+            notification(result.data,"Success");
             setTimeout(() => {
               checkUserAlreadyLogin();
               navigate("/");
             }, 1000);
+          }else{
+            notification(result.data,"Un-Success");
           }
           setTimeout(() => {
             setloadingShow(false);
           }, 1000);
         })
         .catch((err) => {
-          // console.log(err);
           setloadingShow(false);
         });
     }
     if (loginData.Password.length < 8) {
-      notification("User Password is Not Matched");
+      notification("User Password is Not Matched","Warning");
     }
   };
 
@@ -82,7 +83,7 @@ const Login = () => {
           {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> : <input type="button" value="LOGIN" onClick={submitLogin} />}
           <div className="no-account">
             <p>Don't have an account?</p>
-            <NavLink to="/Register" ClassName="active">
+            <NavLink to="/auth/Register" ClassName="active">
               Sign Up
             </NavLink>
           </div>

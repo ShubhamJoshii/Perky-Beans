@@ -27,12 +27,12 @@ const ReserveSeat = () => {
     await axios
       .post("/api/reserveSeat", reserveData)
       .then((result) => {
-        notification(result.data.message);
+        notification(result.data.message,"Success");
         setloadingShow(false);
       })
       .catch(() => {
         setTimeout(() => setloadingShow(false), [1000]);
-        notification("Please Login before Reserving Seat");
+        notification("Please Login before Reserving Seat","Warning");
       });
   };
 

@@ -1,18 +1,18 @@
 import React from "react";
-import {AiFillStar, AiFillHeart} from "react-icons/ai";
+import { AiFillStar, AiFillHeart } from "react-icons/ai";
 
-import {BsFillBagFill} from "react-icons/bs";
-import {TiMinus, TiPlus} from "react-icons/ti";
-import {LuVegan} from "react-icons/lu";
+import { BsFillBagFill } from "react-icons/bs";
+import { TiMinus, TiPlus } from "react-icons/ti";
+import { LuVegan } from "react-icons/lu";
 import Veg from "../../assets/veg.png";
-import {Products} from "../../Data/ProductsJSON";
+import { Products } from "../../Data/ProductsJSON";
 import axios from "axios";
-import {useParams} from "react-router-dom";
-import {useEffect} from "react";
-import {useState} from "react";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useState } from "react";
 import Bags from "../Common/Bags";
-import {Notification, UserData} from "../../routes/App";
-import {useContext} from "react";
+import { Notification, UserData } from "../../routes/App";
+import { useContext } from "react";
 
 const ProductPage = () => {
   const [counter0, setCounter0] = useState(0);
@@ -20,8 +20,8 @@ const ProductPage = () => {
   const [counter2, setCounter2] = useState(0);
   const [itemDetails, setItemDetails] = useState({});
   let itemShow = useParams().productID;
-  const {userData, setUserData} = useContext(UserData);
-  const {checkUserAlreadyLogin, notification} = useContext(Notification);
+  const { userData, setUserData } = useContext(UserData);
+  const { checkUserAlreadyLogin, notification } = useContext(Notification);
 
   useEffect(() => {
     // console.log("reload");
@@ -67,7 +67,7 @@ const ProductPage = () => {
   const addToWishlist = async (_id) => {
     let b = userData.Wishlist.find((e) => e.productID === _id);
     if (b) {
-      await axios.post("/api/removefromWishlist", {productID: _id}).then((result) => {
+      await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
         checkUserAlreadyLogin();
       });
     } else {
@@ -85,7 +85,7 @@ const ProductPage = () => {
     let b = userData.Bag.find((e) => e.productID === _id);
     if (counter0 || counter1 || counter2 > 0) {
       if (b) {
-        await axios.post("/api/updateBag", {productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2}).then((result) => {
+        await axios.post("/api/updateBag", { productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2 }).then((result) => {
           checkUserAlreadyLogin();
         });
       } else {
@@ -101,7 +101,7 @@ const ProductPage = () => {
           });
       }
     } else {
-      notification("firstly, Select Size");
+      notification("firstly, Select Size", "Warning");
     }
   };
 
@@ -112,8 +112,11 @@ const ProductPage = () => {
         <>
           <div className="products product-board">
             <div className="product-card" key={itemDetails._id}>
-              <div id="product-img-BTN">
-                <AiFillHeart onClick={() => addToWishlist(itemDetails._id)} className={userData?.Wishlist.find((e) => e.productID === itemDetails._id) ? "active-Heart heart" : "heart"} />
+              <div id="product-img-BTN1">
+                <div id="onhover-showBTN1">
+                  <p id="wishlist-para">WISHLIST</p>
+                  <AiFillHeart onClick={() => addToWishlist(itemDetails._id)} className={userData?.Wishlist.find((e) => e.productID === itemDetails._id) ? "active-Heart heart" : "heart"} />
+                </div>
               </div>
               <img className="product-image" src={itemDetails.Image} alt={itemDetails.Name} loading="lazy" />
               <div className="product-info">
@@ -168,7 +171,7 @@ const ProductPage = () => {
                   <div className="total">
                     <h1>Total Amount &#x20B9; {total}</h1>
                   </div>
-                  <button className="order" style={counter0 || counter1 || counter2 > 0 ? {} : {background: "grey"}} onClick={() => addToBag(itemDetails._id)}>
+                  <button className="order" style={counter0 || counter1 || counter2 > 0 ? {} : { background: "grey" }} onClick={() => addToBag(itemDetails._id)}>
                     Add to Bag
                   </button>
                 </div>

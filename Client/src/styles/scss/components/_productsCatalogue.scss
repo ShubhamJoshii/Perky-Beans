@@ -11,6 +11,10 @@
   gap: 20px 10px;
   margin-top: 100px;
 
+  .skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+  }
+
   .product-card {
     background-color: $color-primary;
     @include flexMixin($JScontent: flex-start, $direction: column);
@@ -33,48 +37,71 @@
       left: 10px;
       border: 2px solid white;
     }
+
     #LuVegan {
       width: 20px;
       height: 20px;
       position: absolute;
       background-color: white;
       color: green;
-      // padding: 10px;
       border-radius: 5px;
       top: 10px;
       left: 10px;
       border: 2px solid white;
     }
 
-    #product-img-BTN {
+    #product-img-BTN1, #product-img-BTN2 {
       position: absolute;
       top: 15px;
       right: 15px;
 
-      svg {
-        font-size: 24px;
+      #onhover-showBTN1, #onhover-showBTN2 {
+        @include flexMixin($JScontent: flex-end);
+        background-color: rgba(0, 0, 0, 0.653);
+        border-radius: 50px;
         margin-bottom: 4px;
         cursor: pointer;
-        background-color: rgba(0, 0, 0, 0.653);
+      }
+      
+      #bag-para, #wishlist-para {
+        display: none;
+        font-size: 8px;
+        font-weight: 600;
+      }
+
+      svg {
+        font-size: 24px;
+        cursor: pointer;
         border-radius: 50%;
         padding: 3px;
       }
-      .heart:hover {
+
+      .active-Heart, .heart:hover {
         color: red;
       }
-      .bag:hover {
+
+      .bag:hover, .active-Bags {
         color: #ecb014;
       }
-      .active-Heart {
-        color: red;
+
+      #onhover-showBTN1:hover #wishlist-para {
+        display: block;
+        padding-right: 2px;
+        padding-left: 8px;
       }
-      .active-Bags {
-        color: #ecb014;
+
+      #onhover-showBTN2:hover #bag-para {
+        display: block;
+        padding-right: 1px;
+        padding-left: 8px;
       }
+    }
+    #product-img-BTN2{
+      top: 45px;
     }
   }
 
-  img {
+  .product-image {
     width: 100%;
     height: pxToRem(290);
     object-fit: cover;
@@ -91,6 +118,7 @@
       font-weight: bolder;
       text-align: center;
     }
+
     .product-desc {
       text-align: justify;
       margin: 0 8px;
@@ -110,6 +138,7 @@
       position: absolute;
       right: 10px;
       bottom: 4px;
+
       #A {
         color: #b89130;
         font-size: 12px;
@@ -138,6 +167,7 @@
   position: relative;
   top: 8rem;
   gap: 10px;
+
   .Pages {
     @include flexMixin();
     width: 25px;
@@ -148,9 +178,11 @@
     border-radius: 5px;
     cursor: pointer;
   }
+
   .activePage {
     background-color: #ecb014;
   }
+
   #non-active-side-btn {
     opacity: 0.5;
     // svg{
@@ -167,17 +199,21 @@
 
     .product-card {
       width: pxToRem(200);
+
       img {
         height: 260px;
       }
     }
   }
 }
+
 @media (max-width: 840px) {
   .products {
     margin-top: -55px !important;
+
     .product-card {
       width: pxToRem(200);
+
       img {
         height: 220px;
       }
@@ -188,16 +224,20 @@
 @media (max-width: 620px) {
   .products {
     margin: auto;
+
     .product-card {
       width: 45vw;
+
       img {
         height: 140px;
         border-bottom-left-radius: 50px;
       }
+
       .product-info {
         .product-name {
           font-size: 12px;
         }
+
         .product-desc {
           margin: 0 4px;
         }
@@ -211,6 +251,7 @@
           position: absolute;
           right: 10px;
           bottom: 4px;
+
           #A {
             color: #b89130;
             font-size: 14px;
@@ -228,5 +269,18 @@
     // margin: auto;
     margin-top: 100px;
     // background-color: $color-primary;
+  }
+}
+
+
+@keyframes skeleton-loading {
+  0% {
+    // background-color: hsl(200,20%,70%);
+    background-color: #c2c2c2;
+  }
+
+  100% {
+    // background-color: hsl(200,20%,95%);
+    background-color: #ffffff;
   }
 }

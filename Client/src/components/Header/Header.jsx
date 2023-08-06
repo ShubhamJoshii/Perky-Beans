@@ -4,16 +4,17 @@ import Logo from "../../assets/PerkyBeansLogo.png";
 import {Oval} from "react-loader-spinner";
 import {IoMdMenu} from "react-icons/io";
 import {MdClose} from "react-icons/md";
-import {NavLink} from "react-router-dom";
+import {NavLink, useLocation} from "react-router-dom";
 import axios from "axios";
-
 import {Notification, UserData} from "../../routes/App";
+
 const Header = () => {
   const [menuShown, setMenuShow] = useState(false);
   const [loadingShow, setLoadingShow] = useState(false);
   const menuRef = useRef(0);
   const {userData, setUserData} = useContext(UserData);
   const {notification} = useContext(Notification);
+  const location = useLocation();
   useEffect(() => {
     menuShown ? (menuRef.current.style.top = "58px") : (menuRef.current.style.top = "-120vh");
   }, [menuShown]);
@@ -30,9 +31,10 @@ const Header = () => {
       setLoadingShow(false);
     }, 1000);
   };
-  // .catch((err)=>{
 
-  // })
+  useEffect(()=>{
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });                
+  },[location])
 
   return (
     <React.Fragment>
@@ -45,7 +47,7 @@ const Header = () => {
           <NavLink to="/products" ClassName="active">
             <li>PRODUCTS</li>
           </NavLink>
-          <NavLink to="/orders/my-order" ClassName="active">
+          <NavLink to="/orders/my-order" className={location.pathname.includes("/orders") ? "active" : ""}>
             <li>ORDERS</li>
           </NavLink>
           <NavLink to="/contact" ClassName="active">
@@ -60,7 +62,7 @@ const Header = () => {
                 <button id="loginRegisterHeader">{loadingShow ? <Oval height="16" width="16" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>LOGOUT</>}</button>
               </a>
             ) : (
-              <NavLink to="/login" ClassName="active">
+              <NavLink to="/auth/login"  className={location.pathname.includes("/auth") ? "active" : ""}>
                 <button id="loginRegisterHeader">LOGIN / REGISTER</button>
               </NavLink>
             )}
@@ -80,10 +82,10 @@ const Header = () => {
           </div>
         ) : (
           <div id="loginRegisterBTNS">
-            <NavLink to="/login" ClassName="active" onClick={() => setMenuShow(false)}>
+            <NavLink to="/auth/login" ClassName="active" onClick={() => setMenuShow(false)}>
               <button>LOGIN</button>
             </NavLink>
-            <NavLink to="/register" ClassName="active" onClick={() => setMenuShow(false)}>
+            <NavLink to="/auth/register" ClassName="active" onClick={() => setMenuShow(false)}>
               <button>REGISTER</button>
             </NavLink>
           </div>

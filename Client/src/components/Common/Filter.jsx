@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {AiFillStar, AiOutlineCheck, AiOutlineLeft} from "react-icons/ai";
 import {IoIosArrowBack} from "react-icons/io";
 import {BiCheck, BiSolidCircle} from "react-icons/bi";
-import {RiCloseFill, RiArrowDropUpLine} from "react-icons/ri";
+import {RiCloseFill, RiArrowDropUpLine, RiArrowDropDownLine} from "react-icons/ri";
 import {GiCheckMark} from "react-icons/gi";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 // import RangeSlider from "re"
@@ -29,7 +29,7 @@ const FilterData = [
       },
       {
         image: Image,
-        text: "Snakes and Slides",
+        text: "Snacks and Sides",
         apiName: "SnacksAndSides",
       },
       {
@@ -63,6 +63,7 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
     PriceRange: 599,
     RatingUP: 1,
   });
+  const [priceSort,setPriceSort] = useState(false);
   const ref = useRef(null);
   const navigate = useNavigate();
   const showFilterProduct = () => {
@@ -116,7 +117,6 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                           key={subtext.text}
                           id={showFilter.Category.concat(showFilter.Ingredients).find((e) => e.text === subtext.text) ? "active" : ""}
                           onClick={() => {
-                            let Category;
                             if (curr.Topic === "Category") {
                               let Category;
                               showFilter?.Category?.find((e) => e.text === subtext.text) && showFilter.Category.length > 0 ? (Category = showFilter.Category.filter((e) => e.text !== subtext.text)) : (Category = [...showFilter.Category, subtext]);
@@ -144,7 +144,12 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                 <h4>Price Range</h4>
                 <div>
                   <p>&#x20B9;80 - &#x20B9;{showFilter.PriceRange}</p>
-                  <RiArrowDropUpLine className="show-More" />
+                  {
+                    priceSort ? 
+                    <RiArrowDropUpLine className="show-More" onClick={()=>{setPriceSort(!priceSort)}}/>:
+                    <RiArrowDropDownLine  className="show-More" onClick={()=>{setPriceSort(!priceSort)}}/>
+
+                  }
                 </div>
               </div>
               <input
@@ -158,6 +163,19 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                   setshowFilter({...showFilter, PriceRange: e.target.value});
                 }}
               />
+              {
+                priceSort && 
+                <div id="furtherPrice">
+                  <div>
+                    <label htmlFor="PriceLow">Low to High</label>
+                    <input type="radio" name="Price" id="PriceLow" />
+                  </div>
+                  <div>
+                    <label htmlFor="PriceHigh">High to Low</label>
+                    <input type="radio" name="Price" id="PriceHigh" />
+                  </div>
+                </div>
+              }
             </div>
 
             <div className="category">

@@ -1,24 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {Products} from "../../Data/ProductsJSON";
-import {AiFillStar, AiFillHeart, AiOutlineLeft, AiOutlineRight} from "react-icons/ai";
-
-import {BsFillBagFill} from "react-icons/bs";
-import {NavLink, useLocation, useParams} from "react-router-dom";
-import {useContext} from "react";
-import {Loading, Notification, UserData} from "../../routes/App";
+import React, { useEffect, useState } from "react";
+import { Products } from "../../Data/ProductsJSON";
+import { AiFillStar, AiFillHeart, AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { BsFillBagFill } from "react-icons/bs";
+import { NavLink, useLocation, useParams } from "react-router-dom";
+import { LuVegan } from "react-icons/lu";
+import { useContext } from "react";
+import { Notification, UserData } from "../../routes/App";
 import axios from "axios";
-
-import {LuVegan} from "react-icons/lu";
 import Veg from "../../assets/veg.png";
-
-function shuffleArray(array) {
-  for (var i = array.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
-  }
-}
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 
 const ProductsCatalogue = () => {
   const [products, setProducts] = useState([]);
@@ -26,9 +16,8 @@ const ProductsCatalogue = () => {
   const [cardPerPage, setCardPerPage] = useState(24);
   const [category, setCategory] = useState(useParams());
   const [count, setCount] = useState(0);
-  const setloadingScreen = useContext(Loading);
-  const {checkUserAlreadyLogin} = useContext(Notification);
-  const {userData, setUserData} = useContext(UserData);
+  const { checkUserAlreadyLogin } = useContext(Notification);
+  const { userData, setUserData } = useContext(UserData);
   let lastIndex = currPage * cardPerPage;
   let firstIndex = lastIndex - cardPerPage;
   const location = useLocation();
@@ -37,7 +26,6 @@ const ProductsCatalogue = () => {
     let a = [];
     if (location.state !== null) {
       let filterData = location.state;
-      console.log(filterData);
       if (a.length <= 0) {
         Products?.filter((e) => {
           filterData.Category.filter((find) => {
@@ -102,8 +90,10 @@ const ProductsCatalogue = () => {
       }
       setProducts(a);
       setCurrPage(1);
+    }else{
+      setProducts(products);
     }
-  }, [[], location]);
+  }, [location]);
 
   useEffect(() => {
     let a;
@@ -120,7 +110,7 @@ const ProductsCatalogue = () => {
   const addToWishlist = async (_id) => {
     let b = userData.Wishlist.find((e) => e.productID === _id);
     if (b) {
-      await axios.post("/api/removefromWishlist", {productID: _id}).then((result) => {
+      await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
         checkUserAlreadyLogin();
       });
     } else {
@@ -137,7 +127,7 @@ const ProductsCatalogue = () => {
   const addToBag = async (_id) => {
     let b = userData.Bag.find((e) => e.productID === _id);
     if (b) {
-      await axios.post("/api/removeFromBag", {productID: _id}).then((result) => {
+      await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
         checkUserAlreadyLogin();
       });
     } else {
@@ -164,17 +154,24 @@ const ProductsCatalogue = () => {
           } else {
             a = `./${product.Category}/${product._id}`;
           }
-          // console.log(product.type);
           return (
             <div className="product-card" key={product._id}>
               {product.type === "Veg" ? <img id="veg" src={Veg} alt="Veg" /> : <LuVegan id="LuVegan" />}
-              <div id="product-img-BTN">
-                <AiFillHeart onClick={() => addToWishlist(product._id)} className={userData?.Wishlist.find((e) => e.productID === product._id) ? "active-Heart heart" : " heart"} />
-                <br />
-                <BsFillBagFill onClick={() => addToBag(product._id)} className={userData?.Bag.find((e) => e.productID === product._id) ? "active-Bags bag" : "bag"} />
+              <div id="product-img-BTN1">
+                <div id="onhover-showBTN1">
+                  <p id="wishlist-para">WISHLIST</p>
+                  <AiFillHeart onClick={() => addToWishlist(product._id)} className={userData?.Wishlist.find((e) => e.productID === product._id) ? "active-Heart heart" : " heart"} />
+                </div>
               </div>
-              <NavLink to={a} onClick={() => window.scrollTo({top: 0, left: 0, behavior: "smooth"})}>
-                <img src={product.Image} alt={product.Name} className="product-image" />
+              <div id="product-img-BTN2">
+                <div id="onhover-showBTN2">
+                  <p id="bag-para">BAG</p>
+                  <BsFillBagFill onClick={() => addToBag(product._id)} className={userData?.Bag.find((e) => e.productID === product._id) ? "active-Bags bag" : "bag"} />
+                </div>
+              </div>
+              <NavLink to={a} onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" })}>
+                {/* <div  className="product-image skeleton" ></div> */}
+                <img src={product.Image} alt={product.Name} className="product-image skeleton" />
                 <div className="product-info">
                   <h5 className="product-name">{product.Name}</h5>
                   <p className="product-desc">{product.Desc.slice(0, 60)}...</p>
@@ -196,7 +193,7 @@ const ProductsCatalogue = () => {
               className="Pages"
               id={currPage === 1 ? "non-active-side-btn" : ""}
               onClick={() => {
-                window.scrollTo({top: 0, left: 0, behavior: "smooth"});
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                 if (currPage !== 1) {
                   setCount(count - 18);
                   setCurrPage(currPage - 1);
@@ -210,7 +207,7 @@ const ProductsCatalogue = () => {
                 <div
                   key={ids}
                   onClick={() => {
-                    window.scrollTo({top: 0, left: 0, behavior: "smooth"});
+                    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                     setCount(curr);
                     setCurrPage(ids + 1);
                   }}
@@ -223,7 +220,7 @@ const ProductsCatalogue = () => {
               className="Pages"
               id={currPage === pages.length ? "non-active-side-btn" : ""}
               onClick={() => {
-                window.scrollTo({top: 0, left: 0, behavior: "smooth"});
+                window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
                 if (currPage !== pages.length) {
                   setCount(count + 18);
                   setCurrPage(currPage + 1);
