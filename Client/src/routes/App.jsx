@@ -42,6 +42,7 @@ const App = () => {
   }, []);
 
   const notification = (notiText, type) => {
+    console.log(type);
     if (type === "Success") {
       toast.success(notiText, {
         position: "bottom-right",
@@ -53,24 +54,24 @@ const App = () => {
         progress: undefined,
         theme: "dark",
       });
-    } else if ((type = "Un-Success")) {
+    } else if (type === "Un-Success") {
       toast.error(notiText, {
         position: "bottom-right",
-        autoClose: 5000,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         progress: undefined,
         theme: "dark",
       });
-    } else if ((type = "Warning")) {
-      toast.warn("🦄 Wow so easy!", {
+    } else if (type === "Warning") {
+      toast.warn(notiText, {
         position: "bottom-right",
-        autoClose: 5000,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: true,
         progress: undefined,
         theme: "dark",

@@ -65,25 +65,32 @@ const ProductPage = () => {
   const total = Sizes[0].price * Sizes[0].counter + Sizes[1].price * Sizes[1].counter + Sizes[2].price * Sizes[2].counter;
 
   const addToWishlist = async (_id) => {
-    let b = userData.Wishlist.find((e) => e.productID === _id);
-    if (b) {
-      await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
-        checkUserAlreadyLogin();
-      });
-    } else {
-      await axios
+    if(userData){
+
+      let b = userData.Wishlist.find((e) => e.productID === _id);
+      if (b) {
+        await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
+          checkUserAlreadyLogin();
+        });
+      } else {
+        await axios
         .post("/api/addToWishlist", {
           productID: _id,
         })
         .then((result) => {
           checkUserAlreadyLogin();
         });
+      }
+    }else{
+      notification("Please Login Before Adding to Wishlist","Warning");
     }
   };
 
   const addToBag = async (_id) => {
-    let b = userData.Bag.find((e) => e.productID === _id);
-    if (counter0 || counter1 || counter2 > 0) {
+    if(userData){
+
+      let b = userData.Bag.find((e) => e.productID === _id);
+      if (counter0 || counter1 || counter2 > 0) {
       if (b) {
         await axios.post("/api/updateBag", { productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2 }).then((result) => {
           checkUserAlreadyLogin();
@@ -99,9 +106,12 @@ const ProductPage = () => {
           .then((result) => {
             checkUserAlreadyLogin();
           });
+        }
+      } else {
+        notification("firstly, Select Size", "Warning");
       }
-    } else {
-      notification("firstly, Select Size", "Warning");
+    }else{
+      notification("Please Login Before Adding to Bag","Warning");
     }
   };
 

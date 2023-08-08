@@ -16,7 +16,7 @@ const ProductsCatalogue = () => {
   const [cardPerPage, setCardPerPage] = useState(24);
   const [category, setCategory] = useState(useParams());
   const [count, setCount] = useState(0);
-  const { checkUserAlreadyLogin } = useContext(Notification);
+  const { notification,checkUserAlreadyLogin } = useContext(Notification);
   const { userData, setUserData } = useContext(UserData);
   let lastIndex = currPage * cardPerPage;
   let firstIndex = lastIndex - cardPerPage;
@@ -108,40 +108,49 @@ const ProductsCatalogue = () => {
   }
 
   const addToWishlist = async (_id) => {
-    let b = userData.Wishlist.find((e) => e.productID === _id);
-    if (b) {
-      await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
-        checkUserAlreadyLogin();
-      });
-    } else {
-      await axios
-        .post("/api/addToWishlist", {
-          productID: _id,
-        })
-        .then((result) => {
+    if(userData){
+
+      let b = userData.Wishlist.find((e) => e.productID === _id);
+      if (b) {
+        await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
           checkUserAlreadyLogin();
         });
+    } else {
+      await axios
+      .post("/api/addToWishlist", {
+        productID: _id,
+      })
+      .then((result) => {
+        checkUserAlreadyLogin();
+      });
     }
+  }else{
+    notification("Please Login Before Adding to Wishlist","Warning");
+  }
   };
 
   const addToBag = async (_id) => {
-    let b = userData.Bag.find((e) => e.productID === _id);
-    if (b) {
+    if(userData){
+      let b = userData.Bag.find((e) => e.productID === _id);
+      if (b) {
       await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
         checkUserAlreadyLogin();
       });
     } else {
       await axios
-        .post("/api/addtoBag", {
-          productID: _id,
-          SmallCount: 0,
-          MediumCount: 1,
-          LargeCount: 0,
-        })
-        .then((result) => {
-          checkUserAlreadyLogin();
-        });
+      .post("/api/addtoBag", {
+        productID: _id,
+        SmallCount: 0,
+        MediumCount: 1,
+        LargeCount: 0,
+      })
+      .then((result) => {
+        checkUserAlreadyLogin();
+      });
     }
+  }else{
+    notification("Please Login Before Adding to Bag","Warning");
+  }
   };
 
   return (
