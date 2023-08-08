@@ -42,7 +42,6 @@ const App = () => {
   }, []);
 
   const notification = (notiText, type) => {
-    console.log(type);
     if (type === "Success") {
       toast.success(notiText, {
         position: "bottom-right",
@@ -82,7 +81,7 @@ const App = () => {
   useEffect(() => {
     setTimeout(() => {
       setloadingScreen(false);
-    }, 500);
+    }, 1000);
   }, []);
 
   return (
@@ -103,7 +102,6 @@ const App = () => {
               <Route exact path="/Contact" element={<ContactPage />} />
               <Route exact path="/auth/login" element={<Login />} />
               <Route exact path="/auth/Register" element={<Register />} />
-              {/* <Route exact path="/login" element={<Login />} /> */}
               <Route exact path="/auth/login/forgetpassword" element={<ForgotPassword />} />
               <Route exact path="*" element={<PageNotFound />} />
             </Routes>

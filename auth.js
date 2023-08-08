@@ -7,8 +7,8 @@ const Authenication = require("./Authenication");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
 
-let addRoute = "/";
-// let addRoute = "/api/";
+// let addRoute = "/";
+let addRoute = "/api/";
 
 router.get(`${addRoute}home`, Authenication, async (req, res) => {
     if (req.rootUser) {

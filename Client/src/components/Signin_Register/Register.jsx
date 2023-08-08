@@ -41,11 +41,10 @@ const Register = () => {
         .then((result) => {
           notification(result.data,"Success");
           setTimeout(() => {
-            navigate("/login");
+            navigate("/auth/login");
           }, 1000);
         })
         .catch((err) => {
-          // console.log(err);
         });
     } else if (registerData.Password.length < 8) {
       a.style.border = "3px solid red";
