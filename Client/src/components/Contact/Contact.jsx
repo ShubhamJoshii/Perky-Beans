@@ -7,11 +7,11 @@ const Contact = () => {
   const {userData, setUserData} = useContext(UserData);
   const {notification} = useContext(Notification);
   const [contactData, setContactData] = useState({
-    Name: "",
-    Email: "",
+    Name: undefined,
+    Email: undefined,
     type: "Feedback",
-    Contact_Number: "",
-    Description: "",
+    Contact_Number: undefined,
+    Description: undefined,
   });
   const [loadingShow, setloadingShow] = useState(false);
 
@@ -23,13 +23,12 @@ const Contact = () => {
 
   const submitData = async (e) => {
     e.preventDefault();
-    if (contactData.Name && contactData.Email && contactData.type && contactData.Contact_Number && contactData.Description) {
+    if (contactData.type && contactData.Contact_Number.length === 10 && contactData.Description) {
       setloadingShow(true);
       await axios
         .post("/api/contact", {_id: userData?._id, ...contactData})
         .then((result) => {
-          // console.log(result.data);
-          notification(result.data.message);
+          (result.data.Success) ? notification(result.data.message,"Success") :  notification(result.data.message,"Un-Success") ;
           setContactData({
             Name: userData?.Full_Name || "",
             Email: userData?.Email || "",
@@ -40,19 +39,19 @@ const Contact = () => {
           setloadingShow(false);
         })
         .catch(() => {});
-    } else if (!contactData.Name) {
-      notification("Enter Name");
-    } else if (!contactData.Email) {
-      notification("Enter Email");
-    } else if (!contactData.Contact_Number) {
-      notification("Enter Contact Number");
+    }else if(contactData.Contact_Number.length != 10){
+      notification("Enter Correct Contact Number","Info");
     } else if (!contactData.Description) {
-      notification("Enter Description");
+      notification("Enter Description","Info");
+    }else{
+      notification("Please Login First !", "Un-Success");
     }
   };
 
   useEffect(() => {
-    setContactData({...contactData, Name: userData?.Full_Name, Email: userData?.Email});
+    if(userData){
+      setContactData({...contactData, Name: userData?.Full_Name, Email: userData?.Email});
+    }
   }, [userData]);
 
   return (
@@ -66,7 +65,7 @@ const Contact = () => {
             <p>24/7 we will answer your questions and problems</p>
             <form onSubmit={submitData}>
               <div>
-                <input type="text" placeholder="Enter Name" name="Name" value={contactData.Name} onChange={inputHandle} />
+                <input type="text" disabled placeholder="Enter Name" name="Name" value={contactData.Name} onChange={inputHandle} />
                 <select name="type" id="select" defaultValue="Feedback" onChange={inputHandle}>
                   <option value="Feedback">Feedback</option>
                   <option value="Review">Review</option>
@@ -74,10 +73,10 @@ const Contact = () => {
                 </select>
               </div>
               <div>
-                <input type="text" placeholder="Enter E-mail" name="Email" value={contactData.Email} onChange={inputHandle} />
-                <input type="number" placeholder="Enter Contact Number" name="Contact_Number" value={contactData.Contact_Number} onChange={inputHandle} />
+                <input type="text"  disabled placeholder="Enter E-mail" name="Email" value={contactData.Email} onChange={inputHandle} />
+                <input type="number" required placeholder="Enter Contact Number" name="Contact_Number" value={contactData.Contact_Number} onChange={inputHandle} />
               </div>
-              <textarea name="Description" id="" cols="30" rows="10" placeholder="Describe your issue" value={contactData.Description} onChange={inputHandle}></textarea>
+              <textarea name="Description" required id="" cols="30" rows="10" placeholder="Describe your issue" value={contactData.Description} onChange={inputHandle}></textarea>
 
               <button>{loadingShow ? <Oval height="20" width="60" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>SUBMIT</>}</button>
             </form>

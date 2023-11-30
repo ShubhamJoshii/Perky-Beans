@@ -45,12 +45,17 @@
         gap: 15px;
         padding: 10px 40px;
 
-        div {
+        #input-Cover-Wrong{
+          border: 2px solid red;
+        }
+
+        .input-Cover {
           @include flexMixin();
           padding: 5px 20px;
           border-radius: 5px;
           gap: 10px;
           background-color: #ffffff;
+          border: 2px solid;
 
           svg {
             color: #5d0e07;
@@ -78,16 +83,18 @@
 
         button,
         .loading {
+          @include flexMixin();
           background-color: #ecb014;
           cursor: pointer;
-          margin-top: 50px;
+          // margin-top: 50px;
           color: white;
           padding: 5px 25px;
+          min-width: 100px;
           font-size: 20px;
           font-weight: bolder;
         }
         .loading {
-          padding: 5px !important;
+          padding: 2px 5px !important;
         }
       }
 

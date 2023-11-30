@@ -51,6 +51,11 @@
           @include flexMixin();
           gap: 10px;
 
+          input:disabled{
+            background-color: #b6b6b6;
+            cursor: not-allowed;
+          }
+
           input,
           select {
             // width: 22vw;

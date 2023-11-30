@@ -9,6 +9,13 @@ const Mailgen = require("mailgen");
 
 // let addRoute = "/";
 let addRoute = "/api/";
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.AUTH_EMAIL,
+        pass: process.env.AUTH_PASS,
+    }
+});
 
 router.get(`${addRoute}home`, Authenication, async (req, res) => {
     if (req.rootUser) {
@@ -26,19 +33,79 @@ router.get(`${addRoute}logout`, Authenication, async (req, res) => {
 
 router.post(`${addRoute}register`, async (req, res) => {
     const { Full_Name, Email, Password, Confirm_Password } = req.body;
+    console.log(req.body);
+    let EmailToken = require('crypto').randomBytes(32).toString('hex');
     try {
         const userExist = await DBModel.findOne({ Email });
         if (!userExist) {
             const userData = new DBModel({
-                Full_Name, Email, Password, Confirm_Password
+                Full_Name, Email, Password, Confirm_Password, EmailToken, isVerified:false
             })
+
+            let mailGenerator = new Mailgen({
+                theme: "default",
+                product: {
+                    name: "Perky Beans",
+                    link: 'https://perky-beans.vercel.app/'
+                }
+            });
+
+            let response = {
+                body: {
+                    name: `${Full_Name}`,
+                    intro: `
+                        <p>Congratulations! You're almost set to start using Perky Beans- Cafe Web</p>
+                        <p>Just click the button below to validate your email address</p>
+                        <a href="http://${req.headers.host}/user/verify-email?token=${EmailToken}" style="padding: 5px;background-color: brown;color: white;font-size: 22px;text-decoration: none;padding: 6px 15px;"}>Verify Email</a>
+                    `,
+                    outro: "Looking forward"
+                }
+            }
+
+            let mail = mailGenerator.generate(response);
+            let message = {
+                from: process.env.AUTH_EMAIL,
+                to: Email,
+                subject: "Perky Beans- Let's complete your account setup",
+                html: mail
+            }
+
             await userData.save();
-            res.send("User Registered");
+            await new Promise((resolve, reject) => {
+                transporter.sendMail(message).then(() => {
+                    return res.json("Verification  email sent" )
+                }).catch(() => {
+                    return res.json("Verification Error")
+                });
+            });
+
+            // res.send("User Registered ");
         } else {
             res.send("User Email ID already Registered");
         }
     } catch (err) {
+        console.log(err);
         res.send("Error! Try Again");
+    }
+})
+
+router.get(`/user/verify-email`,async(req,res)=>{
+    try{
+        const token = req.query.token;
+        const user =  await DBModel.findOne({EmailToken:token});
+        console.log(user,"Hello WORLD");
+        if(user.isVerified){
+            res.send("Email Already Verfied");
+        }
+        if(user){
+            user.EmailToken = null;
+            user.isVerified = true;
+            await user.save();
+            res.send("Email Verfied");
+        }
+    }catch(err){
+        console.log(err);
+        res.send("Email Already Verfied");
     }
 })
 
@@ -48,7 +115,9 @@ router.post(`${addRoute}login`, async (req, res) => {
         const userExist = await DBModel.findOne({ Email });
         if (userExist) {
             const password_Match = await bcrypt.compare(Password, userExist.Password);
-            if (password_Match) {
+            if(!userExist.isVerified){
+                res.send("Please Verified your Email ID");
+            }else if (password_Match) {
                 userExist.Login = userExist.Login.concat({ Login_Date });
                 const Token = await userExist.generateAuthToken();
                 console.log(Token);
@@ -61,7 +130,8 @@ router.post(`${addRoute}login`, async (req, res) => {
             } else {
                 res.send("User Password not Matched");
             }
-        } else {
+        }
+        else {
             res.send("User Email is not registed");
         }
     } catch (err) { }
@@ -69,7 +139,6 @@ router.post(`${addRoute}login`, async (req, res) => {
 
 router.post(`${addRoute}contact`, async (req, res) => {
     const { _id, Name, Email, type, Contact_Number, Description } = req.body;
-    console.log(req.body);
     let UserRegistered = false;
     try{
         const userExist = DBModel.findOne({_id});
@@ -80,20 +149,20 @@ router.post(`${addRoute}contact`, async (req, res) => {
         }
         const contactData = new ContactModel({ Name, Email, type, Contact_Number, Description,UserRegistered});
         await contactData.save();
-        res.send({message:"Contact Message"});
+        res.send({message:`${type} submitted`,Success:true});
     }catch(err){
-        res.send({message:"Contact Message Error"});
-        console.log(err);
+        res.send({message:`${type} submittion Error `,Success:false});
     }
 })
 
 router.post(`${addRoute}reserveSeat`,Authenication, async (req, res) => {
-    const { Contact_Number, Person_Count, Date, Timing } = req.body;
-    console.log(req.body);
+    const { Contact_Number, Person_Count, Date, Timing,Booking_DateTime } = req.body;
+    // console.log(req.body);
+    // console.log(new date)
     try{
         const userExist = DBModel.findOne({_id:req.userID});
         if( userExist){
-            const contactData = new ReserveSeatModel({ User_ID:req.userID, Contact_Number, Person_Count, Date, Timing });
+            const contactData = new ReserveSeatModel({ User_ID:req.userID, Contact_Number, Person_Count, Reserve_Date:Date,Booking_DateTime, Timing });
             await contactData.save();
             res.send({message:"Seat Reserved"});
         } else{

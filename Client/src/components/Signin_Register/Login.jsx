@@ -28,7 +28,7 @@ const Login = () => {
   };
 
   const submitLogin = async (e) => {
-    e.perventDefault;
+    e.preventDefault();
     setloadingShow(true);
     if (loginData.Email && loginData.Password.length >= 8) {
       await axios
@@ -60,14 +60,14 @@ const Login = () => {
     <>
       <Header />
       <div id="Login">
-        <form>
+        <form onSubmit={submitLogin}>
           <h1>LOGIN</h1>
           <label htmlFor="Email">Email:</label>
           <br />
-          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInput} />
+          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInput} required/>
           <label htmlFor="Password">Password:</label> <br />
           <div id="passwordContainer">
-            <input type="Password" id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInput} />
+            <input type="Password" id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInput} required/>
             <div
               id="passwordEYE"
               onClick={() => {
@@ -78,9 +78,10 @@ const Login = () => {
           </div>
           <div className="forgot-password">
             <NavLink to="./forgetpassword">Forgot Password?</NavLink>
-            {/* <a href="#" className="forgot-password">Forgot Password?</a> */}
           </div>
-          {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> : <input type="button" value="LOGIN" onClick={submitLogin} />}
+          {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> : 
+          <input type="submit" value="LOGIN" />
+          }
           <div className="no-account">
             <p>Don't have an account?</p>
             <NavLink to="/auth/Register" ClassName="active">

@@ -28,6 +28,14 @@ const DBSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  EmailToken:{
+    type:String,
+    require:true
+  },
+  isVerified:{
+    type:Boolean,
+    require:true
+  },
   Password: {
     type: String,
     require: true,
@@ -150,7 +158,10 @@ const reserveSeatDB = new mongoose.Schema({
   }, Person_Count: {
     type: String,
     require: true
-  }, Date: {
+  }, Booking_DateTime: {
+    type: String,
+    require: true
+  }, Reserve_Date: {
     type: String,
     require: true
   }, Timing: {

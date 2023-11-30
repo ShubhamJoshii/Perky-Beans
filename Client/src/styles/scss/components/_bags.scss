@@ -102,8 +102,8 @@
 
         #Icons {
           @include flexMixin($JScontent: space-between, $direction: column);
-
           svg {
+            z-index: 999999;
             border-radius: 50%;
 
             &:hover {

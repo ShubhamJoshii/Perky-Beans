@@ -8,15 +8,15 @@ import Image from "../../assets/Beverages/image (1).png";
 import {Notification, UserData} from "../../routes/App";
 import {useContext} from "react";
 import {Products} from "../../Data/ProductsJSON";
-import {NavLink, useNavigate} from "react-router-dom";
+import {NavLink, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 const Bags = () => {
   const [showBag, setShowBag] = useState(false);
   const [showAmountDetails, setShowAmountDetail] = useState(null);
   const {userData, setUserData} = useContext(UserData);
+  const [category, setCategory] = useState(useParams());
   const {checkUserAlreadyLogin, notification} = useContext(Notification);
   const [loadingShow, setloadingShow] = useState(false);
-
   let GrandTotal = 0;
   const ref = useRef(null);
   const navigate = useNavigate();
@@ -51,6 +51,13 @@ const Bags = () => {
     }
   };
 
+  useEffect(() => {
+    let a;
+    Object.keys(category).length > 0 ? (a = userData?.Bag?.filter((e) => e.Category === category.categoryID || e._id === category.categoryID)) : (a = userData?.Bag);
+    // setProducts(a);
+  }, [category]);
+
+
   return (
     <>
       {showBag ? (
@@ -79,9 +86,12 @@ const Bags = () => {
                       const largePrice = (a.Price + 50) * curr.LargeCount;
                       const Total = smallPrice + mediumPrice + largePrice;
                       GrandTotal += Total;
-
+                      
+                      // console.log(a);
+                      let b = `/products/${a.Category}/${a._id}`;
+                      
                       return (
-                        <div id="productCart" key={ids}>
+                        <div id="productCart" key={ids} onClick={() => navigate(b)}>
                           <div id="productCartFront">
                             <img src={a.Image} alt="CardImage" />
                             <div id="productDetail">

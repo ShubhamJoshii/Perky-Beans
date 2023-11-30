@@ -39,7 +39,9 @@ const Header = () => {
   return (
     <React.Fragment>
       <div className="Header">
-        <img src={Logo} alt="Logo" />
+        <NavLink to="/">
+          <img src={Logo} alt="Logo" />
+        </NavLink>
         <ol>
           <NavLink to="/" ClassName="active">
             <li>HOME</li>
