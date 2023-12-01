@@ -1,64 +1,38 @@
-import Image1 from "../assets/Frontpage/Image (10).png";
-import Image2 from "../assets/Frontpage/Image (13).png";
-import Image3 from "../assets/Frontpage/Image (16).png";
-import Image4 from "../assets/Frontpage/Image (22).png";
-import Image5 from "../assets/Frontpage/Image (27).png";
-import Image6 from "../assets/Frontpage/Image (16).png";
-import Image7 from "../assets/Frontpage/Image (28).png";
-// import Image8 from "../assets/Frontpage/Image (10).png";
-// import Image9 from "../assets/Frontpage/Image (17).png";
-import Image10 from "../assets/Frontpage/Image (23).png";
-import Image11 from "../assets/Frontpage/Image (21).png";
-import Image12 from "../assets/Frontpage/Image (26).png";
-import Image13 from "../assets/Frontpage/Image (35).png";
-import Image14 from "../assets/Frontpage/Image (36).png";
-import Image15 from "../assets/Frontpage/Image (54).png";
-import Image16 from "../assets/Frontpage/Image (47).png";
-import Image17 from "../assets/Frontpage/Image (55).png";
-import Image18 from "../assets/Frontpage/Image (56).png";
-//import Image19 from "../assets/Frontpage/Image (50).png"
-// import Image20 from "../assets/Frontpage/Image (29).png";
-import Image21 from "../assets/Frontpage/Image (30).png";
-// import Image22 from "../assets/Frontpage/Image (31).png";
-import Image23 from "../assets/Frontpage/Image (32).png";
-// import Image24 from "../assets/Frontpage/Image (33).png";
-
-// for Desktop 12
 const FrontJSON = [
   {
     Title: "OUR SPECIALITY",
     Products: [
       {
         Name: "LATTE COFFEE",
-        Image: Image1,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348458/Frontpage/eihkutttytugpvayehld.png",
         _id: "ffd71c0f",
         Category: "Beverages",
         type: "Product",
       },
       {
         Name: "CHOCOLATE MUFFIN",
-        Image: Image2,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348458/Frontpage/aa1biaplzwp8rs4vtwkw.png",
         _id: "2161396f",
         Category: "Muffins",
         type: "Product",
       },
       {
         Name: "BUTTERSCOTCH MUFFIN",
-        Image: Image3,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348459/Frontpage/qvpyrzxng61xfirp2xyb.png",
         _id: "0cb089e1",
         Category: "Muffins",
         type: "Product",
       },
       {
         Name: "MOJITO",
-        Image: Image4,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348461/Frontpage/khff6lnhk0hy1pgfblk4.png",
         _id: "9815279e",
         Category: "Beverages",
         type: "Product",
       },
       {
         Name: "CHOCOLATE DONUTS",
-        Image: Image5,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348461/Frontpage/nqxjg7dzymatal1ldc6s.png",
         _id: "abfswe62",
         Category: "Muffins",
         type: "Product",
@@ -70,59 +44,29 @@ const FrontJSON = [
     Products: [
       {
         Name: "MUFFIN AND CAKE",
-        Image: Image6,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348459/Frontpage/qvpyrzxng61xfirp2xyb.png",
         Category: "Muffins",
       },
       {
         Name: "PIZZAS",
-        Image: Image7,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348462/Frontpage/rbycqkumdzphlnst1tcs.png",
         Category: "Pizza",
       },
-      // {
-      //     Name:"COFFEE",
-      //     Image:Image8,
-      //     Category:""
-      // },
-      // {
-      //     Name:"JUICE",
-      //     Image:Image9,
-      //     Category:"Beverages"
-      // },
       {
         Name: "BEVERAGES",
-        Image: Image21,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348462/Frontpage/vcbftkqoqstawc3xqv2k.png",
         Category: "Beverages",
       },
       {
         Name: "SMOOTHIE & ICE CREAM",
-        Image: Image10,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348461/Frontpage/egdanfnxj39nxhtzo1os.png",
         Category: "Smoothie",
       },
-      // {
-      //     Name:"ICE CREAM",
-      //     Image:Image20,
-      //     Category:"Beverages"
-      // } ,
       {
         Name: "SNAKES AND SIDES",
-        Image: Image23,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348463/Frontpage/svfbhxvk3k2ce1ramssm.png",
         Category: "SnacksAndSides",
       },
-      // {
-      //     Name:"NOODLES",
-      //     Image:Image22,
-      //     Category:"SnacksAndSides"
-      // },
-      // {
-      //     Name:"BURGER",
-      //     Image:Image23,
-      //     Category:"SnacksAndSides"
-      // } ,
-      // {
-      //     Name:"FRENCH FRIES",
-      //     Image:Image24,
-      //     Category:"SnacksAndSides"
-      // }
     ],
   },
   {
@@ -130,22 +74,22 @@ const FrontJSON = [
     Products: [
       {
         Name: "BUY 1 GET 1 FREE",
-        Image: Image11,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348460/Frontpage/cugqnpfngjvtktkxuuzk.png",
         Category: "SnacksAndSides",
       },
       {
         Name: "BURGUR",
-        Image: Image12,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348461/Frontpage/jydguzjfzchcszdjcx3u.png",
         Category: "SnacksAndSides",
       },
       {
         Name: "DONUTS",
-        Image: Image13,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348467/Frontpage/xxzdczhmgacmwg1kpa2w.png",
         Category: "SnacksAndSides",
       },
       {
         Name: "COFFEE",
-        Image: Image14,
+        Image: "https://res.cloudinary.com/dq309na14/image/upload/v1701348464/Frontpage/a71gg88jm5xidny8cyla.png",
         Category: "Beverages",
       },
     ],
@@ -156,7 +100,7 @@ const Reviews = [
   {
     CustomerName: "SHUBHAM JOSHI",
     Review: "I have booked seats in the PERKY BEANS to celebrate my birthday with my family. Everything is per the plan./n I enjoy my special day with nice and cool ambience.",
-    CustomerImage: Image16,
+    CustomerImage: "https://res.cloudinary.com/dq309na14/image/upload/v1701348468/Frontpage/yzestoqo4cksn60o6y6n.png",
     Rating: 4.0,
     Date: "02/05/2022",
   },
@@ -164,14 +108,14 @@ const Reviews = [
     CustomerName: "DEVANSHU",
     Review:
       "Quality is a crucial aspect of any cafe, especially when it comes to serving drinks and sweets. Customers appreciate cafes that prioritize high-quality ingredients, preparation methods, and overall craftsmanship in their offerings. It's important for cafes like Perky Beans to maintain consistent quality in their drinks and sweets to provide an enjoyable and satisfying experience for their customer./n Unique and Exceptional Products :Offering unique and exceptional drinks and sweets can set a cafe. ",
-    CustomerImage: Image18,
+    CustomerImage: "https://res.cloudinary.com/dq309na14/image/upload/v1701348468/Frontpage/ijk3o8eohgotp3hwju2b.png",
     Rating: 4.8,
     Date: "12/08/2022",
   },
   {
     CustomerName: "RISHABH",
     Review: "Ambience of the cafe is so good & interior design of the cafe was appealing and perhaps had a unique or stylish vibe./n Particularly, Lattee Coffee is my favourite.",
-    CustomerImage: Image15,
+    CustomerImage: "https://res.cloudinary.com/dq309na14/image/upload/v1701348468/Frontpage/bksrr0uwv6tounljal2v.png",
     Rating: 4.8,
     Date: "21/06/2022",
   },
@@ -179,7 +123,7 @@ const Reviews = [
     CustomerName: "DEVANSH",
     Review:
       "Quality is a crucial aspect of any cafe, especially when it comes to serving drinks and sweets. Customers appreciate cafes that prioritize high-quality ingredients, preparation methods, and overall craftsmanship in their offerings. It's important for cafes like Perky Beans to maintain consistent quality in their drinks and sweets to provide an enjoyable and satisfying experience for their customer./n Unique and Exceptional Products :Offering unique and exceptional drinks and sweets can set a cafe ",
-    CustomerImage: Image17,
+    CustomerImage: "https://res.cloudinary.com/dq309na14/image/upload/v1701348468/Frontpage/qklyvi58k6culxtd5nm5.png",
     Rating: 4.8,
     Date: "30/04/2022",
   },

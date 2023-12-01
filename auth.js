@@ -71,10 +71,11 @@ router.post(`${addRoute}register`, async (req, res) => {
             }
 
             await userData.save();
-            await new Promise((resolve, reject) => {
-                transporter.sendMail(message).then(() => {
+            await new Promise(async(resolve, reject) => {
+                await transporter.sendMail(message).then(() => {
                     return res.json("Verification  email sent" )
                 }).catch(() => {
+                    // Delete Created User
                     return res.json("Verification Error")
                 });
             });
@@ -305,8 +306,8 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
             }
 
             await otpDBSave.save();
-            await new Promise((resolve, reject) => {
-                transporter.sendMail(message).then(() => {
+            await new Promise(async(resolve, reject) => {
+                await transporter.sendMail(message).then(() => {
                     return res.json({ status: true, message: "Verification OTP email sent" })
                 }).catch(() => {
                     return res.json({ message: "OTP Generation Error" })
