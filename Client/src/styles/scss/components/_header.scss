@@ -79,6 +79,23 @@
         }
       }
     }
+
+    #AdminBTN{
+      background-color: red;
+      color: white;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 50%;
+      aspect-ratio: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      a{
+        aspect-ratio: 1;
+        min-width: 20px;
+        background: none;
+      }
+    }
   }
 
   #MenuIcons {

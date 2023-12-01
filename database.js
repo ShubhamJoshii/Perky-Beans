@@ -24,6 +24,10 @@ const DBSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  Role:{
+    type:String,
+    require:true
+  },
   Email: {
     type: String,
     require: true,
@@ -170,6 +174,40 @@ const reserveSeatDB = new mongoose.Schema({
   }
 })
 
+const ProductsDB = new mongoose.Schema({
+  _id:{
+    type:String,
+    require:true
+  },
+  Product_Name:{
+    type: String,
+    require: true
+  },
+  Description:{
+    type: String,
+    require: true
+  },
+  Rating:{
+    type: String,
+    require: true  
+  },
+  type:{
+    type: String,
+    require: true 
+  },
+  Price:{
+    type: Number,
+    require: true
+  },
+  Category:{
+    type: String,
+    require: true
+  },
+  Product_Photo:{
+    type: String,
+    require: true
+  }
+})
 
 DBSchema.pre("save", async function (next) {
   if (this.isModified("Password")) {
@@ -208,4 +246,7 @@ const OTPVerfication = mongoose.model("OTP_Verification", UserOTPVerification)
 const ContactModel = mongoose.model("Contact", ContactDB)
 const ReserveSeatModel = mongoose.model("Reserve_Seat", reserveSeatDB)
 
-module.exports = { DBModel, OTPVerfication, ContactModel,ReserveSeatModel };
+const ProductsModel = mongoose.model("Products",ProductsDB)
+
+
+module.exports = { DBModel, OTPVerfication, ContactModel,ReserveSeatModel, ProductsModel };

@@ -1,19 +1,19 @@
-import React, {useState, useRef, useEffect, useContext} from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import RandomUser from "../../assets/RandomUser.png";
 import Logo from "../../assets/PerkyBeansLogo.png";
-import {Oval} from "react-loader-spinner";
-import {IoMdMenu} from "react-icons/io";
-import {MdClose} from "react-icons/md";
-import {NavLink, useLocation} from "react-router-dom";
+import { Oval } from "react-loader-spinner";
+import { IoMdMenu } from "react-icons/io";
+import { MdClose } from "react-icons/md";
+import { NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
-import {Notification, UserData} from "../../routes/App";
+import { Notification, UserData } from "../../routes/App";
 
 const Header = () => {
   const [menuShown, setMenuShow] = useState(false);
   const [loadingShow, setLoadingShow] = useState(false);
   const menuRef = useRef(0);
-  const {userData, setUserData} = useContext(UserData);
-  const {notification} = useContext(Notification);
+  const { userData, setUserData } = useContext(UserData);
+  const { notification } = useContext(Notification);
   const location = useLocation();
   useEffect(() => {
     menuShown ? (menuRef.current.style.top = "58px") : (menuRef.current.style.top = "-120vh");
@@ -23,7 +23,7 @@ const Header = () => {
     setLoadingShow(true);
     await axios.get("/api/logout").then((result) => {
       if (result.data) {
-        notification(result.data);
+        notification(result.data, "Success");
         setUserData(null);
       }
     });
@@ -32,9 +32,9 @@ const Header = () => {
     }, 1000);
   };
 
-  useEffect(()=>{
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });                
-  },[location])
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  }, [location])
 
   return (
     <React.Fragment>
@@ -58,17 +58,24 @@ const Header = () => {
           <NavLink to="/reserveseat" ClassName="active">
             <li>RESERVE SEAT</li>
           </NavLink>
+          {
+            userData?.Role === "Admin" &&
+            <div id="AdminBTN">
+              <NavLink to="/admin" className={location.pathname.includes("/auth") ? "active" : ""}> A </NavLink>
+            </div>
+          }
           <div id="LOGINRegister">
             {userData ? (
               <a onClick={logoutBTN}>
                 <button id="loginRegisterHeader">{loadingShow ? <Oval height="16" width="16" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>LOGOUT</>}</button>
               </a>
             ) : (
-              <NavLink to="/auth/login"  className={location.pathname.includes("/auth") ? "active" : ""}>
+              <NavLink to="/auth/login" className={location.pathname.includes("/auth") ? "active" : ""}>
                 <button id="loginRegisterHeader">LOGIN / REGISTER</button>
               </NavLink>
             )}
           </div>
+
         </ol>
 
         <div id="MenuIcons">{menuShown ? <MdClose onClick={() => setMenuShow(!menuShown)} /> : <IoMdMenu onClick={() => setMenuShow(!menuShown)} />}</div>
@@ -108,6 +115,10 @@ const Header = () => {
           <NavLink to="/reserveseat" ClassName="active">
             <li>RESERVE SEAT</li>
           </NavLink>
+          {
+            userData?.Role === "Admin" &&
+            <NavLink to="/admin" ClassName="active"> <li>Admin</li> </NavLink>
+          }
         </ol>
         {userData && (
           <button id="logoutBTN" onClick={() => logoutBTN()}>
