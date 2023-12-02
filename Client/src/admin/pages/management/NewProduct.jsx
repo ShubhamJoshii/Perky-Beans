@@ -1,7 +1,8 @@
-import { useState, ChangeEvent, useEffect, useContext } from "react";
+import {useState, ChangeEvent, useEffect, useContext} from "react";
 import AdminSidebar from "../../components/AdminSidebar";
 import axios from "axios";
-import { UserData, Notification } from "../../../routes/App";
+import {UserData, Notification} from "../../../routes/App";
+import noPhoto from "../../../assets/noPhoto.png";
 
 const NewProduct = () => {
   const [productData, setProductData] = useState({
@@ -11,43 +12,56 @@ const NewProduct = () => {
     Category: "Muffins",
     Product_Photo: undefined,
     Rating: undefined,
-    type: "Veg"
-  })
-  const { notification, checkUserAlreadyLogin } = useContext(Notification);
+    type: "Veg",
+  });
+  const {notification, checkUserAlreadyLogin} = useContext(Notification);
 
   const handleInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setProductData({ ...productData, [name]: value });
-  }
+    setProductData({...productData, [name]: value});
+  };
 
   const saveProduct = async (e) => {
     e.preventDefault();
-    await axios.post("/api/saveProduct", { ...productData }).then((result) => {
-      if (result.data.result) {
-        console.log(result.data.message);
-        notification(result.data.message, "Success");
-        setProductData({
-          Product_Name: "",
-          Description: "",
-          Price: "",
-          Category: "",
-          Product_Photo: "",
-          Rating: "",
-          type: ""
-        })
-      } else {
-        notification(result.data.message, "Un-Success");
-      }
-    }).catch((err) => {
-      console.log(err);
-    })
-  }
+    await axios
+      .post("/api/saveProduct", {...productData})
+      .then((result) => {
+        if (result.data.result) {
+          console.log(result.data.message);
+          notification(result.data.message, "Success");
+          setProductData({
+            Product_Name: "",
+            Description: "",
+            Price: "",
+            Category: "",
+            Product_Photo: "",
+            Rating: "",
+            type: "",
+          });
+        } else {
+          notification(result.data.message, "Un-Success");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="admin-container">
       <AdminSidebar />
       <main className="product-management">
+        <section>
+          {productData._id && <strong>ID - {productData._id}</strong>}
+          <img src={productData.Product_Photo ? productData.Product_Photo : noPhoto} alt="Product" />
+          {(productData.Product_Name || productData.Price) && (
+            <div className="image-container">
+              <p>{productData.Product_Name}</p>
+              <h3>₹{productData.Price ? productData.Price : `N/A`}</h3>
+            </div>
+          )}
+        </section>
         <article>
           <form onSubmit={saveProduct}>
             <h2>New Product</h2>
@@ -71,7 +85,8 @@ const NewProduct = () => {
             </div>
             <div id="dropDowns">
               <div>
-                <label htmlFor="type">Type</label><br />
+                <label htmlFor="type">Type</label>
+                <br />
                 <select name="type" id="select" defaultValue={productData.type} onChange={handleInput}>
                   <option value="Vegan">Vegan</option>
                   <option value="Veg">Vegetarian</option>
@@ -100,7 +115,7 @@ const NewProduct = () => {
               <input required type="file" name="Product_Photo" id="Product_Photo" onChange={handleInput} />
             </div> */}
 
-            {productData.Product_Photo && <img src={productData.Product_Photo} alt="New Image" />}
+            {/* {productData.Product_Photo && <img src={productData.Product_Photo} alt="New Image" />} */}
 
             <input type="submit" value="CREATE" />
             {/* Create</input> */}
