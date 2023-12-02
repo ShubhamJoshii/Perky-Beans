@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import AdminSidebar from "../components/AdminSidebar";
-import { FaTrash } from "react-icons/fa";
 import axios from "axios";
+import { FaTrash } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import Switch from "react-switch"
+import Pagination from '../components/Pagination';
+import { Oval } from "react-loader-spinner"
 const Customers = () => {
   const [usersData, setUsersData] = useState();
   const [checked, setChecked] = useState(false);
-  const handleChange = async(_id,Role) => {
-    await axios.post("/api/updateUserRole",{_id,Role}).then((response)=>{
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handleChange = async (_id, Role) => {
+    setLoading(true);
+    await axios.post("/api/updateUserRole", { _id, Role }).then((response) => {
       // console.log(response.data.message);
       response.data.result && fetchUsers();
-    }).catch((err)=>{
+    }).catch((err) => {
       console.log(err);
+    }).finally(() => {
+      setLoading(false);
     })
   };
 
   const fetchUsers = async () => {
+    setLoading(true);
     await axios.get("/api/fetchUsers").then((result) => {
       // console.log(result.data.data);
       if (result.data?.data) {
@@ -24,18 +33,22 @@ const Customers = () => {
       }
     }).catch((err) => {
       console.log("Error")
+    }).finally(() => {
+      setLoading(false);
     })
   }
   useEffect(() => {
     fetchUsers();
   }, [])
 
-  useEffect(() => {
-    // usersData.map((curr)=>{
-    //   console.log(curr);
-    // })
-    console.log(usersData);
-  }, [usersData])
+  const usersPerPage = 8;
+  const totalPages = Math.ceil(usersData?.length / usersPerPage);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const displayedUsers = usersData?.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
 
 
   return (
@@ -54,30 +67,39 @@ const Customers = () => {
 
             </tr>
           </thead>
-          <tbody>
-            {
-              usersData?.map((curr) => {
-                const isAdmin = curr.Role === "Admin"
-                return (
-                  <tr>
-                    <td>{curr.Full_Name}</td>
-                    <td>{curr.Email}</td>
-                    <td>{curr.Role}</td>
-                    <td>{curr.isVerified ? <p id='verified'>Verified</p> : <p id='not-verified'>Not-Verified</p>}</td>
-                    <td>
-                      <Switch
-                        onChange={()=>handleChange(curr._id,curr.Role)}
-                        checked={isAdmin}
-                        className="react-switch"
-                      />
-                    </td>
-                  </tr>
-                )
-              })
-            }
-            {!usersData && <p>No User Found</p>}
-          </tbody>
+          {loading ? (
+            <td colSpan="5">
+              <Oval height="40" width="60" color="black" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
+            </td>
+          ) : (
+            <tbody>
+              {
+                displayedUsers?.map((curr) => {
+                  const isAdmin = curr.Role === "Admin"
+                  return (
+                    <tr>
+                      <td>{curr.Full_Name}</td>
+                      <td>{curr.Email}</td>
+                      <td>{curr.Role}</td>
+                      <td>{curr.isVerified ? <p id='verified'>Verified</p> : <p id='not-verified'>Not-Verified</p>}</td>
+                      <td>
+                        <Switch
+                          onChange={() => handleChange(curr._id, curr.Role)}
+                          checked={isAdmin}
+                          className="react-switch"
+                        />
+                      </td>
+                    </tr>
+                  )
+                })
+              }
+              {!usersData && <p>No User Found</p>}
+            </tbody>
+          )}
         </table>
+        {!loading &&
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        }
       </div>
     </div>
   )

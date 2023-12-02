@@ -199,6 +199,11 @@ const ProductsDB = new mongoose.Schema({
     type: Number,
     require: true
   },
+  Available:{
+    type: Boolean,
+    default:true,
+    require: true
+  },
   Category:{
     type: String,
     require: true

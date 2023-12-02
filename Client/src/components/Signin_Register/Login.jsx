@@ -89,13 +89,13 @@ const Login = () => {
             </NavLink>
           </div>
         </form>
-        <div className="social-login">
+        {/* <div className="social-login">
           <p>Or log in with:</p>
           <button className="google-login">
             <img src={google} alt="google" />
             <span>Log in with Google</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </>
   );

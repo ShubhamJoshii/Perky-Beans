@@ -38,6 +38,12 @@
   top: 0;
   // z-index: 999999;
   width: 100%;
+
+  .loading{
+    svg{
+      width: 100%;
+    }
+  }
   a {
     text-decoration: none;
     color: black;

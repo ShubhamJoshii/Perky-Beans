@@ -147,7 +147,7 @@ const Register = () => {
               <h1>Verify your email address</h1>
               <img src={EmailVerficationLogo} />
               <p>Verfication email has been sent to:</p>
-              <strong><p>shubhamjoshi@gmail.com</p></strong>
+              <strong><p>{registerData.Email}</p></strong>
               <p>Click on the link in the email to activate your account.
                 <p id="verified-login">Verified? <NavLink to="/auth/login">Login</NavLink></p>
               </p>

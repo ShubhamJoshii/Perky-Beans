@@ -1,13 +1,16 @@
 import {Notification} from "../../routes/App";
 import {IoMdClose} from "react-icons/io";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import {Oval} from "react-loader-spinner";
 import axios from "axios";
 
-import Image1 from "../../assets/Beverages/image (1).png";
 const WishlistCards = ({product, orderData, userData, setUserData}) => {
   const [loadingShow, setloadingShow] = useState(false);
   const {checkUserAlreadyLogin} = useContext(Notification);
+
+  // useEffect(()=>{
+  //   console.log(product);
+  // },[product])
 
   const removeFromWishlist = async (_id) => {
     let b = userData.Wishlist.find((e) => e.productID === _id);
@@ -39,10 +42,10 @@ const WishlistCards = ({product, orderData, userData, setUserData}) => {
 
   return (
     <div id="WishList-Card">
-      <img src={product?.Image} alt="ImageProduct" />
+      <img src={product?.Product_Photo} alt="ImageProduct" />
       <div id="productDesc">
-        <h2>{product?.Name}</h2>
-        <p>{product?.Desc.slice(0, 180)}...</p>
+        <h2>{product?.Product_Name}</h2>
+        <p>{product?.Description.slice(0, 180)}...</p>
       </div>
       <h1>₹{product?.Price}</h1>
       <IoMdClose id="IconClose" onClick={() => removeFromWishlist(orderData.productID)} />

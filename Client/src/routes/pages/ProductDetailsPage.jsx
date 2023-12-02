@@ -1,31 +1,43 @@
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {Products} from "../../Data/ProductsJSON";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+// import {Products} from "../../Data/ProductsJSON";
 import Bags from "../../components/Common/Bags";
 import ProductPage from "../../components/Products/ProductPage";
 import CustomerReview from "../../components/Landing/CustomerReview/CustomerReview";
 import Footer from "../../components/Footer/Footer";
 import PageNotFound from "../../components/PageNotFound/PageNotFound";
 import Header from "../../components/Header/Header";
+import axios from "axios";
 
 const ProductDetailsPage = () => {
   const [itemDetails, setItemDetails] = useState({});
+
   let itemShow = useParams().productID;
+
+  const fetchProductDetails = async () => {
+    await axios.post("/api/fetchProductDetails", { _id: itemShow }).then((response) => {
+      setItemDetails(response.data.data)
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
   useEffect(() => {
-    setItemDetails(Products.find((e) => e._id === itemShow));
+    itemShow && fetchProductDetails();
   }, [itemShow]);
+
   return (
     <>
       <Header />
-      <Bags />
+      {/* <Bags />
       {itemDetails && <ProductPage /> ? (
-        <>
-          <ProductPage />
-          <CustomerReview />
+        <> */}
+      <ProductPage />
+      {/* <CustomerReview />
         </>
       ) : (
         <PageNotFound />
-      )}
+      )} */}
       <Footer />
     </>
   );

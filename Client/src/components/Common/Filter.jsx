@@ -6,7 +6,7 @@ import {RiCloseFill, RiArrowDropUpLine, RiArrowDropDownLine} from "react-icons/r
 import {GiCheckMark} from "react-icons/gi";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 // import RangeSlider from "re"
-import Image from "../../assets/Beverages/Image (1).png";
+import Image from "../../assets/Beverages.png";
 
 const FilterData = [
   {

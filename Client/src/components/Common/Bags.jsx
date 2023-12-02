@@ -4,10 +4,8 @@ import {IoIosClose} from "react-icons/io";
 import {MdOutlineArrowBackIos} from "react-icons/md";
 import {RiArrowDropUpLine, RiArrowDropDownLine} from "react-icons/ri";
 import {Oval} from "react-loader-spinner";
-import Image from "../../assets/Beverages/image (1).png";
 import {Notification, UserData} from "../../routes/App";
 import {useContext} from "react";
-import {Products} from "../../Data/ProductsJSON";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 const Bags = () => {
@@ -20,6 +18,21 @@ const Bags = () => {
   let GrandTotal = 0;
   const ref = useRef(null);
   const navigate = useNavigate();
+
+  const [productsData, setProductsData] = useState([]);
+  const fetchProducts = async () => {
+    await axios.get("/api/fetchProduct").then((result) => {
+      // console.log(result.data.data);
+      setProductsData(result.data.data);
+    }).catch((err) => {
+      console.log("Error")
+    })
+  }
+
+  useEffect(() => {
+    fetchProducts();
+  }, [])
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (ref.current && !ref.current.contains(event.target)) {
@@ -80,7 +93,7 @@ const Bags = () => {
                 {userData?.Bag?.length > 0 ? (
                   <>
                     {userData?.Bag?.map((curr, ids) => {
-                      const a = Products.find((e) => e._id === curr.productID);
+                      const a = productsData.find((e) => e._id === curr.productID);
                       const smallPrice = (a.Price - 50) * curr.SmallCount;
                       const mediumPrice = a.Price * curr.MediumCount;
                       const largePrice = (a.Price + 50) * curr.LargeCount;
@@ -93,10 +106,10 @@ const Bags = () => {
                       return (
                         <div id="productCart" key={ids} onClick={() => navigate(b)}>
                           <div id="productCartFront">
-                            <img src={a.Image} alt="CardImage" />
+                            <img src={a.Product_Photo} alt="CardImage" />
                             <div id="productDetail">
                               <div id="productName">
-                                <h3>{a.Name}</h3>
+                                <h3>{a.Product_Name}</h3>
                                 <h4>
                                   Quantity: {curr.SmallCount > 0 && curr.SmallCount + "S,"} {curr.MediumCount > 0 && curr.MediumCount + "M,"} {curr.LargeCount > 0 && curr.LargeCount + "L,"}{" "}
                                 </h4>

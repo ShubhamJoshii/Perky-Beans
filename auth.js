@@ -50,7 +50,7 @@ router.post(`${addRoute}register`, async (req, res) => {
         Password,
         Confirm_Password,
         EmailToken,
-        Role:"Customer",
+        Role: "Customer",
         isVerified: false,
       });
 
@@ -151,6 +151,66 @@ router.post(`${addRoute}login`, async (req, res) => {
     }
   } catch (err) {}
 });
+
+router.post(`${addRoute}fetchProduct`, async (req, res) => {
+  const {Available} = req.body;
+  if(Available){
+    const products = await ProductsModel.find({Available:true});
+    res.send({ data: products });
+  }else{
+    const products = await ProductsModel.find();
+    res.send({ data: products });
+  }
+});
+
+router.post(`${addRoute}fetchProductDetails`, async (req, res) => {
+  const { _id } = req.body;
+  const productDetails = await ProductsModel.findOne({ _id });
+  productDetails
+    ? res.send({ data: productDetails, found: true })
+    : res.send({ data: "Error", found: false });
+});
+
+router.post(`${addRoute}updateProduct`, async (req, res) => {
+  const {
+    _id,
+    Product_Photo,
+    Product_Name,
+    Description,
+    Price,
+    Rating,
+    type,
+    Category,
+  } = req.body;
+  //   console.log(req.body);
+  const productDetails = await ProductsModel.updateOne(
+    { _id },
+    {
+      $set: {
+        Product_Photo,
+        Product_Name,
+        Description,
+        Price,
+        type,
+        Rating,
+        Category,
+      },
+    }
+  );
+  productDetails
+    ? res.send({ message: "Product Updated" })
+    : res.send({ message: "Product Not Updated Try Again" });
+});
+
+router.post(`${addRoute}deleteProduct`, async (req, res) => {
+  // console.log(req.body);
+  const { _id } = req.body;
+  const deleteProduct = await ProductsModel.deleteOne({ _id });
+  deleteProduct
+    ? res.send({ message: "Product Deleted" })
+    : res.send({ message: "Product Not Deleted Try Again" });
+});
+
 
 router.post(`${addRoute}contact`, async (req, res) => {
   const { _id, Name, Email, type, Contact_Number, Description } = req.body;
@@ -254,6 +314,7 @@ router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
     console.log(err);
   }
 });
+
 router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
@@ -455,86 +516,50 @@ router.post(`${addRoute}saveProduct`, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}fetchProduct`, async (req, res) => {
-  const products = await ProductsModel.find();
-  // console.log(products);
-  res.send({ data: products });
-});
 
-router.post(`${addRoute}fetchProductDetails`, async (req, res) => {
-  const { _id } = req.body;
-  const productDetails = await ProductsModel.findOne({ _id });
-  productDetails
-    ? res.send({ data: productDetails, found: true })
-    : res.send({ data: "Error", found: false });
-});
-
-router.post(`${addRoute}updateProduct`, async (req, res) => {
-  const {
-    _id,
-    Product_Photo,
-    Product_Name,
-    Description,
-    Price,
-    Rating,
-    type,
-    Category,
-  } = req.body;
-  //   console.log(req.body);
-  const productDetails = await ProductsModel.updateOne(
-    { _id },
-    {
-      $set: {
-        Product_Photo,
-        Product_Name,
-        Description,
-        Price,
-        type,
-        Rating,
-        Category,
-      },
-    }
-  );
-  productDetails ? 
-  res.send({ message: "Product Updated" }) :
-  res.send({ message: "Product Not Updated Try Again" }) ;
-
-});
-
-router.post(`${addRoute}deleteProduct`, async (req, res) => {
-  // console.log(req.body);
-  const {_id} = req.body;
-  const deleteProduct = await ProductsModel.deleteOne({ _id });
-  deleteProduct
-    ? res.send({ message: "Product Deleted" })
-    : res.send({ message: "Product Not Deleted Try Again" });
-});
 
 router.get(`${addRoute}fetchUsers`, async (req, res) => {
   // console.log("Hllo");
   const usersData = await DBModel.find();
-  usersData ?
-  res.send({message: "User Found", data: usersData })
-  :
-  res.send({ message: "No User Found" });
+  usersData
+    ? res.send({ message: "User Found", data: usersData })
+    : res.send({ message: "No User Found" });
 });
 
 router.post(`${addRoute}updateUserRole`, async (req, res) => {
-  const {_id,Role} = req.body;
+  const { _id, Role } = req.body;
   let NewRole;
   // console.log(_id);
-  if(Role === "Admin"){
-    NewRole = "Customer"
-  }else{
-    NewRole = "Admin"
+  if (Role === "Admin") {
+    NewRole = "Customer";
+  } else {
+    NewRole = "Admin";
   }
-  const usersData = await DBModel.updateOne({_id},{
-    $set: {Role:NewRole}});
-  
-    usersData ? 
-  res.send({ message: "User Role Updated",result:true })
-  :
-  res.send({ message: "User Role Not Updated",result:false });
+  const usersData = await DBModel.updateOne(
+    { _id },
+    {
+      $set: { Role: NewRole },
+    }
+  );
+
+  usersData
+    ? res.send({ message: "User Role Updated", result: true })
+    : res.send({ message: "User Role Not Updated", result: false });
+});
+
+router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
+  const { _id, isAvailable } = req.body;
+  // console.log(req.body);
+  const productsData = await ProductsModel.updateOne(
+    { _id },
+    {
+      $set: { Available: isAvailable },
+    }
+  );
+
+  productsData
+    ? res.send({ message: "Product Availability Updated", result: true })
+    : res.send({ message: "Product Availability  Not Updated", result: false });
 });
 
 module.exports = router;

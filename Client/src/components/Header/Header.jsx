@@ -60,9 +60,9 @@ const Header = () => {
           </NavLink>
           {
             userData?.Role === "Admin" &&
-            <div id="AdminBTN">
-              <NavLink to="/admin" className={location.pathname.includes("/auth") ? "active" : ""}> A </NavLink>
-            </div>
+          <NavLink id="Admin" to="/admin" >
+            <li>ADMIN</li>
+          </NavLink>
           }
           <div id="LOGINRegister">
             {userData ? (

@@ -33,7 +33,7 @@ const UserData = createContext();
 const Notification = createContext();
 
 const App = () => {
-  const [loadingScreen, setloadingScreen] = useState(true);
+  // const [loadingScreen, setloadingScreen] = useState(true);
   const [userData, setUserData] = useState(null);
   const checkUserAlreadyLogin = async () => {
     await axios
@@ -98,14 +98,14 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setloadingScreen(false);
-    }, 1000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setloadingScreen(false);
+  //   }, 1000);
+  // }, []);
 
   return (
-    <Loading.Provider value={setloadingScreen}>
+    // <Loading.Provider value={setloadingScreen}>
       <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
         <UserData.Provider value={{ userData, setUserData }}>
           <ToastContainer />
@@ -148,7 +148,7 @@ const App = () => {
           </Router>
         </UserData.Provider>
       </Notification.Provider>
-    </Loading.Provider>
+    // </Loading.Provider>
   );
 };
 export default App;

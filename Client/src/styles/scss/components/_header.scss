@@ -73,28 +73,15 @@
         padding: 7px 10px;
         border-bottom: 0px solid #ecb014;
         background-color: rgba(255, 255, 255, 0.871);
-
+        
         button {
           color: black;
         }
       }
     }
-
-    #AdminBTN{
-      background-color: red;
-      color: white;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 50%;
-      aspect-ratio: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      a{
-        aspect-ratio: 1;
-        min-width: 20px;
-        background: none;
-      }
+    
+    #Admin{
+      min-width: 5px;
     }
   }
 
