@@ -1,19 +1,21 @@
-import {useEffect, useRef, useState} from "react";
-import {FaShoppingBag} from "react-icons/fa";
-import {IoIosClose} from "react-icons/io";
-import {MdOutlineArrowBackIos} from "react-icons/md";
-import {RiArrowDropUpLine, RiArrowDropDownLine} from "react-icons/ri";
-import {Oval} from "react-loader-spinner";
-import {Notification, UserData} from "../../routes/App";
-import {useContext} from "react";
-import {NavLink, useNavigate, useParams} from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { FaShoppingBag } from "react-icons/fa";
+import { IoIosClose } from "react-icons/io";
+import { MdOutlineArrowBackIos } from "react-icons/md";
+import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/ri";
+import { Oval } from "react-loader-spinner";
+import { Notification, UserData } from "../../routes/App";
+import { useContext } from "react";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+
 const Bags = () => {
   const [showBag, setShowBag] = useState(false);
   const [showAmountDetails, setShowAmountDetail] = useState(null);
-  const {userData, setUserData} = useContext(UserData);
+  const { userData, setUserData } = useContext(UserData);
   const [category, setCategory] = useState(useParams());
-  const {checkUserAlreadyLogin, notification} = useContext(Notification);
+  const { checkUserAlreadyLogin, notification } = useContext(Notification);
+  const [loading, setLoading] = useState(true);
   const [loadingShow, setloadingShow] = useState(false);
   let GrandTotal = 0;
   const ref = useRef(null);
@@ -21,11 +23,14 @@ const Bags = () => {
 
   const [productsData, setProductsData] = useState([]);
   const fetchProducts = async () => {
-    await axios.get("/api/fetchProduct").then((result) => {
+    setLoading(true);
+    await axios.post("/api/fetchProduct", { Available: true }).then((result) => {
       // console.log(result.data.data);
       setProductsData(result.data.data);
     }).catch((err) => {
       console.log("Error")
+    }).finally(() => {
+      setLoading(false);
     })
   }
 
@@ -46,8 +51,9 @@ const Bags = () => {
   }, [showBag]);
 
   const removeFromBag = async (_id) => {
-    await axios.post("/api/removeFromBag", {productID: _id}).then((result) => {
+    await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
       checkUserAlreadyLogin();
+      fetchProducts();
     });
   };
 
@@ -59,8 +65,9 @@ const Bags = () => {
           notification(result.data);
           checkUserAlreadyLogin();
         }
+      }).finally(() => {
         setloadingShow(false);
-      });
+      })
     }
   };
 
@@ -88,68 +95,77 @@ const Bags = () => {
                 </button>
               </div>
             )}
+
             {userData ? (
-              <div id="bagScroll">
-                {userData?.Bag?.length > 0 ? (
-                  <>
-                    {userData?.Bag?.map((curr, ids) => {
-                      const a = productsData.find((e) => e._id === curr.productID);
-                      const smallPrice = (a.Price - 50) * curr.SmallCount;
-                      const mediumPrice = a.Price * curr.MediumCount;
-                      const largePrice = (a.Price + 50) * curr.LargeCount;
-                      const Total = smallPrice + mediumPrice + largePrice;
-                      GrandTotal += Total;
-                      
-                      // console.log(a);
-                      let b = `/products/${a.Category}/${a._id}`;
-                      
-                      return (
-                        <div id="productCart" key={ids} onClick={() => navigate(b)}>
-                          <div id="productCartFront">
-                            <img src={a.Product_Photo} alt="CardImage" />
-                            <div id="productDetail">
-                              <div id="productName">
-                                <h3>{a.Product_Name}</h3>
-                                <h4>
-                                  Quantity: {curr.SmallCount > 0 && curr.SmallCount + "S,"} {curr.MediumCount > 0 && curr.MediumCount + "M,"} {curr.LargeCount > 0 && curr.LargeCount + "L,"}{" "}
-                                </h4>
+              <>
+                {
+                  !loading ?
+                    <div id="bagScroll">
+                      {userData?.Bag?.length > 0 ? (
+                        <>
+                          {userData?.Bag?.map((curr, ids) => {
+                            const a = productsData?.find((e) => e._id === curr.productID);
+                            const smallPrice = (a?.Price - 50) * curr.SmallCount;
+                            const mediumPrice = a?.Price * curr.MediumCount;
+                            const largePrice = (a?.Price + 50) * curr.LargeCount;
+                            const Total = smallPrice + mediumPrice + largePrice;
+                            GrandTotal += Total;
+
+                            // console.log(a);
+                            let b = `/products/${a?.Category}/${a._id}`;
+
+                            return (
+                              <div id="productCart" key={ids} onClick={() => navigate(b)}>
+                                <div id="productCartFront">
+                                  <img src={a.Product_Photo} alt="CardImage" />
+                                  <div id="productDetail">
+                                    <div id="productName">
+                                      <h3>{a.Product_Name}</h3>
+                                      <h4>
+                                        Quantity: {curr.SmallCount > 0 && curr.SmallCount + "S "} {curr.MediumCount > 0 && curr.MediumCount + "M "} {curr.LargeCount > 0 && curr.LargeCount + "L"}{" "}
+                                      </h4>
+                                    </div>
+                                    <h4>&#x20B9;{Total}</h4>
+                                    <div id="Icons">
+                                      <IoIosClose onClick={() => removeFromBag(curr.productID)} />
+                                      {showAmountDetails === ids ? <RiArrowDropUpLine onClick={() => setShowAmountDetail(null)} /> : <RiArrowDropDownLine onClick={() => setShowAmountDetail(ids)} />}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div id="Amount_Info_Show" style={showAmountDetails === ids ? { height: "100%" } : { height: "0" }}>
+                                  <div id="Amount_INFO">
+                                    <h4>TOTAL :</h4>
+                                    <div>
+                                      {curr.SmallCount > 0 && <p>Regular  x  {curr.SmallCount} </p>}
+                                      {curr.MediumCount > 0 && <p>Medium  x  {curr.MediumCount} </p>}
+                                      {curr.LargeCount > 0 && <p>Large  x  {curr.LargeCount} </p>}
+                                    </div>
+                                    <div>
+                                      {curr.SmallCount > 0 && <p>&#x20B9;{smallPrice}</p>}
+                                      {curr.MediumCount > 0 && <p>&#x20B9;{mediumPrice}</p>}
+                                      {curr.LargeCount > 0 && <p>&#x20B9;{largePrice}</p>}
+                                    </div>
+                                  </div>
+                                  <div id="TotalAmt">
+                                    <p>You Pay :</p>
+                                    <p>&#x20B9;{Total}</p>
+                                  </div>
+                                </div>
                               </div>
-                              <h4>&#x20B9;{Total}</h4>
-                              <div id="Icons">
-                                <IoIosClose onClick={() => removeFromBag(curr.productID)} />
-                                {showAmountDetails === ids ? <RiArrowDropUpLine onClick={() => setShowAmountDetail(null)} /> : <RiArrowDropDownLine onClick={() => setShowAmountDetail(ids)} />}
-                              </div>
-                            </div>
-                          </div>
-                          <div id="Amount_Info_Show" style={showAmountDetails === ids ? {height: "100%"} : {height: "0"}}>
-                            <div id="Amount_INFO">
-                              <h4>TOTAL :</h4>
-                              <div>
-                                <p>Regular {curr.SmallCount && "*" + curr.SmallCount}</p>
-                                <p>Medium {curr.MediumCount && "*" + curr.MediumCount}</p>
-                                <p>Large {curr.LargeCount && "*" + curr.LargeCount}</p>
-                              </div>
-                              <div>
-                                <p>&#x20B9;{smallPrice}</p>
-                                <p>&#x20B9;{mediumPrice}</p>
-                                <p>&#x20B9;{largePrice}</p>
-                              </div>
-                            </div>
-                            <div id="TotalAmt">
-                              <p>You Pay :</p>
-                              <p>&#x20B9;{Total}</p>
-                            </div>
-                          </div>
+                            );
+                          })}
+                        </>
+                      ) : (
+                        <div id="productCart" style={{ textAlign: "center" }}>
+                          No Item Found in Bag
                         </div>
-                      );
-                    })}
-                  </>
-                ) : (
-                  <div id="productCart" style={{textAlign: "center"}}>
-                    No Item Found in Bag
-                  </div>
-                )}
-              </div>
+                      )}
+                    </div>
+                    :
+                    <Oval height="40" width="60" color="black" wrapperStyle={{flex:1, marginTop:"50px"}} wrapperClass="bagScroll loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
+                }
+
+              </>
             ) : (
               <div id="bagScroll" className="userNotLogin">
                 <p>
@@ -164,7 +180,7 @@ const Bags = () => {
             <div id="Bag-Total-Price">
               <h4>Grand Total : </h4>
               <h4>&#x20B9; {GrandTotal}</h4>
-              <button style={userData?.Bag.length > 0 ? {} : {background: "grey"}} onClick={orderNow}>
+              <button style={userData?.Bag.length > 0 ? {} : { background: "grey" }} onClick={orderNow}>
                 {loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>ORDER NOW</>}
               </button>
             </div>

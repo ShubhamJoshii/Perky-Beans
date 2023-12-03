@@ -12,7 +12,7 @@ const SearchBar = ({ position, currPlace, bgColor }) => {
   const [showFilterBox, setShowFilterBox] = useState(false);
   const [Products, setProducts] = useState(null);
   const fetchProducts = async () => {
-    await axios.get("/api/fetchProduct").then((result) => {
+    await axios.post("/api/fetchProduct",{Available:true}).then((result) => {
       setProducts(result.data.data);
     }).catch((err) => {
       console.log("Error")
@@ -53,7 +53,6 @@ const SearchBar = ({ position, currPlace, bgColor }) => {
       <Filter showFilterBox={showFilterBox} setShowFilterBox={setShowFilterBox} />
       <div id="SearchProductsContainer">
         {searchOutput?.map((curr, id) => {
-          // console.log(curr);
           let a;
           currPlace === "home" ? (a = `/products/${curr.Category}/${curr._id}`) : (a = `/products/${curr.Category}/${curr._id}`);
           return (

@@ -15,6 +15,13 @@ const ProductManagement = lazy(() => import("../admin/pages/management/ProductMa
 const TransactionManagement = lazy(() => import("../admin/pages/management/TransactionManagement"));
 const Coupon = lazy(() => import("../admin/pages/apps/Coupon"));
 
+const BarCharts = lazy(() => import("../admin/pages/charts/BarCharts"));
+const LineCharts = lazy(() => import("../admin/pages/charts/LineCharts"));
+const PieCharts = lazy(() => import("../admin/pages/charts/PieCharts"));
+
+const Stopwatch = lazy(() => import("../admin/pages/apps/Stopwatch"));
+// const Toss = lazy(() => import("../admin/pages/apps/Toss"));
+
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage"));
@@ -106,48 +113,61 @@ const App = () => {
 
   return (
     // <Loading.Provider value={setloadingScreen}>
-      <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
-        <UserData.Provider value={{ userData, setUserData }}>
-          <ToastContainer />
-          <Router>
-            <Suspense fallback={<Preloader />}>
-              {/* {loadingScreen && <Preloader />} */}
-              {/* <Admin /> */}
-              <Routes>
+    <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
+      <UserData.Provider value={{ userData, setUserData }}>
+        <ToastContainer />
+        <Router>
+          <Suspense fallback={<Preloader />}>
+            {/* {loadingScreen && <Preloader />} */}
+            {/* <Admin /> */}
+            <Routes>
 
-                <Route exact path="/" element={<HomePage />} />
-                <Route exact path="/Products" element={<ProductsPage />} />
-                <Route exact path="/AboutUs" element={<About_us />} />
-                <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
-                <Route exact path="/Products/:categoryID/:productID" element={<ProductDetailsPage />} />
-                <Route exact path="/Orders/:orders" element={<OrdersPage />} />
-                <Route exact path="/ReserveSeat" element={<ReserveSeatPage />} />
-                <Route exact path="/Contact" element={<ContactPage />} />
-                <Route exact path="/auth/login" element={<Login />} />
-                <Route exact path="/auth/Register" element={<Register />} />
-                <Route exact path="/auth/login/forgetpassword" element={<ForgotPassword />} />
+              <Route exact path="/" element={<HomePage />} />
+              <Route exact path="/Products" element={<ProductsPage />} />
+              <Route exact path="/AboutUs" element={<About_us />} />
+              <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
+              <Route exact path="/Products/:categoryID/:productID" element={<ProductDetailsPage />} />
+              <Route exact path="/Orders/:orders" element={<OrdersPage />} />
+              <Route exact path="/ReserveSeat" element={<ReserveSeatPage />} />
+              <Route exact path="/Contact" element={<ContactPage />} />
+              <Route exact path="/auth/login" element={<Login />} />
+              <Route exact path="/auth/Register" element={<Register />} />
+              <Route exact path="/auth/login/forgetpassword" element={<ForgotPassword />} />
 
 
-                {
-                  userData?.Role === "Admin" &&
-                  <>
-                    <Route path="/admin" element={<Dashboard />} />
-                    <Route path="/admin/dashboard" element={<Dashboard />} />
-                    <Route path="/admin/product" element={<Products />} />
-                    <Route path="/admin/customer" element={<Customers />} />
-                    <Route path="/admin/transaction" element={<Transaction />} />
-                    <Route path="/admin/app/coupon" element={<Coupon />} />
-                    <Route path="/admin/product/new" element={<NewProduct />} />
-                    <Route path="/admin/product/:productId" element={<ProductManagement />} />
-                    <Route path="/admin/transaction/:transactionId" element={<TransactionManagement />} />
-                  </>
-                }
-                <Route exact path="*" element={<PageNotFound />} />
-              </Routes>
-            </Suspense>
-          </Router>
-        </UserData.Provider>
-      </Notification.Provider>
+              {
+                userData?.Role === "Admin" &&
+                <>
+                  <Route path="/admin" element={<Dashboard />} />
+                  <Route path="/admin/dashboard" element={<Dashboard />} />
+                  <Route path="/admin/product" element={<Products />} />
+                  <Route path="/admin/customer" element={<Customers />} />
+                  <Route path="/admin/transaction" element={<Transaction />} />
+                  {/* Charts */}
+
+                  <Route path="/admin/chart/bar" element={<BarCharts />} />
+                  <Route path="/admin/chart/pie" element={<PieCharts />} />
+                  <Route path="/admin/chart/line" element={<LineCharts />} />
+
+                  {/* Apps */}
+
+                  <Route path="/admin/app/stopwatch" element={<Stopwatch />} />
+                  <Route path="/admin/app/coupon" element={<Coupon />} />
+                  {/* <Route path="/admin/app/toss" element={<Toss />} /> */}
+
+                  {/* Management */}
+
+                  <Route path="/admin/product/new" element={<NewProduct />} />
+                  <Route path="/admin/product/:productId" element={<ProductManagement />} />
+                  <Route path="/admin/transaction/:transactionId" element={<TransactionManagement />} />
+                </>
+              }
+              <Route exact path="*" element={<PageNotFound />} />
+            </Routes>
+          </Suspense>
+        </Router>
+      </UserData.Provider>
+    </Notification.Provider>
     // </Loading.Provider>
   );
 };

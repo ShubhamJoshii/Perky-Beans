@@ -53,7 +53,7 @@ const AdminSidebar = () => {
         </h2>
         <DivOne location={location} />
         {/* <DivTwo location={location} /> */}
-        <DivThree location={location} />
+        {/* <DivThree location={location} /> */}
 
         {phoneActive && (
           <button id="close-sidebar" onClick={() => setShowModal(false)}>
@@ -72,7 +72,7 @@ const DivOne = ({ location }) => (
       <Li url="/admin/dashboard" text="Dashboard" Icon={RiDashboardFill} location={location} />
       <Li url="/admin/product" text="Products" Icon={RiShoppingBag3Fill} location={location} />
       <Li url="/admin/customer" text="Users" Icon={IoIosPeople} location={location} />
-      <Li url="/admin/transaction" text="Transaction" Icon={AiFillFileText} location={location} />
+      {/* <Li url="/admin/transaction" text="Transaction" Icon={AiFillFileText} location={location} /> */}
     </ul>
   </div>
 );
@@ -92,9 +92,9 @@ const DivThree = ({ location }) => (
   <div>
     <h5>Apps</h5>
     <ul>
-      {/* <Li url="/admin/app/stopwatch" text="Stopwatch" Icon={FaStopwatch} location={location} /> */}
+      <Li url="/admin/app/stopwatch" text="Stopwatch" Icon={FaStopwatch} location={location} />
       <Li url="/admin/app/coupon" text="Coupon" Icon={RiCoupon3Fill} location={location} />
-      {/* <Li url="/admin/app/toss" text="Toss" Icon={FaGamepad} location={location} /> */}
+      <Li url="/admin/app/toss" text="Toss" Icon={FaGamepad} location={location} />
     </ul>
   </div>
 );

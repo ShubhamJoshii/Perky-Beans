@@ -94,14 +94,17 @@
     background-color: white;
     border-radius: 5px;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.216);
+    position: relative;
 
     > a {
       width: 100%;
       display: flex;
       justify-content: right;
+      position: absolute;
+      top: 15px;
+      right: 15px;
 
       > svg {
-        position: relative;
         cursor: pointer;
         font-size: 30px;
         color: rgb(201, 9, 9);
@@ -157,27 +160,19 @@
         }
       }
 
-      > button,
-      input[type="submit"] {
+      > button,input[type="submit"] {
         padding: 0.5rem;
         border: none;
-        background-color: rgb(5, 107, 224);
         color: white;
         width: 100%;
         border-radius: 5px;
         font-size: 1.1rem;
         cursor: pointer;
+        background-color: rgb(5, 107, 224);
       }
 
       > .delete {
-        padding: 1rem;
-        border: none;
         background-color: rgb(224, 45, 5);
-        color: white;
-        width: 100%;
-        border-radius: 5px;
-        font-size: 1.1rem;
-        cursor: pointer;
       }
     }
   }

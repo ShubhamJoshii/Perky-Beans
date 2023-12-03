@@ -13,18 +13,18 @@ const Orders = () => {
   const [orderShow, setOrderShow] = useState(true);
   const { userData, setUserData } = useContext(UserData);
   const [Products, setProducts] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState("Show");
   const navigate = useNavigate();
   const currRoute = useParams();
 
   const fetchProducts = async () => {
-    await axios.post("/api/fetchProduct",{Available:false}).then((result) => {
-      console.log(result.data.data);
+    setLoading("Show");
+    await axios.post("/api/fetchProduct", { Available: false }).then((result) => {
       setProducts(result.data.data);
+      setLoading("Hide");
     }).catch((err) => {
       console.log("Error")
-    }).finally(() => {
-      setLoading(false);
+      setLoading("LoadBtnShow");
     })
   }
 
@@ -61,15 +61,8 @@ const Orders = () => {
           </h3>
         </div>
         {
-          loading ?
-            <div id="orderCardsContainer">
-
-              <Oval height="40" width="60" color="black" wrapperStyle={{marginTop:"100px"}} wrapperClass="orderProduct loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={4} strokeWidthSecondary={4} />
-            </div>
-            :
+          loading === "Hide" ?
             <>
-
-
               {userData ? (
                 <>
                   {orderShow ? (
@@ -116,9 +109,24 @@ const Orders = () => {
                 </div>
               )}
 
-            </>}
-
-
+            </>
+            :
+            <>
+              {
+                loading === "Show" ?
+                  <div id="orderCardsContainer">
+                    <Oval height="40" width="60" color="black" wrapperStyle={{ marginTop: "100px" }} wrapperClass="orderProduct loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={4} strokeWidthSecondary={4} />
+                  </div>
+                  :
+                  <div id="orderCardsContainer" >
+                    <div className="loadingBTN">
+                      <p>Something went wrong</p>
+                      <button onClick={fetchProducts}>Try again</button>
+                    </div>
+                  </div>
+              }
+            </>
+        }
       </div>
       <img src={Scooter} alt="Scooter" id="scooterIMG" />
       <Bags />

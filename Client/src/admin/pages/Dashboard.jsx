@@ -5,7 +5,7 @@ import userImg from "../assets/userpic.png";
 import { HiTrendingUp, HiTrendingDown } from "react-icons/hi";
 // import data from "../assets/data.json";
 import { BarChart } from "../components/Charts";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Notification } from "../../routes/App";
@@ -16,14 +16,18 @@ import { Notification } from "../../routes/App";
 
 const dashboard = () => {
   const [dropDownShow, setdropDownShow] = useState(false);
-  const {notification} = useContext(Notification);
+  const { notification } = useContext(Notification);
+  const [count, setCount] = useState({
+    products:0,
+    users:0
+  })
   const navigate = useNavigate();
   const logoutBTN = async () => {
     // setLoadingShow(true);
     await axios.get("/api/logout").then((result) => {
       if (result.data) {
         navigate("/");
-        notification(result.data,"Success");
+        notification(result.data, "Success");
         setUserData(null);
         setdropDownShow(false);
       }
@@ -33,6 +37,19 @@ const dashboard = () => {
     }, 1000);
   };
 
+  const fetchUsersProductsCount = async () => {
+    // setLoadingShow(true);
+    await axios.get("/api/fetchUsersProductsCount").then((response) => {
+      // console.log(response.data)
+      setCount(response.data);
+    });
+  };
+
+  useEffect(()=>{
+    fetchUsersProductsCount();
+  },[])
+
+
   return (
     <div className="admin-container">
       <AdminSidebar />
@@ -41,7 +58,7 @@ const dashboard = () => {
           <BsSearch />
           <input type="text" placeholder="Search for data, users, docs" />
           <FaRegBell />
-          <img src={userImg} alt="User" onClick={()=>setdropDownShow(!dropDownShow)}/>
+          <img src={userImg} alt="User" onClick={() => setdropDownShow(!dropDownShow)} />
         </div>
         {
           dropDownShow &&
@@ -58,10 +75,10 @@ const dashboard = () => {
             value={340000}
             heading="Revenue"
             color="rgb(0,115,255)"
-          />
+            />
           <WidgetItem
-            percent={-14}
-            value={400}
+            percent={count.users*10}
+            value={count.users}
             heading="Users"
             color="rgb(0 198 202)"
           />
@@ -72,8 +89,8 @@ const dashboard = () => {
             color="rgb(255 196 0)"
           />
           <WidgetItem
-            percent={30}
-            value={1000}
+            percent={count.products * 1.2}
+            value={count.products}
             heading="Products"
             color="rgb(76 0 255)"
           />
@@ -92,40 +109,7 @@ const dashboard = () => {
               bgColor_2="rgba(53,162,235,0.8)"
             />
           </div>
-          {/* 
-          <div className="dashboard-categories">
-            <h2>Inventory</h2>
-            <div>
-              {data.categories.map((i) => (
-                <CategoryItem
-                  key={i.heading}
-                  heading={i.heading}
-                  value={i.value}
-                  color={`hsl(${i.value * 4},${i.value}%,50%)`}
-                />
-              ))}
-            </div>
-          </div> */}
         </section>
-
-        {/* <section className="transaction-container">
-          <div className="gender-chart">
-            <h2>Gender Ratio</h2>
-
-            <DoughnutChart
-              labels={["Female", "Male"]}
-              data={[12, 19]}
-              backgroundColor={["hsl(340,82%,56%)", "rgba(53,162,235,0.8)"]}
-              cutout={90}
-            />
-
-            <p>
-              <BiMaleFemale />
-            </p>
-          </div>
-
-          <Table data={data.transaction} />
-        </section> */}
       </main>
     </div>
   );
@@ -159,8 +143,8 @@ const WidgetItem = ({
       style={{
         background: `conic-gradient(
         ${color} ${(Math.abs(percent) / 100) * 360}deg,
-        rgb(255, 255, 255) 0
-      )`,
+        rgb(0, 0, 0) 0
+        )`
       }}
     >
       <span

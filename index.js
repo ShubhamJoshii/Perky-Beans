@@ -12,7 +12,8 @@ require("dotenv").config();
 app.use(cors());
 
 // Cokkies Creation
-app.use(express.json());
+app.use(express.json({limit:"25mb"}));
+app.use(express.urlencoded({limit:"25mb"}));
 app.use(cookieParser());
 
 app.use(require("./auth"));

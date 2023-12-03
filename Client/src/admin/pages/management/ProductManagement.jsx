@@ -112,7 +112,6 @@ const ProductManagement = () => {
               {/* <input type="file" name="Product_Photo"  onChange={handleInput}/> */}
               <input type="text" placeholder="Enter Image URL" name="Product_Photo" value={productDetails.Product_Photo} onChange={handleInput} />
             </div>
-            {/* <input type="submit" value="Update" /> */}
             <button onClick={updateProduct}>Update</button>
             <button className="delete" onClick={deleteProduct}>Delete</button>
           </form>

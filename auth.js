@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 const Authenication = require("./Authenication");
 const nodemailer = require("nodemailer");
 const Mailgen = require("mailgen");
+const uploadImage = require("./uploadImage");
 
 // let addRoute = "/";
 let addRoute = "/api/";
@@ -153,11 +154,11 @@ router.post(`${addRoute}login`, async (req, res) => {
 });
 
 router.post(`${addRoute}fetchProduct`, async (req, res) => {
-  const {Available} = req.body;
-  if(Available){
-    const products = await ProductsModel.find({Available:true});
+  const { Available } = req.body;
+  if (Available) {
+    const products = await ProductsModel.find({ Available: true });
     res.send({ data: products });
-  }else{
+  } else {
     const products = await ProductsModel.find();
     res.send({ data: products });
   }
@@ -210,7 +211,6 @@ router.post(`${addRoute}deleteProduct`, async (req, res) => {
     ? res.send({ message: "Product Deleted" })
     : res.send({ message: "Product Not Deleted Try Again" });
 });
-
 
 router.post(`${addRoute}contact`, async (req, res) => {
   const { _id, Name, Email, type, Contact_Number, Description } = req.body;
@@ -359,6 +359,7 @@ router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
     console.log(err);
   }
 });
+
 router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
   const { productID } = req.body;
   try {
@@ -487,6 +488,12 @@ router.post(`${addRoute}forgetPassword/updatePassword`, async (req, res) => {
 
 // Admin Routes
 
+router.post(`${addRoute}uploadImage`, async (req, res) => {
+  uploadImage(req.body.image, req.body.folder)
+    .then((url) => res.send(url))
+    .catch((err) => res.send(500).send(err));
+});
+
 router.post(`${addRoute}saveProduct`, async (req, res) => {
   const {
     Product_Name,
@@ -497,6 +504,7 @@ router.post(`${addRoute}saveProduct`, async (req, res) => {
     Rating,
     type,
   } = req.body;
+  // console.log(Category);
   let _id = require("crypto").randomBytes(4).toString("hex");
   try {
     const productData = new ProductsModel({
@@ -515,8 +523,6 @@ router.post(`${addRoute}saveProduct`, async (req, res) => {
     res.send({ message: "Product Not Registered. Try Again", result: false });
   }
 });
-
-
 
 router.get(`${addRoute}fetchUsers`, async (req, res) => {
   // console.log("Hllo");
@@ -560,6 +566,13 @@ router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
   productsData
     ? res.send({ message: "Product Availability Updated", result: true })
     : res.send({ message: "Product Availability  Not Updated", result: false });
+});
+
+router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
+  const users = await DBModel.countDocuments();
+  const products = await ProductsModel.countDocuments();
+  // console.log(users,products);
+  res.send({ users, products });
 });
 
 module.exports = router;

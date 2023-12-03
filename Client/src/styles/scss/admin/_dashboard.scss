@@ -57,7 +57,6 @@
       padding: 2rem;
       border-radius: 10px;
       @include flex(row, space-between, stretch, 0);
-
       .widget-info {
         > p {
           opacity: 0.7;
@@ -90,18 +89,31 @@
           position: relative;
         }
       }
+
+      &:first-child, 
+      &:nth-child(3){
+        background-color: rgb(74, 73, 73);
+        cursor: not-allowed;
+        .widget-circle::before{
+          background-color: rgb(74, 73, 73);
+
+        }
+      }
     }
   }
-
+  
   .graph-container {
     @include flex(row, unset, unset, 2rem);
+    background-color: rgb(74, 73, 73);
+    cursor: not-allowed;
     padding: 0 2rem 2rem 0;
     > div {
       background-color: white;
       border-radius: 10px;
     }
-
+    
     .revenue-chart {
+      background-color: rgb(74, 73, 73);
       width: 100%;
       padding: 1rem 3rem;
 

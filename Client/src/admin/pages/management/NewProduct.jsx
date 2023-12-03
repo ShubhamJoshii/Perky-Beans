@@ -3,6 +3,8 @@ import AdminSidebar from "../../components/AdminSidebar";
 import axios from "axios";
 import { UserData, Notification } from "../../../routes/App";
 import noPhoto from "../../../assets/noPhoto.png";
+import convertBase64 from "../../convertBase64";
+import { useNavigate } from "react-router-dom";
 
 const NewProduct = () => {
   const [productData, setProductData] = useState({
@@ -15,37 +17,66 @@ const NewProduct = () => {
     type: "Veg",
   });
   const { notification, checkUserAlreadyLogin } = useContext(Notification);
-
+  
+  const navigate = useNavigate();
+  const [image, setImage] = useState('');
   const handleInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setProductData({ ...productData, [name]: value });
   };
 
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    transformFile(file);
+    // console.log(file);
+  }
+
+  const transformFile = async (file) => {
+    const base64 = await convertBase64(file);
+    setProductData({ ...productData, Product_Photo: base64 });
+  }
+
+  useEffect(() => {
+    console.log(image);
+  }, [image])
+
+
   const saveProduct = async (e) => {
     e.preventDefault();
-    await axios
-      .post("/api/saveProduct", { ...productData })
-      .then((result) => {
-        if (result.data.result) {
-          console.log(result.data.message);
-          notification(result.data.message, "Success");
-          setProductData({
-            Product_Name: "",
-            Description: "",
-            Price: "",
-            Category: "",
-            Product_Photo: "",
-            Rating: "",
-            type: "",
+    const base64 = await convertBase64(image);
+    await axios.post("/api/uploadImage", { image: base64 , folder:productData.Category})
+      .then(async (response) => {
+        // setProductData({ ...productData, Product_Photo: response.data });
+        alert("Image Uploaded Successfully");
+        await axios
+          .post("/api/saveProduct", { ...productData, Product_Photo: response.data })
+          .then((result) => {
+            if (result.data.result) {
+              // console.log(result.data.message);
+              notification(result.data.message, "Success");
+              navigate("/admin/product");
+              setProductData({
+                Product_Name: "",
+                Description: "",
+                Price: "",
+                Category: "",
+                Product_Photo: "",
+                Rating: "",
+                type: "",
+              });
+            } else {
+              notification(result.data.message, "Un-Success");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
           });
-        } else {
-          notification(result.data.message, "Un-Success");
-        }
-      })
-      .catch((err) => {
+      }).catch((err) => {
         console.log(err);
-      });
+      })
+
   };
 
   return (
@@ -105,20 +136,19 @@ const NewProduct = () => {
               </div>
             </div>
 
-            <div>
+            {/* <div>
               <label htmlFor="Product_Photo">Image URL</label>
               <input required type="text" placeholder="Name" name="Product_Photo" id="Product_Photo" value={productData.Product_Photo} onChange={handleInput} />
-            </div>
-
-            {/* <div>
-              <label htmlFor="Product_Photo">Photo</label>
-              <input required type="file" name="Product_Photo" id="Product_Photo" onChange={handleInput} />
             </div> */}
+
+            <div>
+              <label htmlFor="Product_Photo">Photo</label>
+              <input required type="file" accept="image/*" name="Product_Photo" id="Product_Photo" onChange={handleImage} />
+            </div>
 
             {/* {productData.Product_Photo && <img src={productData.Product_Photo} alt="New Image" />} */}
 
             <input type="submit" value="CREATE" />
-            {/* Create</input> */}
           </form>
         </article>
       </main>

@@ -18,20 +18,23 @@ const ProductsCatalogue = () => {
   const { notification, checkUserAlreadyLogin } = useContext(Notification);
   const { userData, setUserData } = useContext(UserData);
   const [productsData, setProductsData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState("Show");
 
   let lastIndex = currPage * cardPerPage;
   let firstIndex = lastIndex - cardPerPage;
   const location = useLocation();
 
   const fetchProducts = async () => {
-    await axios.post("/api/fetchProduct",{Available:true}).then((result) => {
-      // console.log(result.data.data);
+    setLoading("Show");
+    await axios.post("/api/fetchProduct", { Available: true }).then((result) => {
       setProductsData(result.data.data);
+      setLoading("Hide");
+      // console.log(result.data);
     }).catch((err) => {
+      setLoading("LoadBtnShow");
       console.log("Error")
-    }).finally(()=>{
-      setLoading(false);
+    }).finally(() => {
+      // setLoading("Hide");
     })
   }
 
@@ -173,9 +176,7 @@ const ProductsCatalogue = () => {
   return (
     <>
       {
-        loading ? 
-        <Oval height="40" width="60" color="white" wrapperStyle={{}} wrapperClass="products loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={4} strokeWidthSecondary={4} />
-        :
+        loading === "Hide" ?
           <>
             <div className="products">
               {products.slice(firstIndex, lastIndex).map((product) => {
@@ -263,6 +264,19 @@ const ProductsCatalogue = () => {
               )}
             </div>
           </>
+          :
+          <>
+            {
+              loading === "Show" ?
+                <Oval height="40" width="60" color="white" wrapperStyle={{}} wrapperClass="products loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={4} strokeWidthSecondary={4} />
+                :
+                <div className="products loadingBTN">
+                  <p>Something went wrong</p> 
+                  <button onClick={fetchProducts}>Try again</button>
+                </div>
+            }
+          </>
+
       }
     </>
   );
