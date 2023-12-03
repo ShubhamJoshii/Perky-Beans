@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import AdminSidebar from "../components/AdminSidebar";
 import axios from "axios";
 import { FaTrash } from "react-icons/fa";
@@ -6,17 +6,24 @@ import { Link } from 'react-router-dom';
 import Switch from "react-switch"
 import Pagination from '../components/Pagination';
 import { Oval } from "react-loader-spinner"
+import { Notification } from '../../routes/App';
 const Customers = () => {
   const [usersData, setUsersData] = useState();
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const {notification} = useContext(Notification);
 
-  const handleChange = async (_id, Role) => {
+  const userRoleUpdate = async (_id, Role) => {
     setLoading(true);
     await axios.post("/api/updateUserRole", { _id, Role }).then((response) => {
       // console.log(response.data.message);
-      response.data.result && fetchUsers();
+      if(response.data.result){
+        fetchUsers();
+        notification(response.data.message,"Success")
+      }else{
+        notification(response.data.message,"Un-Success")
+      }
     }).catch((err) => {
       console.log(err);
     }).finally(() => {
@@ -41,6 +48,21 @@ const Customers = () => {
     fetchUsers();
   }, [])
 
+  const deleteUser = async (_id) => {
+    alert(_id);
+    await axios.post("/api/deleteUser",{_id}).then((response)=>{
+      if(response.data.result){
+        notification(response.data,"Success")
+        console.log(response.data);
+        fetchUsers();
+      }else{
+        notification(response.data,"Un-Success")
+      }
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+
   const usersPerPage = 8;
   const totalPages = Math.ceil(usersData?.length / usersPerPage);
 
@@ -64,11 +86,11 @@ const Customers = () => {
               <th>Role</th>
               <th>Email Verified</th>
               <th>Admins</th>
-
+              <th>Delete</th>
             </tr>
           </thead>
           {loading ? (
-            <td colSpan="5">
+            <td colSpan="6">
               <Oval height="40" width="60" color="black" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
             </td>
           ) : (
@@ -84,10 +106,15 @@ const Customers = () => {
                       <td>{curr.isVerified ? <p id='verified'>Verified</p> : <p id='not-verified'>Not-Verified</p>}</td>
                       <td>
                         <Switch
-                          onChange={() => handleChange(curr._id, curr.Role)}
+                          onChange={() => userRoleUpdate(curr._id, curr.Role)}
                           checked={isAdmin}
                           className="react-switch"
                         />
+                      </td>
+                      <td>
+                        <button onClick={() => deleteUser(curr._id)}>
+                          <FaTrash />
+                        </button>
                       </td>
                     </tr>
                   )

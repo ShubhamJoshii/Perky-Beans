@@ -42,8 +42,6 @@ const Register = () => {
     handlePasswordValidation();
   };
 
-
-
   const handlePasswordValidation = (e) => {
     const password = registerData.Password;
     const lower = new RegExp('(?=.*[a-z])');
@@ -56,6 +54,7 @@ const Register = () => {
     special.test(password) ? setspecialValidation(true) : setspecialValidation(false);
     number.test(password) ? setnumberValidation(true) : setnumberValidation(false);
     length.test(password) ? setLengthValidation(true) : setLengthValidation(false);
+    // console.log(password?.includes(" "));
   }
 
   const registerUser = async (e) => {
@@ -63,7 +62,8 @@ const Register = () => {
     let a = document.getElementById("Password");
     let b = document.getElementById("Confirm_Password");
 
-    if (registerData.Full_Name && registerData.Email && registerData.Password === registerData.Confirm_Password && lowerValidation && upperValidation && numberValidation && specialValidation && lengthValidation) {
+
+    if (registerData.Full_Name && registerData.Email && registerData.Password === registerData.Confirm_Password && lowerValidation && upperValidation && numberValidation && specialValidation && lengthValidation && !registerData.Password?.includes(" ")) {
       setloadingShow(true);
       await axios
         .post("/api/register", registerData)
@@ -77,7 +77,12 @@ const Register = () => {
         .catch((err) => {
           setloadingShow(false);
         });
-    } else if (lengthValidation) {
+    }else if(registerData.Password?.includes(" ")){
+      a.style.border = "3px solid red";
+      b.style.border = "none";
+      notification("Password does not include any white space", "Warning");
+    }
+     else if (lengthValidation) {
       a.style.border = "3px solid red";
       b.style.border = "none";
       notification("Password length should be greater than and equal to 8", "Warning");

@@ -32,11 +32,6 @@ router.get(`${addRoute}home`, Authenication, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}logout`, Authenication, async (req, res) => {
-  res.clearCookie("perkyBeansToken", { path: "/" });
-  res.status(200).send("User Logout");
-  // res.send(req.rootUser);
-});
 
 router.post(`${addRoute}register`, async (req, res) => {
   const { Full_Name, Email, Password, Confirm_Password } = req.body;
@@ -151,6 +146,12 @@ router.post(`${addRoute}login`, async (req, res) => {
       res.send("User Email is not registed");
     }
   } catch (err) {}
+});
+
+router.get(`${addRoute}logout`, Authenication, async (req, res) => {
+  res.clearCookie("perkyBeansToken", { path: "/" });
+  res.status(200).send("User Logout");
+  // res.send(req.rootUser);
 });
 
 router.post(`${addRoute}fetchProduct`, async (req, res) => {
@@ -380,14 +381,20 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
     const userExist = await DBModel.findOne({ Email });
     if (userExist) {
       const otp = `${Math.floor(Math.random() * 900000) + 100000}`;
-      const transporter = await nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.AUTH_EMAIL,
-          pass: process.env.AUTH_PASS,
-        },
-      });
+      
+      // const transporter = await nodemailer.createTransport({
+      //   service: "gmail",
+      //   auth: {
+      //     user: process.env.AUTH_EMAIL,
+      //     pass: process.env.AUTH_PASS,
+      //   },
+      // });
+
+      const otpPreviousSave = await OTPVerfication.deleteMany({userID:userExist._id})
+      // await otpPreviousSave.save();
+
       const hashedOTP = await bcrypt.hash(otp, 12);
+
       const otpDBSave = new OTPVerfication({
         userID: userExist._id,
         OTP: hashedOTP,
@@ -418,11 +425,13 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
         html: mail,
       };
 
-      await otpDBSave.save();
+      
       await new Promise(async (resolve, reject) => {
         await transporter
           .sendMail(message)
-          .then(() => {
+          .then(async() => {
+
+            await otpDBSave.save();
             return res.json({
               status: true,
               message: "Verification OTP email sent",
@@ -459,7 +468,7 @@ router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
       let validOTP = await bcrypt.compare(OTP, hashedOTP);
       console.log(validOTP, hashedOTP, OTP);
       if (validOTP) {
-        await OTPVerfication.deleteMany({ userID: userExist._id });
+        // await OTPVerfication.deleteMany({ userID: userExist._id });
         res.send({ status: true, message: "Valid OTP. Enter New Password" });
       } else {
         res.send({ status: false, message: "Invalid OTP. Please Try Again" });
@@ -532,26 +541,33 @@ router.get(`${addRoute}fetchUsers`, async (req, res) => {
     : res.send({ message: "No User Found" });
 });
 
-router.post(`${addRoute}updateUserRole`, async (req, res) => {
+router.post(`${addRoute}updateUserRole`,Authenication, async (req, res) => {
   const { _id, Role } = req.body;
-  let NewRole;
+  // console.log(req.rootUser);
   // console.log(_id);
-  if (Role === "Admin") {
-    NewRole = "Customer";
-  } else {
-    NewRole = "Admin";
-  }
-  const usersData = await DBModel.updateOne(
-    { _id },
-    {
-      $set: { Role: NewRole },
+  if(req.rootUser.Role === "Admin"){
+    let NewRole;
+    if (Role === "Admin") {
+      NewRole = "Customer";
+    } else {
+      NewRole = "Admin";
     }
-  );
-
-  usersData
-    ? res.send({ message: "User Role Updated", result: true })
-    : res.send({ message: "User Role Not Updated", result: false });
-});
+  
+    const usersData = await DBModel.updateOne(
+      { _id },
+      {
+        $set: { Role: NewRole },
+      }
+    );
+  
+    usersData
+      ? res.send({ message: "User Role Updated", result: true })
+      : res.send({ message: "User Role Not Updated", result: false });
+    }else{
+      res.send({ message: "Admin can only update ROLE", result: false });
+  }
+}
+);
 
 router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
   const { _id, isAvailable } = req.body;
@@ -574,5 +590,21 @@ router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
   // console.log(users,products);
   res.send({ users, products });
 });
+
+
+router.post(`${addRoute}deleteUser`, async(req,res)=>{
+  const {_id} = req.body;
+  try{
+    const findAdmins = await DBModel.countDocuments({Role:"Admin"});
+    if(findAdmins === 1){
+      res.send({message:"You Can't Delete It",result:false});
+    }else{
+      const deleteUser = await DBModel.deleteOne({_id});
+      res.send({message:"User Deleted",result:true});
+    }
+  } catch(err){
+    res.send({message:"Error ! User Not Deleted",result:false});
+  }
+})
 
 module.exports = router;

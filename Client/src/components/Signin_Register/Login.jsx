@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import google from "../../assets/google.png";
-import {NavLink} from "react-router-dom";
-import {AiFillEye, AiFillEyeInvisible} from "react-icons/ai";
+import { NavLink } from "react-router-dom";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import Header from "../Header/Header";
-import {UserData, Notification} from "../../routes/App";
-import {useContext} from "react";
-import {useNavigate} from "react-router-dom";
-import {Oval} from "react-loader-spinner";
+import { UserData, Notification } from "../../routes/App";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Oval } from "react-loader-spinner";
 import axios from "axios";
 const Login = () => {
   const [loginData, setLoginData] = useState({
@@ -14,7 +14,7 @@ const Login = () => {
     Password: "",
   });
   const [passwordShow, setPasswordShow] = useState(false);
-  const {notification, checkUserAlreadyLogin} = useContext(Notification);
+  const { notification, checkUserAlreadyLogin } = useContext(Notification);
   const [loadingShow, setloadingShow] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -24,24 +24,24 @@ const Login = () => {
   const handleInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setLoginData({...loginData, [name]: value});
+    setLoginData({ ...loginData, [name]: value });
   };
 
   const submitLogin = async (e) => {
     e.preventDefault();
-    setloadingShow(true);
-    if (loginData.Email && loginData.Password.length >= 8) {
+    if (loginData.Email && loginData.Password.length >= 8 && !loginData.Password.includes(" ")) {
+      setloadingShow(true);
       await axios
         .post("/api/login", loginData)
         .then((result) => {
           if (result.data === "User Logined") {
-            notification(result.data,"Success");
+            notification(result.data, "Success");
             setTimeout(() => {
               checkUserAlreadyLogin();
               navigate("/");
             }, 1000);
-          }else{
-            notification(result.data,"Un-Success");
+          } else {
+            notification(result.data, "Un-Success");
           }
           setTimeout(() => {
             setloadingShow(false);
@@ -50,9 +50,11 @@ const Login = () => {
         .catch((err) => {
           setloadingShow(false);
         });
+    } else if (loginData.Password.includes(" ")) {
+      notification("User Password is does not Include any white space", "Warning");
     }
-    if (loginData.Password.length < 8) {
-      notification("User Password is Not Matched","Warning");
+    else if (loginData.Password.length < 8) {
+      notification("User Password is Not Matched", "Warning");
     }
   };
 
@@ -64,10 +66,10 @@ const Login = () => {
           <h1>LOGIN</h1>
           <label htmlFor="Email">Email:</label>
           <br />
-          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInput} required/>
+          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInput} required />
           <label htmlFor="Password">Password:</label> <br />
           <div id="passwordContainer">
-            <input type="Password" id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInput} required/>
+            <input type="Password" minLength={8} maxLength={18} id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInput} required />
             <div
               id="passwordEYE"
               onClick={() => {
@@ -79,8 +81,8 @@ const Login = () => {
           <div className="forgot-password">
             <NavLink to="./forgetpassword">Forgot Password?</NavLink>
           </div>
-          {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> : 
-          <input type="submit" value="LOGIN" />
+          {loadingShow ? <Oval height="22" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} /> :
+            <input type="submit" value="LOGIN" />
           }
           <div className="no-account">
             <p>Don't have an account?</p>
