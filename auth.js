@@ -32,7 +32,6 @@ router.get(`${addRoute}home`, Authenication, async (req, res) => {
   }
 });
 
-
 router.post(`${addRoute}register`, async (req, res) => {
   const { Full_Name, Email, Password, Confirm_Password } = req.body;
   console.log(req.body);
@@ -62,10 +61,9 @@ router.post(`${addRoute}register`, async (req, res) => {
         body: {
           name: `${Full_Name}`,
           intro: `
-                        <p>Congratulations! You're almost set to start using Perky Beans- Cafe Web</p>
-                        <p>Just click the button below to validate your email address</p>
-                        <a href="http://${req.headers.host}/user/verify-email?token=${EmailToken}" style="padding: 5px;background-color: brown;color: white;font-size: 22px;text-decoration: none;padding: 6px 15px;"}>Verify Email</a>
-                    `,
+            <p>Congratulations! You're almost set to start using Perky Beans- Cafe Web</p>
+            <p>Just click the button below to validate your email address</p>
+            <a href="http://${req.headers.host}/user/verify-email?token=${EmailToken}" style="padding: 5px;background-color: brown;color: white;font-size: 22px;text-decoration: none;padding: 6px 15px;"}>Verify Email</a>`,
           outro: "Looking forward",
         },
       };
@@ -238,24 +236,102 @@ router.post(`${addRoute}contact`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
-  const { Contact_Number, Person_Count, Date, Timing, Booking_DateTime } =
-    req.body;
-  // console.log(req.body);
-  // console.log(new date)
+router.get(`/booking/cancel`, async (req, res) => {
   try {
-    const userExist = DBModel.findOne({ _id: req.userID });
+    const token = req.query.token;
+    const seatFind = await ReserveSeatModel.findOne({ token : token});
+    console.log(seatFind, "Hello WORLD");
+    if (seatFind.status === "Cancelled") {
+      res.send("Already Cancelled Reserved Seat");
+    }
+    if (seatFind) {
+      seatFind.status = "Cancelled";
+      await seatFind.save();
+      res.send("Seat Reservation Cancelled");
+    }
+  } catch (err) {
+    console.log(err);
+    res.send("Already Cancelled Reserved Seat");
+  }
+});
+
+router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
+  const { Contact_Number, Person_Count, Date, Timing, Booking_DateTime } = req.body;
+  let token = require("crypto").randomBytes(32).toString("hex");
+  try {
+    const userExist = DBModel.findOne({ _id: req.rootUser._id });
     if (userExist) {
       const contactData = new ReserveSeatModel({
-        User_ID: req.userID,
+        token: token,
+        User_ID: req.rootUser._id,
         Contact_Number,
         Person_Count,
-        Reserve_Date: Date,
+        User_Name: req.rootUser.Full_Name,
+        User_Email: req.rootUser.Email,
+        reservation_Date: Date,
         Booking_DateTime,
-        Timing,
+        status:"Confirmed",
+        reservation_Timing: Timing
       });
-      await contactData.save();
-      res.send({ message: "Seat Reserved" });
+
+      let mailGenerator = new Mailgen({
+        theme: "default",
+        product: {
+          name: "Perky Beans",
+          link: "https://perky-beans.vercel.app/",
+        },
+      });
+
+      let response = {
+        body: {
+          name: `${req.rootUser.Full_Name}`,
+          intro: `
+            <p>We hope this email finds you well. Thank you for choosing PerkyBeans for your upcoming visit. We're delighted to confirm your reservation for a seat at our café.</p>
+            <p><strong>Reservation Details:</strong><p>
+            <ul>
+              <li>Reservation Date: ${Date}</li>
+              <li>Reservation Time:  ${Timing}</li>
+              <li>Number of Guests:  ${Person_Count}</li>
+              <li>Reserved Seat Number:  ${"10"}</li>
+            </ul>
+            <p><strong>Additional Information:</strong><p>
+            <ul>
+              <li>Your reservation is confirmed under the name of ${
+                req.rootUser.User_Name
+              }.</li>
+              <li>If you need to modify or cancel your reservation, please contact us at "perkybeans9@gmail.com" or 
+              <a href="http://${req.headers.host}/booking/cancel?token=${token}">cancel reservation</a>
+              </li>
+            </ul>
+            <p><strong>Special Requests:</strong><p>
+            <ul>
+              <li>If you have any special requests or dietary preferences, please let our staff know upon arrival.</li>
+            </ul>
+            <p>We look forward to welcoming you to PerkyBeans and ensuring you have a delightful experience. If you have any further questions or requests, feel free to reach out.</p>
+            `,
+          outro: "Looking forward",
+        },
+      };
+
+      let mail = mailGenerator.generate(response);
+      let message = {
+        from: process.env.AUTH_EMAIL,
+        to: req.rootUser.Email,
+        subject: "Your Reserved Seat Confirmation at PerkyBeans",
+        html: mail,
+      };
+
+      await new Promise(async (resolve, reject) => {
+        await transporter
+          .sendMail(message)
+          .then(async() => {
+            await contactData.save();
+            return res.json({ message: "Seat Reserved. Check Mail!" });
+          })
+          .catch(() => {
+            return res.json("Retry!");
+          });
+      });
     } else {
       res.send({ message: "Please Login" });
     }
@@ -264,6 +340,21 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
     // console.log(err);
   }
 });
+
+
+
+
+router.post(`${addRoute}seatAvailable`,async(req,res)=>{
+  const {time,date} = req.body;
+  // const fetchSeats = await ReserveSeatModel.find({reservation_Date : date});
+  const fetchSeats = await ReserveSeatModel.countDocuments({reservation_Date : date,reservation_Timing:time});
+  console.log(fetchSeats);
+  if(fetchSeats <= 10){
+    res.send({message:"Seat Available",result:true});
+  }else{
+    res.send({message:"Seat Not Available",result:true});
+  }
+})
 
 router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
   const { productID } = req.body;
@@ -381,7 +472,7 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
     const userExist = await DBModel.findOne({ Email });
     if (userExist) {
       const otp = `${Math.floor(Math.random() * 900000) + 100000}`;
-      
+
       // const transporter = await nodemailer.createTransport({
       //   service: "gmail",
       //   auth: {
@@ -390,7 +481,9 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
       //   },
       // });
 
-      const otpPreviousSave = await OTPVerfication.deleteMany({userID:userExist._id})
+      const otpPreviousSave = await OTPVerfication.deleteMany({
+        userID: userExist._id,
+      });
       // await otpPreviousSave.save();
 
       const hashedOTP = await bcrypt.hash(otp, 12);
@@ -425,12 +518,10 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
         html: mail,
       };
 
-      
       await new Promise(async (resolve, reject) => {
         await transporter
           .sendMail(message)
-          .then(async() => {
-
+          .then(async () => {
             await otpDBSave.save();
             return res.json({
               status: true,
@@ -541,33 +632,32 @@ router.get(`${addRoute}fetchUsers`, async (req, res) => {
     : res.send({ message: "No User Found" });
 });
 
-router.post(`${addRoute}updateUserRole`,Authenication, async (req, res) => {
+router.post(`${addRoute}updateUserRole`, Authenication, async (req, res) => {
   const { _id, Role } = req.body;
   // console.log(req.rootUser);
   // console.log(_id);
-  if(req.rootUser.Role === "Admin"){
+  if (req.rootUser.Role === "Admin") {
     let NewRole;
     if (Role === "Admin") {
       NewRole = "Customer";
     } else {
       NewRole = "Admin";
     }
-  
+
     const usersData = await DBModel.updateOne(
       { _id },
       {
         $set: { Role: NewRole },
       }
     );
-  
+
     usersData
       ? res.send({ message: "User Role Updated", result: true })
       : res.send({ message: "User Role Not Updated", result: false });
-    }else{
-      res.send({ message: "Admin can only update ROLE", result: false });
+  } else {
+    res.send({ message: "Admin can only update ROLE", result: false });
   }
-}
-);
+});
 
 router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
   const { _id, isAvailable } = req.body;
@@ -591,20 +681,25 @@ router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
   res.send({ users, products });
 });
 
-
-router.post(`${addRoute}deleteUser`, async(req,res)=>{
-  const {_id} = req.body;
-  try{
-    const findAdmins = await DBModel.countDocuments({Role:"Admin"});
-    if(findAdmins === 1){
-      res.send({message:"You Can't Delete It",result:false});
-    }else{
-      const deleteUser = await DBModel.deleteOne({_id});
-      res.send({message:"User Deleted",result:true});
+router.post(`${addRoute}deleteUser`, async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const findAdmins = await DBModel.countDocuments({ Role: "Admin" });
+    if (findAdmins === 1) {
+      res.send({ message: "You Can't Delete It", result: false });
+    } else {
+      const deleteUser = await DBModel.deleteOne({ _id });
+      res.send({ message: "User Deleted", result: true });
     }
-  } catch(err){
-    res.send({message:"Error ! User Not Deleted",result:false});
+  } catch (err) {
+    res.send({ message: "Error ! User Not Deleted", result: false });
   }
-})
+});
 
+router.get(`${addRoute}reserveSeats`, async (req, res) => {
+  // console.log()
+  const reserveSeats = await ReserveSeatModel.find();
+  // co
+  res.send(reserveSeats);
+});
 module.exports = router;

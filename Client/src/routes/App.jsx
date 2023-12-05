@@ -12,6 +12,7 @@ const Transaction = lazy(() => import("../admin/pages/Transaction"));
 const Customers = lazy(() => import("../admin/pages/Customers"));
 const NewProduct = lazy(() => import("../admin/pages/management/NewProduct"));
 const ProductManagement = lazy(() => import("../admin/pages/management/ProductManagement"));
+const ReserveSeat = lazy(() => import("../admin/pages/ReserveSeat"));
 const TransactionManagement = lazy(() => import("../admin/pages/management/TransactionManagement"));
 const Coupon = lazy(() => import("../admin/pages/apps/Coupon"));
 
@@ -143,6 +144,7 @@ const App = () => {
                   <Route path="/admin/product" element={<Products />} />
                   <Route path="/admin/customer" element={<Customers />} />
                   <Route path="/admin/transaction" element={<Transaction />} />
+                  <Route path="/admin/reserve-seat" element={<ReserveSeat />} />
                   {/* Charts */}
 
                   <Route path="/admin/chart/bar" element={<BarCharts />} />

@@ -153,24 +153,45 @@ const ContactDB = new mongoose.Schema({
 })
 
 const reserveSeatDB = new mongoose.Schema({
+  token:{
+    type: String,
+    require: true  
+  },
   User_ID: {
     type: String,
     require: true
-  },Contact_Number: {
+  },
+  User_Name: {
     type: String,
     require: true
-  }, Person_Count: {
+  },
+  User_Email: {
     type: String,
     require: true
-  }, Booking_DateTime: {
+  },
+  Contact_Number: {
     type: String,
     require: true
-  }, Reserve_Date: {
+  }, 
+  Person_Count: {
     type: String,
     require: true
-  }, Timing: {
+  }, 
+  Booking_DateTime: {
     type: String,
     require: true
+  }, 
+  reservation_Date: {
+    type: String,
+    require: true
+  }, 
+  reservation_Timing: {
+    type: String,
+    require: true
+  },
+  status:{
+    type:String,
+    require:true
   }
 })
 

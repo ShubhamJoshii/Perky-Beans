@@ -48,8 +48,8 @@ const Products = () => {
     <div className="admin-container">
       <AdminSidebar />
       <div className='dashboard-product-box'>
-        <h2 class="heading">Products</h2>
-        <table class="table" role="table">
+        <h2 className="heading">Products</h2>
+        <table className="table" role="table">
           <thead>
             <tr>
               <th>_id</th>

@@ -90,15 +90,14 @@
         }
       }
 
-      &:first-child, 
-      &:nth-child(3){
-        background-color: rgb(74, 73, 73);
-        cursor: not-allowed;
-        .widget-circle::before{
-          background-color: rgb(74, 73, 73);
-
-        }
-      }
+      // &:first-child, 
+      // &:nth-child(3){
+      //   background-color: rgb(74, 73, 73);
+      //   cursor: not-allowed;
+      //   .widget-circle::before{
+      //     background-color: rgb(74, 73, 73);
+      //   }
+      // }
     }
   }
   

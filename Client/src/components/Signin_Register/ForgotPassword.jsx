@@ -109,6 +109,14 @@ const ForgotPassword = () => {
     setlodingshow(false);
   }, [forgetBTN]);
 
+  const handleInputEmail = (e) => {
+    const { name, value } = e.target;
+    const isValidInput = /^[A-Za-z\s]+$/.test(value[0]);
+    if (isValidInput || value === "") {
+      // setLoginData({ ...loginData, [name]: value });
+      setforgetData({ Email: e.target.value })
+    }}
+
   return (
     <>
       <Header />
@@ -121,7 +129,7 @@ const ForgotPassword = () => {
           <form onSubmit={sendOTP}>
             <div>
               <label htmlFor="email">Email:</label>
-              <input type="email" id="email" name="email" placeholder="Enter your email" onChange={(e) => setforgetData({ Email: e.target.value })} />
+              <input type="email" id="email" name="email" value={forgetData.Email} placeholder="Enter your email" onChange={handleInputEmail} />
             </div>
             {loadingShow ? <Oval height="24" width="24" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> :
               <input type="submit" value="SEND OTP" className="otp-link" />}
@@ -134,7 +142,7 @@ const ForgotPassword = () => {
             </span>
             <div>
               <label htmlFor="email">OTP:</label>
-              <input type="number" id="otp" name="otp" placeholder="Enter OTP" onChange={(e) => setforgetData({ ...forgetData, OTP: e.target.value })} />
+              <input type="number" id="otp" name="otp"  placeholder="Enter OTP" onChange={(e) => setforgetData({ ...forgetData, OTP: e.target.value })} />
               <p id="resendOTP" onClick={sendOTP}>
                 RESEND OTP
               </p>

@@ -6,7 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Notification } from "../../routes/App";
 import axios from "axios";
 import EmailVerficationLogo from "../../assets/EmailVerficationLogo.png"
-import {Oval} from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 const Register = () => {
   const [registerData, setregisterInfo] = useState({
     Full_Name: "",
@@ -40,6 +40,22 @@ const Register = () => {
     const value = e.target.value;
     setregisterInfo({ ...registerData, [name]: value });
     handlePasswordValidation();
+  };
+  
+  const handleInputEmail = (e) => {
+    const { name, value } = e.target;
+    const isValidInput = /^[A-Za-z\s]+$/.test(value[0]);
+    if (isValidInput || value === "") {
+      setregisterInfo({ ...registerData, [name]: value });
+    }
+  }
+  
+  const handleInputName = (e) => {
+    const { name, value } = e.target;
+    const isValidInput = /^[A-Za-z\s]+$/.test(value);
+    if (isValidInput || value === "") {
+      setregisterInfo({ ...registerData, [name]: value });
+    }
   };
 
   const handlePasswordValidation = (e) => {
@@ -77,12 +93,12 @@ const Register = () => {
         .catch((err) => {
           setloadingShow(false);
         });
-    }else if(registerData.Password?.includes(" ")){
+    } else if (registerData.Password?.includes(" ")) {
       a.style.border = "3px solid red";
       b.style.border = "none";
       notification("Password does not include any white space", "Warning");
     }
-     else if (lengthValidation) {
+    else if (lengthValidation) {
       a.style.border = "3px solid red";
       b.style.border = "none";
       notification("Password length should be greater than and equal to 8", "Warning");
@@ -107,10 +123,10 @@ const Register = () => {
               <h1>Sign Up</h1>
               <label htmlFor="Full_Name">Full Name:</label>
               <br />
-              <input type="text" id="Full_Name" name="Full_Name" placeholder="Enter your full name" value={registerData.Full_Name} required onChange={handleInput} />
+              <input type="text" id="Full_Name" name="Full_Name" placeholder="Enter your full name" value={registerData.Full_Name} required onChange={handleInputName} />
               <label htmlFor="Email">Email: </label>
               <br />
-              <input type="email" id="Email" name="Email" placeholder="Enter your email" value={registerData.Email} required onChange={handleInput} />
+              <input type="email" id="Email" name="Email" placeholder="Enter your email" value={registerData.Email} required onChange={handleInputEmail} />
               <label htmlFor="password">Password:</label>
               <div id="passwordContainer">
                 <input type="password" id="Password" name="Password" placeholder="Enter your Password" value={registerData.Password} required onChange={handleInput} />

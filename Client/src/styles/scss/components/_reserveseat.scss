@@ -39,6 +39,19 @@
       flex-wrap: wrap-reverse;
       gap: 40px;
 
+      #seatAvailable, #seatNotAvailable{
+        @include flexMixin(center, flex-end);
+        gap: 5px;
+        font-size: 12px;
+        margin-top: 4px;
+        letter-spacing: 1.5px;
+      }
+      #seatAvailable{
+        color: #ecb014;
+      }
+      #seatNotAvailable{
+        color: red;
+      }
       form {
         @include flexMixin();
         flex-direction: column;

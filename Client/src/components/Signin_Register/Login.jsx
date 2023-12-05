@@ -21,11 +21,20 @@ const Login = () => {
     passwordShow ? (document.getElementById("Password").type = "text") : (document.getElementById("Password").type = "password");
   }, [passwordShow]);
 
-  const handleInput = (e) => {
+  const handleInputPassword = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setLoginData({ ...loginData, [name]: value });
   };
+  
+  
+  const handleInputEmail = (e) => {
+    const { name, value } = e.target;
+    const isValidInput = /^[A-Za-z\s]+$/.test(value[0]);
+    if (isValidInput || value === "") {
+      setLoginData({ ...loginData, [name]: value });
+    }
+  }
 
   const submitLogin = async (e) => {
     e.preventDefault();
@@ -66,10 +75,10 @@ const Login = () => {
           <h1>LOGIN</h1>
           <label htmlFor="Email">Email:</label>
           <br />
-          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInput} required />
+          <input type="Email" id="Email" name="Email" placeholder="Enter your Email" value={loginData.Email} onChange={handleInputEmail} required />
           <label htmlFor="Password">Password:</label> <br />
           <div id="passwordContainer">
-            <input type="Password" minLength={8} maxLength={18} id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInput} required />
+            <input type="Password" minLength={8} maxLength={18} id="Password" name="Password" placeholder="Enter your Password" value={loginData.Password} onChange={handleInputPassword} required />
             <div
               id="passwordEYE"
               onClick={() => {

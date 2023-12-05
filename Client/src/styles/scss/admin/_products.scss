@@ -4,6 +4,12 @@
   overflow: auto;
   @include square(100%);
   height: 100vh;
+  #seatConfirmed{
+    color: lime;
+  }
+  #seatCancelled{
+    color: red;
+  }
 }
 
 .create-product-btn {
