@@ -6,6 +6,9 @@ const {
   ContactModel,
   ReserveSeatModel,
   ProductsModel,
+  BagsModel,
+  WishlistsModel,
+  OrdersModel,
 } = require("./database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -212,7 +215,8 @@ router.post(`${addRoute}deleteProduct`, async (req, res) => {
 });
 
 router.post(`${addRoute}contact`, async (req, res) => {
-  const { _id, Name, Email, type, Contact_Number, Description } = req.body;
+  const { _id, Name, Email, type, Contact_Number, Description, rating } =
+    req.body;
   let UserRegistered = false;
   try {
     const userExist = DBModel.findOne({ _id });
@@ -228,6 +232,7 @@ router.post(`${addRoute}contact`, async (req, res) => {
       Contact_Number,
       Description,
       UserRegistered,
+      rating,
     });
     await contactData.save();
     res.send({ message: `${type} submitted`, Success: true });
@@ -239,7 +244,7 @@ router.post(`${addRoute}contact`, async (req, res) => {
 router.get(`/booking/cancel`, async (req, res) => {
   try {
     const token = req.query.token;
-    const seatFind = await ReserveSeatModel.findOne({ token : token});
+    const seatFind = await ReserveSeatModel.findOne({ token: token });
     console.log(seatFind, "Hello WORLD");
     if (seatFind.status === "Cancelled") {
       res.send("Already Cancelled Reserved Seat");
@@ -256,7 +261,8 @@ router.get(`/booking/cancel`, async (req, res) => {
 });
 
 router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
-  const { Contact_Number, Person_Count, Date, Timing, Booking_DateTime } = req.body;
+  const { Contact_Number, Person_Count, Date, Timing, Booking_DateTime } =
+    req.body;
   let token = require("crypto").randomBytes(32).toString("hex");
   try {
     const userExist = DBModel.findOne({ _id: req.rootUser._id });
@@ -270,8 +276,8 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
         User_Email: req.rootUser.Email,
         reservation_Date: Date,
         Booking_DateTime,
-        status:"Confirmed",
-        reservation_Timing: Timing
+        status: "Confirmed",
+        reservation_Timing: Timing,
       });
 
       let mailGenerator = new Mailgen({
@@ -300,7 +306,9 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
                 req.rootUser.User_Name
               }.</li>
               <li>If you need to modify or cancel your reservation, please contact us at "perkybeans9@gmail.com" or 
-              <a href="http://${req.headers.host}/booking/cancel?token=${token}">cancel reservation</a>
+              <a href="http://${
+                req.headers.host
+              }/booking/cancel?token=${token}">cancel reservation</a>
               </li>
             </ul>
             <p><strong>Special Requests:</strong><p>
@@ -324,7 +332,7 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
       await new Promise(async (resolve, reject) => {
         await transporter
           .sendMail(message)
-          .then(async() => {
+          .then(async () => {
             await contactData.save();
             return res.json({ message: "Seat Reserved. Check Mail!" });
           })
@@ -341,30 +349,51 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
   }
 });
 
-
-
-
-router.post(`${addRoute}seatAvailable`,async(req,res)=>{
-  const {time,date} = req.body;
+router.post(`${addRoute}seatAvailable`, async (req, res) => {
+  const { time, date } = req.body;
   // const fetchSeats = await ReserveSeatModel.find({reservation_Date : date});
-  const fetchSeats = await ReserveSeatModel.countDocuments({reservation_Date : date,reservation_Timing:time});
+  const fetchSeats = await ReserveSeatModel.countDocuments({
+    reservation_Date: date,
+    reservation_Timing: time,
+  });
   console.log(fetchSeats);
-  if(fetchSeats <= 10){
-    res.send({message:"Seat Available",result:true});
-  }else{
-    res.send({message:"Seat Not Available",result:true});
+  if (fetchSeats <= 10) {
+    res.send({ message: "Seat Available", result: true });
+  } else {
+    res.send({ message: "Seat Not Available", result: true });
   }
-})
+});
+
+// Wishlist Routes
+
+router.get(`${addRoute}fetchWishlist`, Authenication, async (req, res) => {
+  const fetchWishlist = await WishlistsModel.findOne({ user_id: req.userID });
+  if (fetchWishlist) {
+    res.send({ data: fetchWishlist.Wishlist, result: true });
+  } else {
+    res.send({ data: [], result: false });
+  }
+});
 
 router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
   const { productID } = req.body;
   try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    userExist.Wishlist = await userExist.Wishlist.concat({ productID });
-    userExist.save();
+    const wishlistExist = await WishlistsModel.findOne({ user_id: req.userID });
+    if (wishlistExist) {
+      wishlistExist.Wishlist = await wishlistExist.Wishlist.concat({
+        productID,
+      });
+      await wishlistExist.save();
+    } else {
+      const Wishlist = await WishlistsModel({
+        user_id: req.userID,
+        Wishlist: [{ productID }],
+      });
+      await Wishlist.save();
+    }
     res.send("Add to Wishlist");
   } catch (err) {
-    console.log(err);
+    res.send("Please Login");
   }
 });
 
@@ -374,11 +403,13 @@ router.post(
   async (req, res) => {
     const { productID } = req.body;
     try {
-      const userExist = await DBModel.findOne({ _id: req.userID });
-      userExist.Wishlist = await userExist.Wishlist.filter(
+      const wishlistExist = await WishlistsModel.findOne({
+        user_id: req.userID,
+      });
+      wishlistExist.Wishlist = await wishlistExist.Wishlist.filter(
         (e) => e.productID !== productID
       );
-      userExist.save();
+      wishlistExist.save();
       res.send("Remove from Wishlist");
     } catch (err) {
       console.log(err);
@@ -386,40 +417,91 @@ router.post(
   }
 );
 
-router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
-  const { productID, SmallCount, MediumCount, LargeCount } = req.body;
-  // console.log(req.body);
-  try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    let objIndex = await userExist.Bag.findIndex(
-      (obj) => obj.productID == productID
-    );
-    userExist.Bag[objIndex] = await {
-      productID,
-      SmallCount,
-      MediumCount,
-      LargeCount,
-    };
-    await userExist.save();
-    res.send("Add to bag");
-  } catch (err) {
-    console.log(err);
+// Bags Routes
+router.get(`${addRoute}fetchBag`, Authenication, async (req, res) => {
+  const fetchBag = await BagsModel.findOne({ user_id: req.userID });
+  // console.log(fetchBag.Bag);
+  if (fetchBag) {
+    res.send({ data: fetchBag.Bag, result: true });
+  } else {
+    res.send({ data: [], result: false });
   }
 });
 
 router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    userExist.Bag = await userExist.Bag.concat({
-      productID,
-      SmallCount,
-      MediumCount,
-      LargeCount,
-    });
-    userExist.save();
+    const bagExist = await BagsModel.findOne({ user_id: req.userID });
+    if (bagExist) {
+      bagExist.Bag = await bagExist.Bag.concat({
+        productID,
+        SmallCount,
+        MediumCount,
+        LargeCount,
+      });
+      await bagExist.save();
+    } else {
+      const Bag = await BagsModel({
+        user_id: req.userID,
+        Bag: [
+          {
+            productID,
+            SmallCount,
+            MediumCount,
+            LargeCount,
+          },
+        ],
+      });
+      await Bag.save();
+    }
     res.send("Add to bag");
   } catch (err) {
+    res.send("Please Login");
+    console.log(err);
+  }
+});
+
+// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxXXX
+
+router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
+  //   const userExist = await DBModel.findOne({ _id: req.userID });
+  //   let objIndex = await userExist.Bag.findIndex(
+  //     (obj) => obj.productID == productID
+  //   );
+  //   userExist.Bag[objIndex] = await {
+  //     productID,
+  //     SmallCount,
+  //     MediumCount,
+  //     LargeCount,
+  //   };
+  //   await userExist.save();
+  const { productID, SmallCount, MediumCount, LargeCount } = req.body;
+  try {
+    const bagExist = await BagsModel.findOne({ user_id: req.userID });
+    if (bagExist) {
+      let objIndex = await bagExist.Bag.findIndex(
+        (obj) => obj.productID === productID
+      );
+      console.log(productID, SmallCount, MediumCount, LargeCount);
+      bagExist.Bag[objIndex] = await {
+        productID,
+        SmallCount,
+        MediumCount,
+        LargeCount,
+        _id: bagExist.Bag[objIndex]._id,
+      };
+      // console.log(bagExist)
+      // bagExist.Bag = await bagExist.Bag.concat({
+      //   productID,
+      //   SmallCount,
+      //   MediumCount,
+      //   LargeCount,
+      // })
+      await bagExist.save();
+    }
+    res.send("Add to bag");
+  } catch (err) {
+    res.send("Please Login");
     console.log(err);
   }
 });
@@ -427,26 +509,49 @@ router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
 router.post(`${addRoute}removeFromBag`, Authenication, async (req, res) => {
   const { productID } = req.body;
   try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    userExist.Bag = await userExist.Bag.filter(
-      (e) => e.productID !== productID
-    );
-    userExist.save();
+    const fetchBag = await BagsModel.findOne({ user_id: req.userID });
+    fetchBag.Bag = await fetchBag.Bag.filter((e) => e.productID !== productID);
+    await fetchBag.save();
     res.send("Remove from bag");
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
-  console.log(Date.now());
-  let orderedAt = Date.now();
+router.get(`${addRoute}fetchOrders`, Authenication, async (req, res) => {
   try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    userExist.Orders = await userExist.Orders.concat(...userExist.Bag);
-    userExist.Bag = await [];
-    userExist.save();
-    res.send("Product Ordered");
+    const fetchOrders = await OrdersModel.find({ user_id: req.userID });
+    // console.log(fetchOrders);
+    res.send({ data: fetchOrders, result: true });
+  } catch (error) {
+    console.log(error);
+    res.send({ data: [], result: true });
+  }
+});
+
+router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
+  // let orderedAt = Date.now();
+  // console.log(Date.now());
+  const { Delivery_Charge, GST, Discount,TotalAmountPayed } = req.body;
+  // console.log(Delivery_Charge, GST, Discount);
+  try {
+    const bagData = await BagsModel.findOne({ user_id: req.userID });
+    if (bagData) {
+      const Orders = bagData.Bag;
+      const orderExists = await OrdersModel({
+        user_id: req.userID,
+        Orders,
+        status: "CONFIRMED",
+        Delivery_Charge,
+        GST,
+        Discount,
+        TotalAmountPayed
+      });
+      const bagDataDelete = await BagsModel.deleteOne({ user_id: req.userID });
+      await orderExists.save();
+      // await bagDataDelete.save();
+      res.send("Product Ordered");
+    }
   } catch (err) {
     console.log(err);
   }
@@ -701,5 +806,13 @@ router.get(`${addRoute}reserveSeats`, async (req, res) => {
   const reserveSeats = await ReserveSeatModel.find();
   // co
   res.send(reserveSeats);
+});
+router.get(`${addRoute}fetchReview`, async (req, res) => {
+  const fetchReview = await ContactModel.find({ type: "Review" });
+  if (fetchReview) {
+    res.send(fetchReview);
+  } else {
+    res.send("hello world");
+  }
 });
 module.exports = router;

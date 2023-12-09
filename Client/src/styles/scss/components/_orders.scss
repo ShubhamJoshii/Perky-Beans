@@ -43,144 +43,151 @@
   }
 
   #orderCardsContainer {
-    @include flexMixin(flex-start, center);
-    // @include flexMixin(flex-start, flex-start);
-    flex-wrap: wrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 10px;
     gap: 20px;
 
-    #orderProduct {
-      @include flexMixin(flex-start, center);
-      border: 2px solid #8a8686;
-      border-radius: 10px;
+    #order-details {
+      background-color: white;
+      border-radius: 20px;
       overflow: hidden;
-      flex-wrap: wrap;
-      width: 420px;
-      // padding-bottom: 45px;
-      // position: relative;
 
-      #orderCards {
-        padding: 15px;
-        padding-bottom: 55px;
-        width: 400px;
-        position: relative;
-        h4,
-        h2 {
-          text-align: center;
-          width: 100%;
-          margin-bottom: 10px;
-        }
-
-        #orders-Product {
-          @include flexMixin();
-          gap: 20px;
-          flex-wrap: wrap;
-
-          p {
-            text-align: center;
-
-            &:last-child {
-              font-weight: bold;
-            }
-          }
-
-          div {
-            img {
-              width: 100px;
-              aspect-ratio: 1;
-              object-fit: cover;
-              border-radius: 5px;
-            }
-          }
-        }
-
-        #orderDesc {
-          font-size: 14px;
-          margin: 5px 20px;
-        }
-
-        #btns {
-          @include flexMixin(normal);
-          gap: 20px;
+      #order-details-inner {
+        display: flex;
+        padding: 10px 10px 0px 10px;
+        justify-content: space-between;
+        span {
           font-size: 12px;
-          margin-top: 20px;
-          position: absolute;
-          bottom: 10px;
-          width: 94%;
-          margin: auto;
-          // width: calc(100% - 22px);
-          // margin-left: 17px;
+          letter-spacing: 1px;
+        }
+        #order-id {
+          color: rgb(66, 65, 65);
+        }
+        #order-status {
+          color: rgb(66, 65, 65);
+          color: red;
+        }
+      }
+      #btns {
+        @include flexMixin(normal);
+        gap: 20px;
+        font-size: 12px;
+        margin-bottom: 20px;
 
-          button {
-            padding: 10px 38px;
-            color: white;
-            font-weight: bolder;
-            cursor: pointer;
+        button {
+          padding: 10px 38px;
+          color: white;
+          font-weight: bolder;
+          cursor: pointer;
 
-            &:first-child {
-              background-color: #ecb014;
-            }
+          &:first-child {
+            background-color: #ecb014;
+          }
 
-            &:last-child {
-              background-color: #332626;
+          &:last-child {
+            background-color: #332626;
+          }
+        }
+      }
+
+      #order-summary {
+        display: flex;
+        gap: 10px;
+        justify-content: end;
+        table {
+          tr {
+            td {
+              padding-right: 15px;
+              font-size: 13px;
             }
           }
         }
       }
 
-      .track-order {
-        @include flexMixin(flex-start, $direction: column);
-        position: relative;
-        // height: 100%;
-        // overflow: hidden;
-        // transition: 1s;
-        // flex: 1;
-        width: 450px;
-        padding: 40px;
-        background-color: white;
-
-        #closeICON {
-          color: #332626;
-          font-size: 26px;
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          cursor: pointer;
-        }
-
-        h3 {
-          margin-bottom: 20px;
-          margin-left: 70px;
-        }
-
-        div {
-          position: relative;
-
-          #Line {
-            position: absolute;
-            left: 0px;
-            background-color: black;
-            width: 2px;
-            height: 100%;
+      #orders-Collection {
+        #orderCards {
+          display: flex;
+          align-content: center;
+          padding: 10px;
+          gap: 20px;
+          #product-name-pay {
+            display: flex;
+            justify-content: space-between;
+            h3 {
+              font-size: 22px;
+            }
           }
-
-          #timeStamp-Order {
-            margin-left: 20px;
-
-            p {
-              margin-left: 20px;
-              font-size: 12px;
+          img {
+            width: 120px;
+            // height: 160px;
+            object-fit: cover;
+            aspect-ratio: 1;
+            border-radius: 10px;
+          }
+        }
+      }
+      .track-order {
+        margin-top: 10px;
+        padding: 10px 30px;
+        position: relative;
+        margin: auto;
+        width: 90%;
+        div {
+          width: inherit;
+          display: flex;
+          #Line {
+            // width: 50%;
+            width: inherit;
+            height: 3px;
+            position: absolute;
+            background-color: black;
+          }
+          #track-collection {
+            width: -webkit-fill-available;
+            margin-top: 10px;
+            #timeStamp-Order {
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              flex-direction: column;
+              .trackDone {
+                background: red !important;
+              }
+              #currStage-Order {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+                font-weight: bolder;
+                width: 12px;
+                height: 12px;
+                font-size: 10px;
+                border-radius: 50%;
+                background-color: black;
+                position: absolute;
+                top: 5px;
+              }
+              h5 {
+                text-align: center;
+              }
             }
-
-            #currStage-Order {
-              width: 10px;
-              height: 10px;
-              border-radius: 50%;
-              background-color: black;
-              position: absolute;
-              left: -24px;
-              margin-top: 4px;
-            }
+          }
+        }
+      }
+    }
+    @media (max-width: 800px) {
+      #order-details #orders-Collection #orderCards {
+        img{
+          width: 96px;
+        }
+        div {
+          #product-name-pay{
+            font-size: 14px;
+          }
+          p {
+            font-size: 13px;
           }
         }
       }
@@ -258,50 +265,6 @@
 
     .userNotLogin p {
       font-size: 12px !important;
-    }
-
-    #orderCardsContainer {
-      #orderProduct {
-        #orderCards {
-          padding: 15px 0px;
-
-          h2 {
-            font-size: 18px;
-          }
-
-          h4 {
-            font-size: 14px;
-          }
-
-          #orders-Product {
-            div {
-              img {
-                width: 70px;
-              }
-
-              p {
-                font-size: 12px;
-              }
-            }
-          }
-
-          #orderDesc {
-            margin: 4px 0px;
-            font-size: 12px;
-            text-align: center;
-            // width: 100%;
-          }
-
-          #btns {
-            @include flexMixin(normal);
-            font-size: 12px;
-            // align-self: normal;
-            button {
-              padding: 5px 15px;
-            }
-          }
-        }
-      }
     }
 
     #wishlist {

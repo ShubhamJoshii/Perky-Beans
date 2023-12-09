@@ -20,11 +20,12 @@ const ProductPage = () => {
   const [Products, setProducts] = useState({});
   const [loading, setLoading] = useState("Show");
   const [AddToBag, setAddToBag] = useState(false);
+  const [productAtBag, setProductAtBag] = useState({});
 
   let itemShow = useParams().productID;
-  const { userData, setUserData } = useContext(UserData);
+  const { userData, setUserData,updateBag, fetchBag,fetchWishList,addToBag,addToWishlist,bagData,wishlistData  } = useContext(UserData);
+  // const [wishlistData, setWishlistData] = useState([]);
   const { checkUserAlreadyLogin, notification } = useContext(Notification);
-
   useEffect(() => {
     // console.log("reload");
     userData?.Bag.find((e) => {
@@ -39,9 +40,10 @@ const ProductPage = () => {
   const fetchProductDetails = async () => {
     setLoading("Show");
     await axios.post("/api/fetchProductDetails", { _id: itemShow }).then((response) => {
-      // console.log(response.data.data)
+      // console.log(response.data.data._id, bagData[0].productID)
       setProducts(response.data.data)
       setLoading("Hide");
+      fetchWishList();
     }).catch((err) => {
       setLoading("LoadBtnShow");
       console.log(err);
@@ -49,6 +51,18 @@ const ProductPage = () => {
       // setLoading(false);
     })
   }
+  
+  useEffect(()=>{
+    const productAt = bagData?.find(e => e.productID === Products._id)
+    // setProductAtBag(productAt);
+    if(productAt){
+      setCounter0(productAt.SmallCount);
+      setCounter1(productAt.MediumCount);
+      setCounter2(productAt.LargeCount);
+    }
+  },[bagData,Products])
+
+
 
   useEffect(() => {
     itemShow && fetchProductDetails();
@@ -80,62 +94,6 @@ const ProductPage = () => {
 
   const total = Sizes[0].price * Sizes[0].counter + Sizes[1].price * Sizes[1].counter + Sizes[2].price * Sizes[2].counter;
 
-  const addToWishlist = async (_id) => {
-    if (userData) {
-      let b = userData.Wishlist.find((e) => e.productID === _id);
-      if (b) {
-        await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
-          checkUserAlreadyLogin();
-        });
-      } else {
-        await axios
-          .post("/api/addToWishlist", {
-            productID: _id,
-          })
-          .then((result) => {
-            checkUserAlreadyLogin();
-          })
-      }
-    } else {
-      notification("Please Login Before Adding to Wishlist", "Warning");
-    }
-  };
-
-  const addToBag = async (_id) => {
-    setAddToBag(true);
-    if (userData) {
-      let b = userData.Bag.find((e) => e.productID === _id);
-      if (counter0 || counter1 || counter2 > 0) {
-        if (b) {
-          await axios.post("/api/updateBag", { productID: _id, SmallCount: counter0, MediumCount: counter1, LargeCount: counter2 }).then((result) => {
-            checkUserAlreadyLogin();
-          });
-        } else {
-          await axios
-            .post("/api/addtoBag", {
-              productID: _id,
-              SmallCount: counter0,
-              MediumCount: counter1,
-              LargeCount: counter2,
-            })
-            .then((result) => {
-              // checkUserAlreadyLogin();
-            }).catch(()=>{
-            })
-            .finally(()=>{
-              checkUserAlreadyLogin();
-              setAddToBag(false);
-            })
-          }
-        } else {
-          notification("firstly, Select Size", "Warning");
-        }
-      } else {
-        notification("Please Login Before Adding to Bag", "Warning");
-      }
-      setAddToBag(false);
-  };
-
   return (
     <React.Fragment>
       <Bags />
@@ -147,7 +105,7 @@ const ProductPage = () => {
                 <div id="product-img-BTN1">
                   <div id="onhover-showBTN1">
                     <p id="wishlist-para">WISHLIST</p>
-                    <AiFillHeart onClick={() => addToWishlist(Products._id)} className={userData?.Wishlist.find((e) => e.productID === Products._id) ? "active-Heart heart" : "heart"} />
+                    <AiFillHeart onClick={() => addToWishlist(Products._id)} className={wishlistData?.find((e) => e.productID === Products._id) ? "active-Heart heart" : "heart"} />
                   </div>
                 </div>
                 <img className="product-image" src={Products.Product_Photo} alt={Products.Product_Photo} loading="lazy" />
@@ -208,7 +166,7 @@ const ProductPage = () => {
                         <Oval height="18" width="18" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} />
                       </button>
                       :
-                      <button className="order" style={counter0 || counter1 || counter2 > 0 ? {} : { background: "grey" }} onClick={() => addToBag(Products._id)}>
+                      <button className="order" style={counter0 || counter1 || counter2 > 0 ? {} : { background: "grey" }} onClick={() => updateBag(Products._id, counter0, counter1, counter2)}>
                         Add to Bag
                       </button>
                     }

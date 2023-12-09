@@ -1,24 +1,26 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Oval} from "react-loader-spinner";
+import React, { useContext, useEffect, useState } from "react";
+import { Oval } from "react-loader-spinner";
 import SideIMG from "../../assets/Slider/Slider (1).png";
-import {Notification, UserData} from "../../routes/App";
+import { Notification, UserData } from "../../routes/App";
 import axios from "axios";
+import { Rate } from "antd";
 const Contact = () => {
-  const {userData, setUserData} = useContext(UserData);
-  const {notification} = useContext(Notification);
+  const { userData, setUserData } = useContext(UserData);
+  const { notification } = useContext(Notification);
   const [contactData, setContactData] = useState({
     Name: undefined,
     Email: undefined,
     type: "Feedback",
     Contact_Number: undefined,
-    Description: undefined,
+    Description: "",
+    rating: null
   });
   const [loadingShow, setloadingShow] = useState(false);
 
   const inputHandle = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    setContactData({...contactData, [name]: value});
+    setContactData({ ...contactData, [name]: value });
   };
 
   const submitData = async (e) => {
@@ -26,31 +28,32 @@ const Contact = () => {
     if (contactData.type && contactData.Contact_Number.length === 10 && contactData.Description) {
       setloadingShow(true);
       await axios
-        .post("/api/contact", {_id: userData?._id, ...contactData})
+        .post("/api/contact", { _id: userData?._id, ...contactData })
         .then((result) => {
-          (result.data.Success) ? notification(result.data.message,"Success") :  notification(result.data.message,"Un-Success") ;
+          (result.data.Success) ? notification(result.data.message, "Success") : notification(result.data.message, "Un-Success");
           setContactData({
             Name: userData?.Full_Name || "",
             Email: userData?.Email || "",
-            type: "Feedback",
+            type: contactData.type,
             Contact_Number: "",
             Description: "",
+            rating:null
           });
           setloadingShow(false);
         })
-        .catch(() => {});
-    }else if(contactData.Contact_Number.length != 10){
-      notification("Enter Correct Contact Number","Info");
+        .catch(() => { });
+    } else if (contactData.Contact_Number.length != 10) {
+      notification("Enter Correct Contact Number", "Info");
     } else if (!contactData.Description) {
-      notification("Enter Description","Info");
-    }else{
+      notification("Enter Description", "Info");
+    } else {
       notification("Please Login First !", "Un-Success");
     }
   };
 
   useEffect(() => {
-    if(userData){
-      setContactData({...contactData, Name: userData?.Full_Name, Email: userData?.Email});
+    if (userData) {
+      setContactData({ ...contactData, Name: userData?.Full_Name, Email: userData?.Email });
     }
   }, [userData]);
 
@@ -72,12 +75,18 @@ const Contact = () => {
                   <option value="Issue">Issue</option>
                 </select>
               </div>
+              {
+                contactData.type === "Review" &&
+                <Rate defaultValue={contactData?.rating} className="overall-rate-antd" allowClear={false} tooltips={["Very Bad", "Bad", "Good", "Excellent", "Awesome"]} onChange={(value) => { setContactData({...contactData,rating:value}) }} />
+              }
               <div>
-                <input type="text"  disabled placeholder="Enter E-mail" name="Email" value={contactData.Email} onChange={inputHandle} />
+                <input type="text" disabled placeholder="Enter E-mail" name="Email" value={contactData.Email} onChange={inputHandle} />
                 <input type="number" required placeholder="Enter Contact Number" name="Contact_Number" value={contactData.Contact_Number} onChange={inputHandle} />
               </div>
-              <textarea name="Description" required id="" cols="30" rows="10" placeholder="Describe your issue" value={contactData.Description} onChange={inputHandle}></textarea>
-
+              <div id="textArea">
+                <textarea name="Description" required id="" cols="30" rows="10" minLength={10} maxLength={300} placeholder="Describe your issue" value={contactData.Description} onChange={inputHandle}></textarea>
+                <p>{contactData?.Description?.length} / 300</p>
+              </div>
               <button>{loadingShow ? <Oval height="20" width="60" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>SUBMIT</>}</button>
             </form>
           </div>

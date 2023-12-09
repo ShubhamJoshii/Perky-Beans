@@ -53,6 +53,8 @@ const App = () => {
       })
       .catch(() => { });
   };
+  const [bagData, setBagData] = useState([]);
+  const [wishlistData, setWishlistData] = useState([]);
 
   useEffect(() => {
     checkUserAlreadyLogin();
@@ -106,6 +108,91 @@ const App = () => {
     }
   };
 
+
+  const fetchBag = async () => {
+    await axios.get("/api/fetchBag").then((response) => {
+      setBagData(response.data.data);
+    }).catch((err) => {
+      console.log("Error")
+    })
+  }
+
+  const updateBag = async (_id, SmallCount = 0, MediumCount = 1, LargeCount = 0) => {
+    if (userData) {
+      let b = bagData.find((e) => e.productID === _id);
+      if (b) {
+        await axios.post("/api/updateBag", {
+          productID: _id,
+          SmallCount,
+          MediumCount,
+          LargeCount,
+        }).then((result) => {
+          // checkUserAlreadyLogin();
+          fetchBag();
+        });
+      }
+    }
+  }
+
+  const addToBag = async (_id, SmallCount = 0, MediumCount = 1, LargeCount = 0) => {
+    if (userData) {
+      let b = bagData.find((e) => e.productID === _id);
+      if (b) {
+        await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
+          // checkUserAlreadyLogin();
+          fetchBag();
+        });
+      } else {
+        await axios
+          .post("/api/addtoBag", {
+            productID: _id,
+            SmallCount,
+            MediumCount,
+            LargeCount,
+          })
+          .then((result) => {
+            // checkUserAlreadyLogin();
+            fetchBag();
+          });
+      }
+    } else {
+      notification("Please Login Before Adding to Bag", "Warning");
+    }
+  };
+
+  const fetchWishList = async () => {
+    await axios.get("/api/fetchWishlist").then((response) => {
+      setWishlistData(response.data.data);
+    }).catch((err) => {
+      console.log("Error")
+    })
+
+  }
+
+  const addToWishlist = async (_id) => {
+    if (userData) {
+      let b = wishlistData.find((e) => e.productID === _id);
+      if (b) {
+        await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
+          // checkUserAlreadyLogin();
+          fetchWishList();
+        });
+      } else {
+        await axios
+          .post("/api/addToWishlist", {
+            productID: _id,
+          })
+          .then((result) => {
+            // checkUserAlreadyLogin();
+            fetchWishList();
+          });
+      }
+    } else {
+      notification("Please Login Before Adding to Wishlist", "Warning");
+    }
+  };
+
+
   // useEffect(() => {
   //   setTimeout(() => {
   //     setloadingScreen(false);
@@ -115,7 +202,8 @@ const App = () => {
   return (
     // <Loading.Provider value={setloadingScreen}>
     <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
-      <UserData.Provider value={{ userData, setUserData }}>
+      <UserData.Provider value={{ userData,updateBag, setUserData, fetchBag, fetchWishList, addToBag, addToWishlist, bagData, wishlistData }}>
+
         <ToastContainer />
         <Router>
           <Suspense fallback={<Preloader />}>

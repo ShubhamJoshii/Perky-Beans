@@ -2,6 +2,10 @@
 #reviewHeading {
   margin-left: 40px;
 }
+:where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-first, :where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-second{
+  color: rgba(255, 255, 255, 0.223);
+}
+
 .CustomerReview {
   @include flexMixin(normal, flex-start);
   overflow: scroll;
@@ -11,15 +15,78 @@
   margin: 10px 20px;
   -ms-overflow-style: none;
   scrollbar-width: none;
-
+  
   &::-webkit-scrollbar {
     display: none;
   }
+  .overallRating{
+    border: 2px solid white;
+    position: relative;
+    width: 440px;
+    // padding: 20px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    #overall-rating-text{
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.597);
+    }
+    
+    #overall-rating-star{
+      @include flexMixin(center,flex-start);
+      margin-bottom: 4px;
+      margin-top: 4px;
+      gap: 10px;
+      h2{
+        font-size: 34px;
+      }
+      .overall-rate-antd{
+        @include flexMixin(center,flex-start);
+        gap: 4px ;
+      }
+    }
+    
+    #rating-count{
+      @include flexMixin(center,flex-start);
+      gap: 10px;
+      overflow: hidden;
+      p{
+        font-size: 14px;
+      }
+      div{
+        @include flexMixin(center,flex-start);
+      }
+      
+      #rating-line{
+        flex: 1;
+        position: relative;
+        height: 3px;
+        #rating-line-main{
+          height: 3px;
+          position: absolute;
+          background-color: white;
+          width: 50%;
+        }
+        #rating-line-background{
+          height: 3px;
+          position: absolute;
+          width: 100%;
+          background-color: rgba(255, 255, 255, 0.389);
+        }
+      }
+      #review-count{
+        font-size: 12px;
+        width: 26px;
+        text-align: end;
+      }
+    }
+  }
+
   .reviewCard {
     width: 875px;
     border-radius: 10px;
     border: 2px solid white;
-    padding: 20px;
+    // padding: 20px;
+    padding: 14px 20px;
     position: relative;
     #userINFO {
       @include flexMixin();

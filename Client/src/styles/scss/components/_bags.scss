@@ -152,7 +152,7 @@
     overflow: scroll;
     width: 100%;
     flex: 1;
-    margin-bottom: 55px;
+    // margin-bottom: 55px;
   }
   .userNotLogin {
     margin-top: 25px !important;
@@ -186,9 +186,39 @@
       cursor: pointer;
     }
   }
+  
+  .bag-order-detail-show{
+    bottom: 60px !important;
+  }
 
+  .bag-order-detail-hide{
+    bottom: -100px !important;
+  }
+
+  #bag-order-detail{
+    position: absolute;
+    background-color: white;
+    padding: 10px;
+    bottom: -100px;
+    display: flex;
+    justify-content: end;
+    gap: 20px;
+    width: 100%;
+    transition: 1s;
+    h4{
+      font-size: 14px;
+    }
+    table{
+      tr{
+        td{
+          padding-right: 15px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
   #Bag-Total-Price {
-    position: fixed;
+    // position: fixed;
     @include flexMixin($JScontent: space-evenly);
     bottom: 0;
     font-family: 16px;
@@ -196,10 +226,21 @@
     width: 450px;
     padding: 5px;
     background-color: #f7e7dc;
+    // position: relative;
+    z-index: 99999;
 
     h4 {
       font-size: 20px;
+      span{
+        font-size: 12px;
+        color: blue;
+        cursor: pointer;
+        &:hover{
+          color: #ecb014;
+        }
+      }
     }
+    
 
     button {
       background-color: #ecb014;

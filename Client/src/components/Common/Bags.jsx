@@ -12,27 +12,57 @@ import axios from "axios";
 const Bags = () => {
   const [showBag, setShowBag] = useState(false);
   const [showAmountDetails, setShowAmountDetail] = useState(null);
-  const { userData, setUserData } = useContext(UserData);
+  const { userData, fetchBag, bagData, } = useContext(UserData);
   const [category, setCategory] = useState(useParams());
   const { checkUserAlreadyLogin, notification } = useContext(Notification);
   const [loading, setLoading] = useState(true);
   const [loadingShow, setloadingShow] = useState(false);
-  let GrandTotal = 0;
+  const [showDetail, setShowDetail] = useState(false);
+  const [Charges, setCharge] = useState({
+    Delivery_Charge: 0,
+    GST: 0,
+    Discount: 0
+  })
+  const [GrandTotal, setGrandTotal] = useState(0);
+
   const ref = useRef(null);
   const navigate = useNavigate();
-
+  
   const [productsData, setProductsData] = useState([]);
+  
+  const fetchGrandTotal = () => {
+    let Total = 0;
+    let Delivery_Charge = 0;
+    let GST = 0;
+    let Discount = 0;
+    bagData?.map((curr, ids) => {
+      const a = productsData?.find((e) => e._id === curr.productID);
+      const smallPrice = (a?.Price - 50) * curr.SmallCount;
+      const mediumPrice = a?.Price * curr.MediumCount;
+      const largePrice = (a?.Price + 50) * curr.LargeCount;
+      Total += smallPrice + mediumPrice + largePrice;
+    })
+    GST = Total * 18 / 100;
+    Total > 500 || Total === 0 ? Delivery_Charge = 0 : Delivery_Charge = 40;
+    setCharge({GST,Delivery_Charge,Discount});
+    setGrandTotal(Total + Delivery_Charge - Discount);
+  }
+
   const fetchProducts = async () => {
     setLoading(true);
     await axios.post("/api/fetchProduct", { Available: true }).then((result) => {
-      // console.log(result.data.data);
       setProductsData(result.data.data);
+      fetchBag();
     }).catch((err) => {
       console.log("Error")
     }).finally(() => {
       setLoading(false);
     })
   }
+  
+  useEffect(()=>{
+    fetchGrandTotal();
+  },[productsData,bagData])
 
   useEffect(() => {
     fetchProducts();
@@ -52,18 +82,18 @@ const Bags = () => {
 
   const removeFromBag = async (_id) => {
     await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
-      checkUserAlreadyLogin();
-      fetchProducts();
+      fetchBag();
     });
   };
 
   const orderNow = async (_id) => {
-    if (userData?.Bag?.length > 0) {
+
+    if (bagData.length > 0) {
       setloadingShow(true);
-      await axios.post("/api/orderNow").then((result) => {
+      await axios.post("/api/orderNow",{...Charges,TotalAmountPayed:GrandTotal}).then((result) => {
         if (result.data === "Product Ordered") {
-          notification(result.data);
-          checkUserAlreadyLogin();
+          notification(result.data, "Success");
+          fetchBag();
         }
       }).finally(() => {
         setloadingShow(false);
@@ -84,7 +114,7 @@ const Bags = () => {
         <div id="BagSliderContainer">
           <div id="BagSlider" ref={ref}>
             <div id="bag-back-btn">
-              <MdOutlineArrowBackIos onClick={() => setShowBag(!showBag)} />
+              <MdOutlineArrowBackIos onClick={() => {setShowBag(!showBag)}} />
               <h3>BAG</h3>
             </div>
             {!userData && (
@@ -101,15 +131,16 @@ const Bags = () => {
                 {
                   !loading ?
                     <div id="bagScroll">
-                      {userData?.Bag?.length > 0 ? (
+                      {bagData?.length > 0 ? (
                         <>
-                          {userData?.Bag?.map((curr, ids) => {
+                          {bagData?.map((curr, ids) => {
                             const a = productsData?.find((e) => e._id === curr.productID);
                             const smallPrice = (a?.Price - 50) * curr.SmallCount;
                             const mediumPrice = a?.Price * curr.MediumCount;
                             const largePrice = (a?.Price + 50) * curr.LargeCount;
                             const Total = smallPrice + mediumPrice + largePrice;
-                            GrandTotal += Total;
+                            // GrandTotal += Total;
+                            // setGrandTotal((prev) => prev + Total);
 
                             // console.log(a);
                             let b = `/products/${a?.Category}/${a._id}`;
@@ -162,7 +193,7 @@ const Bags = () => {
                       )}
                     </div>
                     :
-                    <Oval height="40" width="60" color="black" wrapperStyle={{flex:1, marginTop:"50px"}} wrapperClass="bagScroll loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
+                    <Oval height="40" width="60" color="black" wrapperStyle={{ flex: 1, marginTop: "50px" }} wrapperClass="bagScroll loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
                 }
 
               </>
@@ -177,10 +208,48 @@ const Bags = () => {
                 </p>
               </div>
             )}
+            <div id={"bag-order-detail"} className={showDetail}>
+              <h4>Order Summary</h4>
+              <table>
+                {bagData?.map((curr, ids) => {
+                  const a = productsData?.find((e) => e._id === curr.productID);
+                  const smallPrice = (a?.Price - 50) * curr.SmallCount;
+                  const mediumPrice = a?.Price * curr.MediumCount;
+                  const largePrice = (a?.Price + 50) * curr.LargeCount;
+                  const Total = (smallPrice + mediumPrice + largePrice) * (100 - 18) / 100;
+                  // GrandTotal += Total;
+
+                  return (
+                    <tr>
+                      <td>{a.Product_Name}</td>
+                      <td>&#x20B9; {Total}</td>
+                    </tr>
+                  )
+                })}
+                <tr>
+                  <td>Delivery Charges: </td>
+                  <td>&#x20B9; {Charges.Delivery_Charge}</td>
+                </tr>
+                <tr>
+                  <td>GST: </td>
+                  <td>&#x20B9; {Charges.GST}</td>
+                </tr>
+                <tr>
+                  <td>Discount: </td>
+                  <td>&#x20B9; {Charges.Discount}</td>
+                </tr>
+                <tr>
+                  <td>Order Total:</td>
+                  <td>&#x20B9; {GrandTotal}</td>
+                </tr>
+              </table>
+            </div>
             <div id="Bag-Total-Price">
-              <h4>Grand Total : </h4>
+              <h4>Grand Total
+                <span onClick={() => setShowDetail((prev) => prev === "bag-order-detail-show" ? "bag-order-detail-hide" : "bag-order-detail-show")}> (Details)</span>
+              </h4>
               <h4>&#x20B9; {GrandTotal}</h4>
-              <button style={userData?.Bag.length > 0 ? {} : { background: "grey" }} onClick={orderNow}>
+              <button style={bagData.length > 0 ? {} : { background: "grey" }} onClick={orderNow}>
                 {loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>ORDER NOW</>}
               </button>
             </div>
@@ -189,7 +258,7 @@ const Bags = () => {
       ) : (
         <div id="bagBTN">
           <FaShoppingBag onClick={() => setShowBag(!showBag)} />
-          {userData?.Bag.length > 0 && <p>{userData?.Bag.length}</p>}
+          {bagData?.length > 0 && <p>{bagData?.length}</p>}
         </div>
       )}
     </>

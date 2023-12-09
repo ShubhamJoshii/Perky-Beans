@@ -11,9 +11,10 @@ import { Oval } from "react-loader-spinner";
 
 const Orders = () => {
   const [orderShow, setOrderShow] = useState(true);
-  const { userData, setUserData } = useContext(UserData);
+  const { userData, setUserData, fetchBag, fetchWishList, addToBag, addToWishlist, bagData, wishlistData } = useContext(UserData);
   const [Products, setProducts] = useState(null);
   const [loading, setLoading] = useState("Show");
+  const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
   const currRoute = useParams();
 
@@ -22,6 +23,8 @@ const Orders = () => {
     await axios.post("/api/fetchProduct", { Available: false }).then((result) => {
       setProducts(result.data.data);
       setLoading("Hide");
+      fetchWishList();
+      fetchOrders();
     }).catch((err) => {
       console.log("Error")
       setLoading("LoadBtnShow");
@@ -39,6 +42,14 @@ const Orders = () => {
       setOrderShow(true);
     }
   }, [currRoute]);
+
+
+  const fetchOrders = async()=>{
+    await axios.get("/api/fetchOrders").then((response)=>{
+      // console.log(response.data.data);
+      setOrders(response.data.data);
+    })
+  }
 
   return (
     <>
@@ -67,12 +78,12 @@ const Orders = () => {
                 <>
                   {orderShow ? (
                     <>
-                      {userData?.Orders.length > 0 ? (
+                      {orders?.length > 0 ? (
                         <div id="orderCardsContainer">
-                          {userData?.Orders?.toReversed().map((curr, ids) => {
-                            const product = Products?.find((e) => e._id === curr.productID);
-                            console.log(product);
-                            return <OrderCards product={product} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
+                          {orders?.toReversed().map((curr, ids) => {
+                            // const product = Products?.find((e) => e._id === curr.Orders[0].productID);
+                            // console.log(product)
+                            return <OrderCards product={Products} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
                           })}
                         </div>
                       ) : (
@@ -81,10 +92,10 @@ const Orders = () => {
                     </>
                   ) : (
                     <>
-                      {userData?.Wishlist.length > 0 ? (
+                      {wishlistData?.length > 0 ? (
                         <div id="wishlist">
                           <div id="orderCardsContainer">
-                            {userData?.Wishlist?.toReversed().map((curr, ids) => {
+                            {wishlistData?.toReversed().map((curr, ids) => {
                               // console.log(curr);
                               const product = Products?.find((e) => e._id === curr.productID);
                               return <WishlistCards product={product} orderData={curr} key={curr + ids} userData={userData} setUserData={setUserData} />;

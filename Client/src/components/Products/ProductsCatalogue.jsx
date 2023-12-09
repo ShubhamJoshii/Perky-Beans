@@ -16,7 +16,9 @@ const ProductsCatalogue = () => {
   const [category, setCategory] = useState(useParams());
   const [count, setCount] = useState(0);
   const { notification, checkUserAlreadyLogin } = useContext(Notification);
-  const { userData, setUserData } = useContext(UserData);
+  const { fetchBag,fetchWishList,addToBag,addToWishlist,bagData,wishlistData  } = useContext(UserData);
+  // const [bagData, setBagData] = useState([]);
+  // const [wishlistData, setWishlistData] = useState([]);
   const [productsData, setProductsData] = useState([]);
   const [loading, setLoading] = useState("Show");
 
@@ -26,21 +28,21 @@ const ProductsCatalogue = () => {
 
   const fetchProducts = async () => {
     setLoading("Show");
-    await axios.post("/api/fetchProduct", { Available: true }).then((result) => {
-      setProductsData(result.data.data);
+    await axios.post("/api/fetchProduct", { Available: true }).then((response) => {
+      setProductsData(response.data.data);
       setLoading("Hide");
-      // console.log(result.data);
+      fetchBag();
+      fetchWishList();
     }).catch((err) => {
       setLoading("LoadBtnShow");
       console.log("Error")
-    }).finally(() => {
-      // setLoading("Hide");
     })
   }
 
   useEffect(() => {
     fetchProducts();
   }, [])
+
 
   useEffect(() => {
     let a = [];
@@ -127,52 +129,6 @@ const ProductsCatalogue = () => {
     pages.push(i);
   }
 
-  const addToWishlist = async (_id) => {
-    if (userData) {
-
-      let b = userData.Wishlist.find((e) => e.productID === _id);
-      if (b) {
-        await axios.post("/api/removefromWishlist", { productID: _id }).then((result) => {
-          checkUserAlreadyLogin();
-        });
-      } else {
-        await axios
-          .post("/api/addToWishlist", {
-            productID: _id,
-          })
-          .then((result) => {
-            checkUserAlreadyLogin();
-          });
-      }
-    } else {
-      notification("Please Login Before Adding to Wishlist", "Warning");
-    }
-  };
-
-  const addToBag = async (_id) => {
-    if (userData) {
-      let b = userData.Bag.find((e) => e.productID === _id);
-      if (b) {
-        await axios.post("/api/removeFromBag", { productID: _id }).then((result) => {
-          checkUserAlreadyLogin();
-        });
-      } else {
-        await axios
-          .post("/api/addtoBag", {
-            productID: _id,
-            SmallCount: 0,
-            MediumCount: 1,
-            LargeCount: 0,
-          })
-          .then((result) => {
-            checkUserAlreadyLogin();
-          });
-      }
-    } else {
-      notification("Please Login Before Adding to Bag", "Warning");
-    }
-  };
-
   return (
     <>
       {
@@ -192,13 +148,13 @@ const ProductsCatalogue = () => {
                     <div id="product-img-BTN1">
                       <div id="onhover-showBTN1">
                         <p id="wishlist-para">WISHLIST</p>
-                        <AiFillHeart onClick={() => addToWishlist(product._id)} className={userData?.Wishlist.find((e) => e.productID === product._id) ? "active-Heart heart" : " heart"} />
+                        <AiFillHeart onClick={() => addToWishlist(product._id)} className={wishlistData.find((e) => e.productID === product._id) ? "active-Heart heart" : " heart"} />
                       </div>
                     </div>
                     <div id="product-img-BTN2">
                       <div id="onhover-showBTN2">
                         <p id="bag-para">BAG</p>
-                        <BsFillBagFill onClick={() => addToBag(product._id)} className={userData?.Bag.find((e) => e.productID === product._id) ? "active-Bags bag" : "bag"} />
+                        <BsFillBagFill onClick={() => addToBag(product._id)} className={bagData.find((e) => e.productID === product._id) ? "active-Bags bag" : "bag"} />
                       </div>
                     </div>
                     <NavLink to={a} onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" })}>
@@ -271,7 +227,7 @@ const ProductsCatalogue = () => {
                 <Oval height="40" width="60" color="white" wrapperStyle={{}} wrapperClass="products loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={4} strokeWidthSecondary={4} />
                 :
                 <div className="products loadingBTN">
-                  <p>Something went wrong</p> 
+                  <p>Something went wrong</p>
                   <button onClick={fetchProducts}>Try again</button>
                 </div>
             }

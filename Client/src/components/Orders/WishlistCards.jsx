@@ -3,20 +3,18 @@ import {IoMdClose} from "react-icons/io";
 import {useContext, useEffect, useState} from "react";
 import {Oval} from "react-loader-spinner";
 import axios from "axios";
-
+import { UserData } from "../../routes/App";
 const WishlistCards = ({product, orderData, userData, setUserData}) => {
   const [loadingShow, setloadingShow] = useState(false);
   const {checkUserAlreadyLogin} = useContext(Notification);
-
-  // useEffect(()=>{
-  //   console.log(product);
-  // },[product])
-
+  const {fetchWishList,wishlistData,fetchBag} = useContext(UserData);
+  
   const removeFromWishlist = async (_id) => {
-    let b = userData.Wishlist.find((e) => e.productID === _id);
+    let b = wishlistData.find((e) => e.productID === _id);
+    console.log("Clicked",b)
     if (b) {
       await axios.post("/api/removefromWishlist", {productID: _id}).then((result) => {
-        checkUserAlreadyLogin();
+        fetchWishList();
       });
     }
   };
@@ -33,8 +31,10 @@ const WishlistCards = ({product, orderData, userData, setUserData}) => {
           LargeCount: 0,
         })
         .then((result) => {
-          checkUserAlreadyLogin();
+          // checkUserAlreadyLogin();
           setloadingShow(false);
+          removeFromWishlist(_id);
+          fetchBag();
         });
     }
     setTimeout(() => setloadingShow(false), 1000);
