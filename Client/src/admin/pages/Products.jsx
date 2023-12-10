@@ -7,10 +7,10 @@ import Switch from "react-switch";
 import Pagination from "../components/Pagination";
 import {Oval} from "react-loader-spinner"
 const Products = () => {
-  const [productsData, setProductsData] = useState();
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-
+  
+  const [productsData, setProductsData] = useState();
   const fetchProducts = async () => {
     await axios.post("/api/fetchProduct",{Available:false}).then((result) => {
       // console.log(result.data.data);
@@ -80,7 +80,7 @@ const Products = () => {
                       <td><img src={curr.Product_Photo} style={{ borderRadius: "20px" }} alt={curr.Product_Name} /></td>
                       <td>{curr.Product_Name}</td>
                       <td>{curr.Description.slice(0, 50)}...</td>
-                      <td>{curr.Price}</td>
+                      <td>&#x20B9;{curr.Price}</td>
                       <td>{curr.Rating}</td>
                       <td>{curr.Category}</td>
                       <td>{curr.type}</td>

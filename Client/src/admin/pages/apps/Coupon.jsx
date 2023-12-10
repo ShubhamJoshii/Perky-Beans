@@ -1,50 +1,54 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import AdminSidebar from "../../components/AdminSidebar";
-
-const allLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-const allNumbers = "1234567890";
-const allSymbols = "!@#$%^&*()_+";
-
+import axios from "axios";
+import { Notification } from "../../../routes/App"
 const Coupon = () => {
-  const [size, setSize] = useState(8);
-  const [prefix, setPrefix] = useState("");
-  const [includeNumbers, setIncludeNumbers] = useState(false);
-  const [includeCharacters, setIncludeCharacters] = useState(false);
-  const [includeSymbols, setIncludeSymbols] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const { notification } = useContext(Notification)
+  const [couponData, setCouponData] = useState({
+    Code: "", Discount_Allot: "", Description: ""
+  })
+  const [allCoupon, setAllCoupon] = useState([]);
 
-  const [coupon, setCoupon] = useState("");
+  const fetchCoupon = async () => {
+    await axios.get("/api/fetchCoupon").then((response) => {
+      // console.log(response.data.Data)
+      setAllCoupon(response.data.Data)
+    }).catch((err) => {
+      console.log(err)
+    })
+  }
 
-  const copyText = async (coupon) => {
-    await window.navigator.clipboard.writeText(coupon);
-    setIsCopied(true);
-  };
+  useEffect(() => {
+    fetchCoupon();
+  }, [])
 
-  const submitHandler = (e) => {
+  const inputHandle = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setCouponData({ ...couponData, [name]: value })
+  }
+
+  const submitHandler = async (e) => {
     e.preventDefault();
-
-    if (!includeNumbers && !includeCharacters && !includeSymbols)
-      return alert("Please Select One At Least");
-
-    let result = prefix || "";
-    const loopLength= size - result.length;
-
-    for (let i = 0; i < loopLength; i++) {
-      let entireString = "";
-      if (includeCharacters) entireString += allLetters;
-      if (includeNumbers) entireString += allNumbers;
-      if (includeSymbols) entireString += allSymbols;
-
-      const randomNum= ~~(Math.random() * entireString.length);
-      result += entireString[randomNum];
+    if (couponData.Code.length > 4 && couponData.Discount_Allot < 50) {
+      await axios.post("/api/newCouponAdd", couponData).then((response) => {
+        response.data.result ?
+          notification(response.data.message, "Success") : notification(response.data.message, "Un-Success")
+        setCouponData({ Code: "", Discount_Allot: "", Description:""})
+      }).catch((err) => {
+        console.log(err)
+      }).finally(() => {
+        fetchCoupon();
+      })
+    } else if (couponData.Code.length < 4) {
+      notification("Coupon Length Should be greater than 4", "Info")
     }
-
-    setCoupon(result);
   };
 
   useEffect(() => {
     setIsCopied(false);
-  }, [coupon]);
+  }, [couponData]);
 
   return (
     <div className="admin-container">
@@ -53,24 +57,39 @@ const Coupon = () => {
         <h1>Coupon</h1>
         <section>
           <form className="coupon-form" onSubmit={submitHandler}>
-            <input
+            <div>
+              <input
+                type="text"
+                placeholder="Coupon Code"
+                name="Code"
+                value={couponData.Code}
+                onChange={inputHandle}
+                min="4"
+                maxLength={18}
+              />
+
+              <input
+                type="number"
+                placeholder="Discount Allot"
+                name="Discount_Allot"
+                value={couponData.Discount_Allot}
+                onChange={inputHandle}
+                max={50}
+              />
+            </div>
+
+            <textarea
               type="text"
-              placeholder="Text to include"
-              value={prefix}
-              onChange={(e) => setPrefix(e.target.value)}
-              maxLength={size}
+              placeholder="Enter Coupon Description"
+              name="Description"
+              value={couponData.Description}
+              onChange={inputHandle}
+              required
+              min="15"
+              maxLength={300}
             />
 
-            <input
-              type="number"
-              placeholder="Coupon Length"
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
-              min={8}
-              max={25}
-            />
-
-            <fieldset>
+            {/* <fieldset>
               <legend>Include</legend>
 
               <input
@@ -93,18 +112,33 @@ const Coupon = () => {
                 onChange={() => setIncludeSymbols((prev) => !prev)}
               />
               <span>Symbols</span>
-            </fieldset>
+            </fieldset> */}
             <button type="submit">Generate</button>
           </form>
-
-          {coupon && (
-            <code>
-              {coupon}{" "}
-              <span onClick={() => copyText(coupon)}>
-                {isCopied ? "Copied" : "Copy"}
-              </span>{" "}
-            </code>
-          )}
+          <table class="table" role="table">
+            <thead>
+              <tr>
+                <th>Coupon Code</th>
+                <th>Discount Alloted</th>
+                <th>Description</th>
+                <th>Expired At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                allCoupon.slice(0).reverse().map((curr) => {
+                  return (
+                    <tr>
+                      <td>{curr.Code}</td>
+                      <td>{curr.Discount_Allot}</td>
+                      <td>{curr.Description}</td>
+                      <td>{curr.ExpiredAt}</td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
+          </table>
         </section>
       </main>
     </div>

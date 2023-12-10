@@ -20,21 +20,26 @@ const Bags = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [Charges, setCharge] = useState({
     Delivery_Charge: 0,
-    GST: 0,
-    Discount: 0
+    GST: 0
   })
+  const [showCoupon,setShowCoupon] = useState("Hide");
   const [GrandTotal, setGrandTotal] = useState(0);
+  const [AllCoupon, setAllCoupon] = useState([]);
+  const [Discount_Allot, setDiscount_Allot] = useState({
+    Discount:0,
+    Coupon_ID:""
+  });
 
   const ref = useRef(null);
   const navigate = useNavigate();
-  
+
   const [productsData, setProductsData] = useState([]);
-  
+
   const fetchGrandTotal = () => {
     let Total = 0;
     let Delivery_Charge = 0;
     let GST = 0;
-    let Discount = 0;
+    // let Discount = Charges.Discount;
     bagData?.map((curr, ids) => {
       const a = productsData?.find((e) => e._id === curr.productID);
       const smallPrice = (a?.Price - 50) * curr.SmallCount;
@@ -44,8 +49,8 @@ const Bags = () => {
     })
     GST = Total * 18 / 100;
     Total > 500 || Total === 0 ? Delivery_Charge = 0 : Delivery_Charge = 40;
-    setCharge({GST,Delivery_Charge,Discount});
-    setGrandTotal(Total + Delivery_Charge - Discount);
+    setCharge({...Charges, GST, Delivery_Charge });
+    setGrandTotal(Total + Delivery_Charge);
   }
 
   const fetchProducts = async () => {
@@ -59,13 +64,14 @@ const Bags = () => {
       setLoading(false);
     })
   }
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     fetchGrandTotal();
-  },[productsData,bagData])
+  }, [productsData, bagData])
 
   useEffect(() => {
     fetchProducts();
+    fetchCoupon();
   }, [])
 
   useEffect(() => {
@@ -87,10 +93,9 @@ const Bags = () => {
   };
 
   const orderNow = async (_id) => {
-
     if (bagData.length > 0) {
       setloadingShow(true);
-      await axios.post("/api/orderNow",{...Charges,TotalAmountPayed:GrandTotal}).then((result) => {
+      await axios.post("/api/orderNow", { ...Charges, TotalAmountPayed: GrandTotal, ...Discount_Allot }).then((result) => {
         if (result.data === "Product Ordered") {
           notification(result.data, "Success");
           fetchBag();
@@ -101,12 +106,35 @@ const Bags = () => {
     }
   };
 
+  const fetchCoupon = async () => {
+    await axios.get("/api/fetchCoupon").then((response) => {
+      // console.log(response.data.Data)
+      setAllCoupon(response.data.Data)
+    }).catch((err) => {
+      console.log(err)
+    })
+  }
+
+
   useEffect(() => {
     let a;
     Object.keys(category).length > 0 ? (a = userData?.Bag?.filter((e) => e.Category === category.categoryID || e._id === category.categoryID)) : (a = userData?.Bag);
     // setProducts(a);
   }, [category]);
 
+  const addCoupon = (curr) => {
+    if(curr.Code === Discount_Allot.Coupon_ID){
+      setDiscount_Allot({Discount:"",Coupon_ID:""})
+    }else{
+      setDiscount_Allot({...Discount_Allot,Discount:curr.Discount_Allot,Coupon_ID:curr.Code})
+    }
+    fetchGrandTotal();
+  }
+
+  useEffect(()=>{
+    // console.log(Discount_Allot)
+    setGrandTotal(GrandTotal - Discount_Allot.Discount)
+  },[Discount_Allot])
 
   return (
     <>
@@ -114,7 +142,7 @@ const Bags = () => {
         <div id="BagSliderContainer">
           <div id="BagSlider" ref={ref}>
             <div id="bag-back-btn">
-              <MdOutlineArrowBackIos onClick={() => {setShowBag(!showBag)}} />
+              <MdOutlineArrowBackIos onClick={() => { setShowBag(!showBag) }} />
               <h3>BAG</h3>
             </div>
             {!userData && (
@@ -185,12 +213,43 @@ const Bags = () => {
                               </div>
                             );
                           })}
+                          <div id="Add-Coupon">
+                            <button onClick={() => {
+                              if(showCoupon === "Hide"){
+                                setShowCoupon("Show");
+                                setShowDetail("bag-order-detail-hide");
+                              }else{
+                                setShowCoupon("Hide");
+                              }
+                            }}>Add Coupon</button>
+                            <div id="Add-Coupon-show"  className={showCoupon}>
+                              <h5>Add Coupons: </h5>
+                              <table>
+                                <tbody>
+                                  {
+                                    AllCoupon.map((curr) => {
+                                      // console.log()
+                                      let used = false;
+                                      used =userData.Coupon_Used.find(e => e.Name === curr.Code)
+                                      return (
+                                        <tr id="coupons" className={used ? "used_Coupon" : ""} >
+                                          <td><button disabled={used}  id={Discount_Allot.Coupon_ID === curr.Code ? "active" : ""} onClick={() => addCoupon(curr)}>{curr.Code}</button></td>
+                                          <td><p>{curr.Description}  </p></td>
+                                        </tr>
+                                      )
+                                    })
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
                         </>
                       ) : (
                         <div id="productCart" style={{ textAlign: "center" }}>
                           No Item Found in Bag
                         </div>
                       )}
+
                     </div>
                     :
                     <Oval height="40" width="60" color="black" wrapperStyle={{ flex: 1, marginTop: "50px" }} wrapperClass="bagScroll loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
@@ -228,7 +287,7 @@ const Bags = () => {
                 })}
                 <tr>
                   <td>Delivery Charges: </td>
-                  <td>&#x20B9; {Charges.Delivery_Charge}</td>
+                  <td>&#x20B9; {Charges.Delivery_Charge < 0 && "-" } {Charges.Delivery_Charge}</td>
                 </tr>
                 <tr>
                   <td>GST: </td>
@@ -236,7 +295,7 @@ const Bags = () => {
                 </tr>
                 <tr>
                   <td>Discount: </td>
-                  <td>&#x20B9; {Charges.Discount}</td>
+                  <td>&#x20B9; {Charges.Discount > 0 && "-" } {Discount_Allot.Discount}</td>
                 </tr>
                 <tr>
                   <td>Order Total:</td>
@@ -244,9 +303,20 @@ const Bags = () => {
                 </tr>
               </table>
             </div>
+
             <div id="Bag-Total-Price">
               <h4>Grand Total
-                <span onClick={() => setShowDetail((prev) => prev === "bag-order-detail-show" ? "bag-order-detail-hide" : "bag-order-detail-show")}> (Details)</span>
+                {
+                  bagData.length > 0 &&
+                  <span onClick={() => {
+                    if(showDetail === "bag-order-detail-show"){
+                      setShowDetail("bag-order-detail-hide");
+                    }else{
+                      setShowDetail("bag-order-detail-show")
+                      setShowCoupon("Hide")
+                    }
+                    }}> (Details)</span>
+                }
               </h4>
               <h4>&#x20B9; {GrandTotal}</h4>
               <button style={bagData.length > 0 ? {} : { background: "grey" }} onClick={orderNow}>

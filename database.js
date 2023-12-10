@@ -15,7 +15,7 @@ mongoose
     console.log("Database ERROR", err);
   });
 
-const DBSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   Full_Name: {
     type: String,
     require: true,
@@ -69,6 +69,13 @@ const DBSchema = new mongoose.Schema({
       LargeCount: {
         type: Number,
         require: true,
+      },
+    },
+  ],
+  Coupon_Used: [
+    {
+      Name: {
+        type: String,
       },
     },
   ],
@@ -242,7 +249,10 @@ const ordersDB = new mongoose.Schema({
   },
   orderedAt: {
     type: Date,
-    default:Date.now
+    default: Date.now,
+  },
+  Coupon_Used: {
+    type: String,
   },
   Orders: [
     {
@@ -264,24 +274,24 @@ const ordersDB = new mongoose.Schema({
       },
     },
   ],
-  TotalAmountPayed:{
+  TotalAmountPayed: {
     type: Number,
     require: true,
   },
-  GST:{
+  GST: {
     type: Number,
     require: true,
-    default: 0
+    default: 0,
   },
-  Delivery_Charge:{
+  Delivery_Charge: {
     type: Number,
     require: true,
-    default: 0
+    default: 0,
   },
-  Discount:{
+  Discount: {
     type: Number,
     require: true,
-    default: 0
+    default: 0,
   },
   status: {
     type: String,
@@ -331,7 +341,26 @@ const WishlistDB = new mongoose.Schema({
   ],
 });
 
-DBSchema.pre("save", async function (next) {
+const CouponDB = new mongoose.Schema({
+  Code: {
+    type: String,
+    require: true,
+  },
+  Discount_Allot: {
+    type: String,
+    require: true,
+  },
+  ExpiredAt: {
+    type: String,
+    require: true,
+  },
+  Description: {
+    type: String,
+    require: true,
+  },
+});
+
+UserSchema.pre("save", async function (next) {
   if (this.isModified("Password")) {
     this.Password = await bcrypt.hash(this.Password, 12);
     this.Confirm_Password = await bcrypt.hash(this.Confirm_Password, 12);
@@ -339,8 +368,7 @@ DBSchema.pre("save", async function (next) {
   next();
 });
 
-
-DBSchema.methods.addtoBag = async function (Message, time, whoWrote) {
+UserSchema.methods.addtoBag = async function (Message, time, whoWrote) {
   console.log(Message, time, whoWrote);
   this.Messages = this.Messages.concat({
     Message,
@@ -351,7 +379,7 @@ DBSchema.methods.addtoBag = async function (Message, time, whoWrote) {
   return this.Messages;
 };
 
-DBSchema.methods.generateAuthToken = async function () {
+UserSchema.methods.generateAuthToken = async function () {
   try {
     let Token = jwt.sign({ _id: this._id }, SECRET_KEY);
     this.Tokens = this.Tokens.concat({ Token: Token });
@@ -362,7 +390,7 @@ DBSchema.methods.generateAuthToken = async function () {
   }
 };
 
-const DBModel = mongoose.model("User_Register", DBSchema);
+const DBModel = mongoose.model("User_Register", UserSchema);
 const OTPVerfication = mongoose.model("OTP_Verification", UserOTPVerification);
 const ContactModel = mongoose.model("Contact", ContactDB);
 const ReserveSeatModel = mongoose.model("Reserve_Seat", reserveSeatDB);
@@ -370,7 +398,7 @@ const OrdersModel = mongoose.model("Orders", ordersDB);
 const BagsModel = mongoose.model("Bags", bagsDB);
 const WishlistsModel = mongoose.model("Wishlists", WishlistDB);
 const ProductsModel = mongoose.model("Products", ProductsDB);
-
+const CouponModel = mongoose.model("Coupons", CouponDB);
 
 module.exports = {
   DBModel,
@@ -380,5 +408,6 @@ module.exports = {
   ProductsModel,
   OrdersModel,
   BagsModel,
-  WishlistsModel
+  WishlistsModel,
+  CouponModel,
 };

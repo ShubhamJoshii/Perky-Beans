@@ -9,6 +9,7 @@ const {
   BagsModel,
   WishlistsModel,
   OrdersModel,
+  CouponModel,
 } = require("./database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -461,20 +462,7 @@ router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
   }
 });
 
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxxXXX
-
 router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
-  //   const userExist = await DBModel.findOne({ _id: req.userID });
-  //   let objIndex = await userExist.Bag.findIndex(
-  //     (obj) => obj.productID == productID
-  //   );
-  //   userExist.Bag[objIndex] = await {
-  //     productID,
-  //     SmallCount,
-  //     MediumCount,
-  //     LargeCount,
-  //   };
-  //   await userExist.save();
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
     const bagExist = await BagsModel.findOne({ user_id: req.userID });
@@ -529,10 +517,23 @@ router.get(`${addRoute}fetchOrders`, Authenication, async (req, res) => {
   }
 });
 
+router.get(`${addRoute}fetchAllOrders`, Authenication, async (req, res) => {
+  try {
+    if(req.rootUser.Role === "Admin"){
+      const fetchOrders = await OrdersModel.find();
+      // console.log(fetchOrders);
+      res.send({ data: fetchOrders, result: true });
+    }
+  } catch (error) {
+    console.log(error);
+    res.send({ data: [], result: true });
+  }
+});
+
 router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
   // let orderedAt = Date.now();
   // console.log(Date.now());
-  const { Delivery_Charge, GST, Discount,TotalAmountPayed } = req.body;
+  const { Delivery_Charge, GST, Discount, TotalAmountPayed,Coupon_ID  } = req.body;
   // console.log(Delivery_Charge, GST, Discount);
   try {
     const bagData = await BagsModel.findOne({ user_id: req.userID });
@@ -545,11 +546,23 @@ router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
         Delivery_Charge,
         GST,
         Discount,
-        TotalAmountPayed
+        TotalAmountPayed,
+        Coupon_Used:Coupon_ID
       });
       const bagDataDelete = await BagsModel.deleteOne({ user_id: req.userID });
       await orderExists.save();
       // await bagDataDelete.save();
+      if(Coupon_ID){
+        const userExist = await DBModel.findOne({_id: req.userID});
+        // const usersData = await DBModel.updateOne(
+        //   { _id : req.userID },
+        //   {
+        //     $set: { Coupon_Used: Coupon_ID },
+        //   }
+        // );
+        userExist.Coupon_Used = await userExist.Coupon_Used.concat({Name:Coupon_ID});
+        await userExist.save();
+      }
       res.send("Product Ordered");
     }
   } catch (err) {
@@ -570,6 +583,24 @@ router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
     console.log(err);
   }
 });
+
+router.post(`${addRoute}changeStatus`,async(req,res)=>{
+  const {_id,status} = req.body;
+  // console.log(_id,status)
+  try{
+    const changeStatus = await OrdersModel.updateOne({_id},{
+      $set: { status },
+    });
+    if(changeStatus){
+      res.send({message:"Order Status Updated",result:true});
+    }else{
+      res.send({message:"Order Status Not Updated",result:false});
+    } 
+  }catch(err){
+    console.log(err);
+  }
+})
+
 
 router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
   const { Email } = req.body;
@@ -813,6 +844,39 @@ router.get(`${addRoute}fetchReview`, async (req, res) => {
     res.send(fetchReview);
   } else {
     res.send("hello world");
+  }
+});
+
+router.get(`${addRoute}fetchCoupon`, async (req, res) => {
+  try {
+    const fetchCoupon = await CouponModel.find();
+    res.send({ Data: fetchCoupon });
+  } catch (err) {
+    res.send("Error");
+  }
+});
+
+router.post(`${addRoute}newCouponAdd`, Authenication, async (req, res) => {
+  const { Code, Discount_Allot,Description } = req.body;
+  var currDate = new Date();
+  var result = currDate.setDate(currDate.getDate() + 10);
+  let ExpiredAt = new Date(result);
+  console.log(ExpiredAt);
+  try{
+    if(req.rootUser.Role === "Admin"){
+      const findExist = await CouponModel.findOne({Code});
+      if(!findExist){
+        const couponAdd = await CouponModel({Code,Discount_Allot,ExpiredAt,Description})
+        await couponAdd.save();
+        res.send({message:"Coupon Added",result:true})
+      }
+      else{
+        res.send({message:"Coupon Already Exist",result:false})
+      }
+    }
+  }catch(err){
+    res.send({message:"Only Admin can Create Coupon"})
+    // console.log(err)
   }
 });
 module.exports = router;

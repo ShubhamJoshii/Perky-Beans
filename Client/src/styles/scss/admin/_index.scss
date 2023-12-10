@@ -104,6 +104,16 @@
     tr {
       box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.093);
     }
+    #orders-table{
+      button{
+        padding: 4px;
+        background-color: #ecb014;
+        color: white;
+        font-weight: bolder;
+        letter-spacing: 1px;
+        font-size: 12px;
+      }
+    }
 
     td {
       padding: 1rem;

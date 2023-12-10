@@ -60,11 +60,32 @@
     }
 
     .coupon-form {
-      @include grid(2fr 1fr, 2rem);
-      max-width: 30rem;
+      // @include grid(2fr 1fr, 2rem);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+      // max-width: 30rem;
       width: 100%;
-      > input {
+      div {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        input {
+          padding: 1rem;
+          border: 1px solid rgba(0, 0, 0, 0.359);
+          outline: none;
+          flex: 1;
+          border-radius: 5px;
+        }
+      }
+      > textarea {
         padding: 1rem;
+        width: 100%;
         border: 1px solid rgba(0, 0, 0, 0.359);
         outline: none;
         border-radius: 5px;

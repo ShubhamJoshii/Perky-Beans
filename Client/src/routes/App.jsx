@@ -8,8 +8,8 @@ import { Suspense, lazy } from "react";
 
 const Dashboard = lazy(() => import("../admin/pages/Dashboard"));
 const Products = lazy(() => import("../admin/pages/Products"));
-const Transaction = lazy(() => import("../admin/pages/Transaction"));
-const Customers = lazy(() => import("../admin/pages/Customers"));
+const Orders = lazy(() => import("../admin/pages/Orders"));
+const Users = lazy(() => import("../admin/pages/Users"));
 const NewProduct = lazy(() => import("../admin/pages/management/NewProduct"));
 const ProductManagement = lazy(() => import("../admin/pages/management/ProductManagement"));
 const ReserveSeat = lazy(() => import("../admin/pages/ReserveSeat"));
@@ -230,8 +230,8 @@ const App = () => {
                   <Route path="/admin" element={<Dashboard />} />
                   <Route path="/admin/dashboard" element={<Dashboard />} />
                   <Route path="/admin/product" element={<Products />} />
-                  <Route path="/admin/customer" element={<Customers />} />
-                  <Route path="/admin/transaction" element={<Transaction />} />
+                  <Route path="/admin/users" element={<Users />} />
+                  <Route path="/admin/Orders" element={<Orders />} />
                   <Route path="/admin/reserve-seat" element={<ReserveSeat />} />
                   {/* Charts */}
 

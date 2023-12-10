@@ -153,6 +153,57 @@
     width: 100%;
     flex: 1;
     // margin-bottom: 55px;
+    #Add-Coupon {
+      display: flex;
+      justify-content: end;
+      margin-right: 15px;
+      button {
+        color: white;
+        padding: 4px 8px;
+        font-size: 10px;
+        background-color: #33200a;
+      }
+      .Hide{
+        bottom: -100px !important;
+      }
+      .Show{
+        bottom: 60px !important;
+      }
+
+      #Add-Coupon-show {
+        position: absolute;
+        bottom: -100px;
+        transition: 1s;
+        background-color: white;
+        width: 100%;
+        right: 0;
+        padding: 4px 10px;
+        .used_Coupon{
+          background-color: grey !important;
+        }
+        #coupons {
+          margin-bottom: 4px;
+            td {
+              padding: 5px 4px;
+              button {
+                font-size: 12px;
+                letter-spacing: 1px;
+                &:hover:not([disabled]){
+                  background-color: #ecb014;
+                  transform: translate(1.05);
+                }
+              }
+              #active{
+                background-color: #ecb014;
+              }
+              p {
+                font-size: 10px;
+              }
+            }
+          }
+        
+      }
+    }
   }
   .userNotLogin {
     margin-top: 25px !important;
@@ -186,16 +237,16 @@
       cursor: pointer;
     }
   }
-  
-  .bag-order-detail-show{
+
+  .bag-order-detail-show {
     bottom: 60px !important;
   }
 
-  .bag-order-detail-hide{
+  .bag-order-detail-hide {
     bottom: -100px !important;
   }
 
-  #bag-order-detail{
+  #bag-order-detail {
     position: absolute;
     background-color: white;
     padding: 10px;
@@ -205,12 +256,12 @@
     gap: 20px;
     width: 100%;
     transition: 1s;
-    h4{
+    h4 {
       font-size: 14px;
     }
-    table{
-      tr{
-        td{
+    table {
+      tr {
+        td {
           padding-right: 15px;
           font-size: 13px;
         }
@@ -231,16 +282,15 @@
 
     h4 {
       font-size: 20px;
-      span{
+      span {
         font-size: 12px;
         color: blue;
         cursor: pointer;
-        &:hover{
+        &:hover {
           color: #ecb014;
         }
       }
     }
-    
 
     button {
       background-color: #ecb014;

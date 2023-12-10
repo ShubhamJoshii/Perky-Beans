@@ -1,1 +1,0 @@
-import{j as e}from"./index-5c2fc0ab.js";const r=()=>e.jsxs("div",{className:"Preloader",children:[e.jsx("div",{className:"Circle",children:" "}),e.jsx("div",{className:"Circle",children:" "}),e.jsx("div",{className:"Circle",children:" "}),e.jsx("div",{className:"Circle",children:" "}),e.jsx("span",{children:e.jsx("h4",{children:"LOADING..."})})]});export{r as default};

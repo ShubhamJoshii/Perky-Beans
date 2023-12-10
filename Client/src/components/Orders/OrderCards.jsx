@@ -57,11 +57,6 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData }) => {
           orderData.Orders.map((curr) => {
             const prd = product.find(e => e._id === curr.productID);
             const Total = prd.Price * curr.LargeCount + prd.Price * curr.MediumCount + prd.Price * curr.SmallCount
-            // setTotalOrder([
-            //   `${orderData._id}` : {
-                
-            //   }
-            //   ])
             return (
               <div id="orderCards">
                 <img src={prd.Product_Photo} />
@@ -87,26 +82,29 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData }) => {
               return (
                 <tr>
                   <td>{prd.Product_Name}:</td>
-                  <td>&#x20B9;{Total * (100 - 18)/100}</td>
+                  <td>&#x20B9; {Total * (100 - 18)/100}</td>
                 </tr>
               )
             }
           )}
           <tr>
                 <td>Delivery Charges: </td>
-                <td>{orderData.Delivery_Charge}</td>
+                <td>&#x20B9; {orderData.Delivery_Charge}</td>
               </tr>
               <tr>
                 <td>GST: </td>
-                <td>{orderData.GST}</td>
+                <td>&#x20B9; {orderData.GST}</td>
               </tr>
-              <tr>
-                <td>Discount: </td>
-                <td>{orderData.Discount}</td>
-              </tr>
+              {
+                orderData.Discount > 0 &&
+                <tr>
+                  <td>Discount: {orderData?.Coupon_Used && <span>({orderData?.Coupon_Used})</span>} </td>
+                  <td>&#x20B9; {orderData.Discount}</td>
+                </tr>
+              }
               <tr>
                 <td>Order Total:</td>
-                <td>{orderData.TotalAmountPayed}</td>
+                <td>&#x20B9; {orderData.TotalAmountPayed}</td>
               </tr>
         </table>
       </div>
