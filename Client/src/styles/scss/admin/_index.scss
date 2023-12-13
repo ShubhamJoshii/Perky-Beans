@@ -94,13 +94,14 @@
   th {
     font-weight: bold;
     color: #0000009e;
-    font-size: 1.1rem;
+    // font-size: 1.1rem;
     font-weight: 400;
     padding: 2rem 1rem;
   }
 
   tbody {
     overflow: scroll;
+    font-size: 14px;
     tr {
       box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.093);
     }
@@ -112,6 +113,18 @@
         font-weight: bolder;
         letter-spacing: 1px;
         font-size: 12px;
+      }
+      #order-status-prepared{
+        background-color: cyan;
+      }
+      #order-status-pickup{
+        background-color: green;
+      }
+      #order-status-received{
+        background-color: red;
+      }
+      #order-complete{
+        background-color: #ecb014;
       }
     }
 

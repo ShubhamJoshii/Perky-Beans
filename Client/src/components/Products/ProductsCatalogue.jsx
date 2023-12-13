@@ -88,12 +88,13 @@ const ProductsCatalogue = () => {
       if (a.length > 0) {
         let b = [];
         a.filter((e) => {
-          if (e.Price <= parseInt(filterData.PriceRange)) {
+            if (e.Price <= parseInt(filterData.PriceRange)) {
             b.push(e);
           }
         });
         a = b;
       }
+      console.log(a)
       if (a.length <= 0) {
         productsData.filter((e) => {
           if (e.Star >= filterData.RatingUP) {
@@ -104,7 +105,7 @@ const ProductsCatalogue = () => {
       if (a.length > 0) {
         let b = [];
         a.filter((e) => {
-          if (e.Star >= filterData.RatingUP) {
+          if (e.Rating >= filterData.RatingUP) {
             b.push(e);
           }
         });

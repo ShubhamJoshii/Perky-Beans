@@ -6,6 +6,16 @@
   color: rgba(255, 255, 255, 0.223);
 }
 
+#bethefirstone{
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  letter-spacing: 1px;
+  pre{
+    color: red;
+  }
+}
+
 .CustomerReview {
   @include flexMixin(normal, flex-start);
   overflow: scroll;
@@ -82,7 +92,7 @@
   }
 
   .reviewCard {
-    width: 875px;
+    // width: 875px;
     border-radius: 10px;
     border: 2px solid white;
     // padding: 20px;

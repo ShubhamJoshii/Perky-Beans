@@ -6,6 +6,7 @@ import { FaPlus } from "react-icons/fa";
 import Switch from "react-switch";
 import Pagination from "../components/Pagination";
 import {Oval} from "react-loader-spinner"
+import TableHOC from "../components/TableHOC"
 const Products = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +48,7 @@ const Products = () => {
   return (
     <div className="admin-container">
       <AdminSidebar />
+      {/* <TableHOC heading={["_id","Photo","Name","Description","Price","Rating","Category","Type","Action","Available"]} loading={loading}/> */}
       <div className='dashboard-product-box'>
         <h2 className="heading">Products</h2>
         <table className="table" role="table">

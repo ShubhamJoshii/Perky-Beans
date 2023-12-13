@@ -140,7 +140,7 @@ router.post(`${addRoute}login`, async (req, res) => {
           httpOnly: true,
         });
         userExist.save();
-        res.send("User Logined");
+        res.send("User logged in");
       } else {
         res.send("User Password not Matched");
       }
@@ -258,6 +258,25 @@ router.get(`/booking/cancel`, async (req, res) => {
   } catch (err) {
     console.log(err);
     res.send("Already Cancelled Reserved Seat");
+  }
+});
+
+router.post(`${addRoute}productReview`, Authenication, async (req, res) => {
+  const { Description, rating, _id } = req.body;
+  console.log(Description, rating, _id);
+  try {
+    const findProduct = await ProductsModel.findOne({ _id: _id });
+    findProduct.Reviews = await findProduct.Reviews.concat({
+      Description,
+      rating,
+      name: req.rootUser.Full_Name,
+      user_id: req.rootUser._id,
+    });
+    await findProduct.save();
+    res.send({ message: "Review Submitted", result: true });
+  } catch (err) {
+    console.log(err);
+    res.send({ message: "Review Not Submitted! Try Again.", result: false });
   }
 });
 
@@ -519,7 +538,7 @@ router.get(`${addRoute}fetchOrders`, Authenication, async (req, res) => {
 
 router.get(`${addRoute}fetchAllOrders`, Authenication, async (req, res) => {
   try {
-    if(req.rootUser.Role === "Admin"){
+    if (req.rootUser.Role === "Admin") {
       const fetchOrders = await OrdersModel.find();
       // console.log(fetchOrders);
       res.send({ data: fetchOrders, result: true });
@@ -533,7 +552,8 @@ router.get(`${addRoute}fetchAllOrders`, Authenication, async (req, res) => {
 router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
   // let orderedAt = Date.now();
   // console.log(Date.now());
-  const { Delivery_Charge, GST, Discount, TotalAmountPayed,Coupon_ID  } = req.body;
+  const { Delivery_Charge, GST, Discount, TotalAmountPayed, Coupon_ID } =
+    req.body;
   // console.log(Delivery_Charge, GST, Discount);
   try {
     const bagData = await BagsModel.findOne({ user_id: req.userID });
@@ -542,25 +562,28 @@ router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
       const orderExists = await OrdersModel({
         user_id: req.userID,
         Orders,
-        status: "CONFIRMED",
+        status: "ORDER PLACED",
         Delivery_Charge,
         GST,
         Discount,
         TotalAmountPayed,
-        Coupon_Used:Coupon_ID
+        Coupon_Used: Coupon_ID,
       });
       const bagDataDelete = await BagsModel.deleteOne({ user_id: req.userID });
       await orderExists.save();
       // await bagDataDelete.save();
-      if(Coupon_ID){
-        const userExist = await DBModel.findOne({_id: req.userID});
+      if (Coupon_ID) {
+        const userExist = await DBModel.findOne({ _id: req.userID });
+
         // const usersData = await DBModel.updateOne(
         //   { _id : req.userID },
         //   {
         //     $set: { Coupon_Used: Coupon_ID },
         //   }
         // );
-        userExist.Coupon_Used = await userExist.Coupon_Used.concat({Name:Coupon_ID});
+        userExist.Coupon_Used = await userExist.Coupon_Used.concat({
+          Name: Coupon_ID,
+        });
         await userExist.save();
       }
       res.send("Product Ordered");
@@ -571,36 +594,41 @@ router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
 });
 
 router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
-  const { productID } = req.body;
+  const { _id } = req.body;
   try {
-    const userExist = await DBModel.findOne({ _id: req.userID });
-    userExist.Orders = await userExist.Orders.filter(
-      (e) => e.productID !== productID
+    const orderExist = await OrdersModel.updateOne(
+      { _id },
+      {
+        $set: { status: "Order Cancelled" },
+      }
     );
-    userExist.save();
-    res.send("Product Ordered Cancelled");
+    if (orderExist) {
+      res.send("Product Order Cancelled");
+    }
   } catch (err) {
     console.log(err);
   }
 });
 
-router.post(`${addRoute}changeStatus`,async(req,res)=>{
-  const {_id,status} = req.body;
+router.post(`${addRoute}changeStatus`, async (req, res) => {
+  const { _id, status } = req.body;
   // console.log(_id,status)
-  try{
-    const changeStatus = await OrdersModel.updateOne({_id},{
-      $set: { status },
-    });
-    if(changeStatus){
-      res.send({message:"Order Status Updated",result:true});
-    }else{
-      res.send({message:"Order Status Not Updated",result:false});
-    } 
-  }catch(err){
+  try {
+    const changeStatus = await OrdersModel.updateOne(
+      { _id },
+      {
+        $set: { status },
+      }
+    );
+    if (changeStatus) {
+      res.send({ message: "Order Status Updated", result: true });
+    } else {
+      res.send({ message: "Order Status Not Updated", result: false });
+    }
+  } catch (err) {
     console.log(err);
   }
-})
-
+});
 
 router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
   const { Email } = req.body;
@@ -811,10 +839,60 @@ router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
 });
 
 router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
-  const users = await DBModel.countDocuments();
-  const products = await ProductsModel.countDocuments();
-  // console.log(users,products);
-  res.send({ users, products });
+  // const users = await DBModel.countDocuments({Role:"Customer"});
+  const users = await DBModel.find();
+  let totalUsers = users.length;
+  let todayDay = new Date().toISOString();
+  todayDay = todayDay.split("T")[0];
+  let OldTotalUsers = totalUsers - users.filter((e) => {
+    let time = e.RegisterDate.toISOString().split("T")[0];
+    if (time === todayDay) {
+      return true;
+    }
+    return false;
+  }).length;
+  let percentage_users = ((totalUsers - OldTotalUsers)/OldTotalUsers * 100).toFixed(1); 
+  
+  
+  const products = await ProductsModel.find();
+  let Totalproducts = products.length;
+  let TotalAvailableproducts = Totalproducts - products.filter((e) => {
+    if (e.Available === false) {
+      return true;
+    }
+    return false;
+  }).length;
+  let percentage_products = 100 - ((Totalproducts - TotalAvailableproducts)/TotalAvailableproducts * 100).toFixed(1); 
+  
+  
+  const TotalOrder = await OrdersModel.find();
+  let TotalTransaction = TotalOrder.length;
+  let totalRevenue = 0;
+  let totalTodayRevenue = 0;
+  
+  let totalTodayTransaction = TotalTransaction - TotalOrder.filter((e) => {
+    let time = e.orderedAt.toISOString().split("T")[0];
+    totalRevenue += e.TotalAmountPayed;
+    if (time === todayDay) {
+      totalTodayRevenue += e.TotalAmountPayed;
+      return true;
+    }
+    return false;
+  }).length;
+
+  let percentage_transaction = ((TotalTransaction - totalTodayTransaction)/totalTodayTransaction * 100).toFixed(1); 
+  let percentage_revenue = ((totalRevenue - totalRevenue + totalTodayRevenue)/totalTodayRevenue * 100).toFixed(1); 
+
+  res.send({
+    totalUsers,
+    percentage_users,
+    Totalproducts,
+    percentage_products,
+    TotalTransaction,
+    percentage_transaction,
+    totalRevenue,
+    percentage_revenue,
+  });
 });
 
 router.post(`${addRoute}deleteUser`, async (req, res) => {
@@ -857,25 +935,29 @@ router.get(`${addRoute}fetchCoupon`, async (req, res) => {
 });
 
 router.post(`${addRoute}newCouponAdd`, Authenication, async (req, res) => {
-  const { Code, Discount_Allot,Description } = req.body;
+  const { Code, Discount_Allot, Description } = req.body;
   var currDate = new Date();
   var result = currDate.setDate(currDate.getDate() + 10);
   let ExpiredAt = new Date(result);
   console.log(ExpiredAt);
-  try{
-    if(req.rootUser.Role === "Admin"){
-      const findExist = await CouponModel.findOne({Code});
-      if(!findExist){
-        const couponAdd = await CouponModel({Code,Discount_Allot,ExpiredAt,Description})
+  try {
+    if (req.rootUser.Role === "Admin") {
+      const findExist = await CouponModel.findOne({ Code });
+      if (!findExist) {
+        const couponAdd = await CouponModel({
+          Code,
+          Discount_Allot,
+          ExpiredAt,
+          Description,
+        });
         await couponAdd.save();
-        res.send({message:"Coupon Added",result:true})
-      }
-      else{
-        res.send({message:"Coupon Already Exist",result:false})
+        res.send({ message: "Coupon Added", result: true });
+      } else {
+        res.send({ message: "Coupon Already Exist", result: false });
       }
     }
-  }catch(err){
-    res.send({message:"Only Admin can Create Coupon"})
+  } catch (err) {
+    res.send({ message: "Only Admin can Create Coupon" });
     // console.log(err)
   }
 });

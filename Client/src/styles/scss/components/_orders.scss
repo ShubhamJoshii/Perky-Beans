@@ -1,5 +1,10 @@
 @use "../abstracts/" as *;
 
+:where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-first,
+:where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-second {
+  color: #ffffff;
+}
+
 #Orders {
   position: relative;
   top: 68px;
@@ -9,6 +14,10 @@
   min-height: calc(100vh - 118px);
   padding: 30px 60px;
   border-radius: 20px;
+
+  // :where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-first, :where(.css-dev-only-do-not-override-6j9yrn).ant-rate .ant-rate-star-second{
+  //   color: #15151545 !important;
+  // }
 
   #order-wishlists {
     display: flex;
@@ -92,6 +101,49 @@
         }
       }
 
+      .write-feedback {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        textarea{
+          width: 80%;
+          border-radius: 20px;
+          padding: 10px;
+          
+        }
+        #second-write-feedback{
+          display: flex;
+          width: 80%;
+          justify-content: start;
+          align-items: center;
+          gap: 30px;
+          div{
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            p{
+              font-size: 12px;
+            }
+            .order-rate-antd {
+              background-color: #332626;
+              padding: 4px 10px;
+              border-radius: 5px;
+            }
+          }
+        }
+        button{
+          background-color: #ecb014;
+          color: white;
+          padding: 6px 10px;
+          letter-spacing: 1px;
+          font-weight: bolder;
+        }
+      }
+
       #order-summary {
         display: flex;
         gap: 10px;
@@ -101,7 +153,7 @@
             td {
               padding-right: 15px;
               font-size: 13px;
-              span{
+              span {
                 font-size: 10px;
                 color: red;
               }
@@ -123,9 +175,16 @@
               font-size: 22px;
             }
           }
+          #write-feedback{
+            background-color: #332626;
+            color: white;
+            font-weight: bolder;
+            padding: 2px 10px;
+          }
           img {
             width: 120px;
             // height: 160px;
+            cursor: pointer;
             object-fit: cover;
             aspect-ratio: 1;
             border-radius: 10px;
@@ -147,6 +206,7 @@
             height: 3px;
             position: absolute;
             background-color: black;
+            transition: 5s;
           }
           #track-collection {
             width: -webkit-fill-available;
@@ -183,11 +243,11 @@
     }
     @media (max-width: 800px) {
       #order-details #orders-Collection #orderCards {
-        img{
+        img {
           width: 96px;
         }
         div {
-          #product-name-pay{
+          #product-name-pay {
             font-size: 14px;
           }
           p {
@@ -230,8 +290,8 @@
         bottom: 10px;
         right: 20px;
         padding: 5px 20px;
-        font-weight: bolder;
         cursor: pointer;
+        font-weight: bolder;
         background-color: #ecb014;
         color: white;
 

@@ -1,5 +1,8 @@
 .dashboard {
   overflow-y: auto;
+  .loading{
+    margin-top: 50px;
+  }
 
   .bar {
     height: 4rem;

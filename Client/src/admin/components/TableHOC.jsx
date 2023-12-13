@@ -1,75 +1,39 @@
-import { AiOutlineSortAscending, AiOutlineSortDescending } from "react-icons/ai";
-import { usePagination, useSortBy, useTable } from "react-table";
+import { Oval } from "react-loader-spinner"
 
-function TableHOC(columns, data, containerClassname, heading, showPagination = false, pageSize = 6) {
-  return function HOC() {
-    const options = {
-      columns,
-      data,
-      initialState: {
-        pageSize: pageSize,
-      },
-    };
-
-    const {
-      getTableProps,
-      getTableBodyProps,
-      headerGroups,
-      page,
-      prepareRow,
-      nextPage,
-      pageCount,
-      state: { pageIndex },
-      previousPage,
-      canNextPage,
-      canPreviousPage,
-    } = useTable(options, useSortBy, usePagination);
-
-    return (
-      <div className={containerClassname}>
-        <h2 className="heading">{heading}</h2>
-        <table className="table" {...getTableProps()}>
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                    {column.render("Header")}
-                    {column.isSorted && <span> {column.isSortedDesc ? <AiOutlineSortDescending /> : <AiOutlineSortAscending />}</span>}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-
-              return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {showPagination && (
-          <div className="table-pagination">
-            <button disabled={!canPreviousPage} onClick={previousPage}>
-              Prev
-            </button>
-            <span>{`${pageIndex + 1} of ${pageCount}`}</span>
-            <button disabled={!canNextPage} onClick={nextPage}>
-              Next
-            </button>
-          </div>
+const TableHOC = ({ heading,loading }) => {
+  return (
+    <div className='dashboard-product-box'>
+      <h2 className="heading">Products</h2>
+      <table className="table" role="table">
+        {tableHeadings(heading)}
+        {loading ? (
+            <td colSpan="10">
+              <Oval height="40" width="60" color="black" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
+            </td>
+          ) : (
+          <>
+          </>
         )}
-      </div>
-    );
-  };
+      </table>
+    </div>
+  )
+}
+
+
+const tableHeadings = (heading) => {
+  return (
+    <thead>
+      <tr>
+        {
+          heading.map((curr) => {
+            return <th>{curr}</th>
+          })
+        }
+      </tr>
+    </thead>
+
+  )
+
 }
 
 export default TableHOC;

@@ -1,12 +1,12 @@
 import { Column } from "react-table";
 import AdminSidebar from "../components/AdminSidebar";
 import { ReactElement, useState, useCallback } from "react";
-import TableHOC from "../components/TableHOC";
+// import TableHOC from "../components/TableHOC";
 import { Link } from "react-router-dom";
 import { Oval } from "react-loader-spinner";
 import axios from "axios";
 import { useEffect } from "react";
-import {Notification} from "../../routes/App"
+import { Notification } from "../../routes/App"
 import { useContext } from "react";
 
 const Orders = () => {
@@ -14,7 +14,7 @@ const Orders = () => {
   const [productsData, setProductsData] = useState();
   const [UsersData, setUsersData] = useState();
   const [loading, setLoading] = useState(false);
-  const {notification} = useContext(Notification);
+  const { notification } = useContext(Notification);
 
   const fetchAllOrders = async () => {
     await axios.get("/api/fetchAllOrders").then((response) => {
@@ -56,16 +56,16 @@ const Orders = () => {
     fetchAllOrders();
   }, [])
 
-  const changeStatus = async(status,_id)=>{
-    await axios.post("/api/changeStatus",{_id,status}).then((response)=>{
+  const changeStatus = async (status, _id) => {
+    await axios.post("/api/changeStatus", { _id, status }).then((response) => {
       // console.log(response.data)
-      if(response.data.result) {
-        notification(response.data.message,"Success");
+      if (response.data.result) {
+        notification(response.data.message, "Success");
         fetchAllOrders();
-      }else{
-        notification(response.data.message,"Un-Success");
+      } else {
+        notification(response.data.message, "Un-Success");
       }
-    }).catch((err)=>{
+    }).catch((err) => {
       console.log(err)
     })
   }
@@ -83,7 +83,7 @@ const Orders = () => {
               <th>Order At</th>
               <th>Order</th>
               <th>Amount</th>
-              <th>Discount</th>
+              {/* <th>Discount</th> */}
               <th>Status</th>
               <th>Manage</th>
             </tr>
@@ -100,9 +100,9 @@ const Orders = () => {
                     {
                       OrdersData?.slice().reverse().map((curr) => {
                         const userName = UsersData?.find(e => e._id === curr.user_id)
-                        const arr =  ["CONFIRMED","SHIPPED","DELIVERY","DELIVERED"];
-                        // console.log(curr)
-                        const a = arr?.findIndex(e=> e === curr.status);
+                        const arr = ["ORDER PLACED", "ORDER PREPARED", "READY FOR PICKUP", "ORDER RECEIVED", "Order Cancelled"];
+                        const a = arr?.findIndex(e => e === curr.status);
+                        // console.log(a)
                         return (
                           <tr id="orders-table">
                             <th>{userName.Full_Name}</th>
@@ -119,12 +119,13 @@ const Orders = () => {
                               </ul>
                             </th>
                             <th>&#x20B9; {curr.TotalAmountPayed}</th>
-                            <th> &#8377; {curr.Discount}</th>
+                            {/* <th> &#8377; {curr.Discount}</th> */}
                             <th> {curr.status}</th>
-                              { a === 0 && <th><button onClick={() => changeStatus(arr[1],curr._id)}>{arr[1]}</button></th> }
-                              { a === 1 && <th><button onClick={() => changeStatus(arr[2],curr._id)}>{arr[2]}</button></th> }
-                              { a === 2 && <th><button onClick={() => changeStatus(arr[3],curr._id)}>{arr[3]}</button></th> }
-                              { a === 3 && <th>Order Delivery</th> }
+                            {a === 0 && <th><button id="order-status-prepared" onClick={() => changeStatus(arr[1], curr._id)}> {arr[1]}</button></th>}
+                            {a === 1 && <th><button id="order-status-pickup" onClick={() => changeStatus(arr[2], curr._id)}>{arr[2]}</button></th>}
+                            {a === 2 && <th><button id="order-status-received" onClick={() => changeStatus(arr[3], curr._id)}>{arr[3]}</button></th>}
+                            {(a === -1 || a === 3) && <th><button id="order-complete">ORDER COMPLETE	</button></th>}
+                            {(a === 4) && <th>Order Cancelled</th>}
                           </tr>
                         )
                       })

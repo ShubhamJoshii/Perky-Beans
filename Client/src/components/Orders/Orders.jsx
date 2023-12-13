@@ -83,7 +83,7 @@ const Orders = () => {
                           {orders?.toReversed().map((curr, ids) => {
                             // const product = Products?.find((e) => e._id === curr.Orders[0].productID);
                             // console.log(product)
-                            return <OrderCards product={Products} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
+                            return <OrderCards product={Products} fetchProducts={fetchProducts} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
                           })}
                         </div>
                       ) : (

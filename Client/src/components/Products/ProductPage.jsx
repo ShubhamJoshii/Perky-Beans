@@ -21,9 +21,10 @@ const ProductPage = () => {
   const [loading, setLoading] = useState("Show");
   const [AddToBag, setAddToBag] = useState(false);
   const [productAtBag, setProductAtBag] = useState({});
-
+  const [Review, setReview] = useState(null);
+  
   let itemShow = useParams().productID;
-  const { userData, setUserData,updateBag, fetchBag,fetchWishList,addToBag,addToWishlist,bagData,wishlistData  } = useContext(UserData);
+  const { userData, setUserData, updateBag, fetchBag,fetchWishList,addToBag,addToWishlist,bagData,wishlistData  } = useContext(UserData);
   // const [wishlistData, setWishlistData] = useState([]);
   const { checkUserAlreadyLogin, notification } = useContext(Notification);
   useEffect(() => {
@@ -40,9 +41,10 @@ const ProductPage = () => {
   const fetchProductDetails = async () => {
     setLoading("Show");
     await axios.post("/api/fetchProductDetails", { _id: itemShow }).then((response) => {
-      // console.log(response.data.data._id, bagData[0].productID)
+      // console.log(response.data.data.Reviews)
       setProducts(response.data.data)
       setLoading("Hide");
+      setReview(response.data.data.Reviews)
       fetchWishList();
     }).catch((err) => {
       setLoading("LoadBtnShow");
@@ -174,7 +176,9 @@ const ProductPage = () => {
                 </div>
               </div>
             </div>
-            <CustomerReview />
+            {/* {Review.length > 0 && */}
+              <CustomerReview Review={Review}/>
+            {/* } */}
             {/* <Footer /> */}
           </> :
           <>

@@ -52,6 +52,10 @@ const UserSchema = new mongoose.Schema({
       },
     },
   ],
+  RegisterDate:{
+    type:Date,
+    default:Date.now
+  },
   Bag: [
     {
       productID: {
@@ -240,6 +244,25 @@ const ProductsDB = new mongoose.Schema({
     type: String,
     require: true,
   },
+  Reviews:[
+    {
+      user_id:{
+        type:String
+      },
+      Description:{
+        type:String,
+        required:true
+      },
+      rating:{
+        type:Number,
+        required:true
+      },
+      name:{
+        type:String,
+        required:true
+      }
+    }
+  ]
 });
 
 const ordersDB = new mongoose.Schema({
