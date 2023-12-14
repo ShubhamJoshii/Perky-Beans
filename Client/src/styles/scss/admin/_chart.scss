@@ -2,24 +2,33 @@
   background-color: white;
   padding: 4rem;
   overflow-y: auto;
-  > h1 {
-    margin: 0 0 5rem 2rem;
+  h2{
+    margin-bottom: 2rem;
   }
   > section {
-    width: 80%;
-    margin: 4rem auto;
-
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    // width: 80%;
+    // margin: 4rem auto;
+    
     > div {
-      max-width: 25rem;
-      margin: auto;
-      margin-top: 6rem;
-      margin-bottom: -1rem;
+      // max-width: 25rem;
+      // margin: auto;
+      // margin-top: 2rem;
+      margin-bottom: 2rem;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.535);
+      border-radius: 10px;
+      padding: 10px 20px;
+      > h2 {
+        padding-top: 10px;
+        text-align: center;
+        font-size: 16px;
+        text-transform: uppercase;
+        color: rgba(6, 6, 6, 0.529);
+      }
     }
 
-    > h2 {
-      margin: 2rem 0;
-      text-align: center;
-      @include heading(2px);
-    }
   }
 }

@@ -14,7 +14,7 @@ const ReserveSeat = () => {
 
   const fetchReserveSeats = async () => {
     await axios.get("/api/reserveSeats").then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
       setReserveSeats(response.data);
     })
       .catch((error) => {

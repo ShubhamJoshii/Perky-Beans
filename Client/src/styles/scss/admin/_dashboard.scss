@@ -1,6 +1,6 @@
 .dashboard {
   overflow-y: auto;
-  .loading{
+  .loading {
     margin-top: 50px;
   }
 
@@ -23,28 +23,27 @@
       cursor: pointer;
     }
   }
-  #logoutBUTTON{
+  #logoutBUTTON {
     position: absolute;
     background-color: white;
     right: 10px;
     top: 60px;
     border-color: black;
-    box-shadow: 0 0 2px black; 
+    box-shadow: 0 0 2px black;
     border-radius: 2px;
-    p{
+    p {
       padding: 5px 15px;
       border-bottom: 1px solid black;
       font-weight: 600;
       font-size: 14px;
-      &:hover{
+      &:hover {
         background-color: rgba(0, 0, 0, 0.23);
-        cursor: pointer
+        cursor: pointer;
       }
-      button{
-        background: none
+      button {
+        background: none;
       }
     }
-
   }
 
   .widget-container {
@@ -75,25 +74,36 @@
 
       .widget-circle {
         position: relative;
-        @include square(5rem);
-        border-radius: 50%;
-        flex: none;
-        display: grid;
-        place-items: center;
-        background-color: aquamarine;
-        &::before {
-          content: "";
-          position: absolute;
-          @include square(4rem);
-          background-color: white;
-          border-radius: 100%;
-        }
+        width: 100px;
+        // @include square(5rem);
+        // border-radius: 50%;
+        // flex: none;
+        // display: grid;
+        // place-items: center;
+        // background-color: aquamarine;
+        // &::before {
+          //   content: "";
+          //   position: absolute;
+          //   @include square(4rem);
+          //   background-color: white;
+          //   border-radius: 100%;
+          // }
+          // canvas{
+            // margin: 10px;
+            // width: 120%;
+          // }
         span {
-          position: relative;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+        &:hover span{
+          z-index: -1;
         }
       }
 
-      // &:first-child, 
+      // &:first-child,
       // &:nth-child(3){
       //   background-color: rgb(74, 73, 73);
       //   cursor: not-allowed;
@@ -103,20 +113,21 @@
       // }
     }
   }
-  
+
   .graph-container {
-    @include flex(row, unset, unset, 2rem);
-    background-color: rgb(74, 73, 73);
-    cursor: not-allowed;
+    @include flex(center, center, unset, 2rem);
+    // background-color: rgb(74, 73, 73);
+    // cursor: not-allowed;
     padding: 0 2rem 2rem 0;
     > div {
       background-color: white;
       border-radius: 10px;
     }
-    
+
     .revenue-chart {
-      background-color: rgb(74, 73, 73);
-      width: 100%;
+      // background-color: rgb(74, 73, 73);
+      width: 60%;
+      // height: 50%;
       padding: 1rem 3rem;
 
       > h2 {

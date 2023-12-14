@@ -4,7 +4,7 @@ import { BsSearch } from "react-icons/bs";
 import userImg from "../assets/userpic.png";
 import { HiTrendingUp, HiTrendingDown } from "react-icons/hi";
 // import data from "../assets/data.json";
-import { BarChart } from "../components/Charts";
+import { BarChart, DoughnutChart } from "../components/Charts";
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -18,14 +18,21 @@ const dashboard = () => {
   const [dropDownShow, setdropDownShow] = useState(false);
   const { notification } = useContext(Notification);
   const [count, setCount] = useState({
-    Totalproducts: 0,
-    totalUsers: 0,
-    TotalAvailableproducts: 0,
-    TotalAvailableUsers: 0,
-    TotalTransaction: 0,
-    totalTodayTransaction: 0,
     totalRevenue: 0,
-    totalTodayRevenue: 0
+    percentage_revenue: 0,
+    totalUsers: 0,
+    percentage_users: 0,
+    TotalTransaction: 0,
+    percentage_transaction: 0,
+    Totalproducts: 0,
+    percentage_products: 0
+  });
+  const [revenue, setRevenue] = useState({
+    months: [],
+    totalRevenue: []
+  });
+  const [Transaction, setTransaction] = useState({
+    months: [], totalTransaction: []
   });
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
@@ -47,16 +54,64 @@ const dashboard = () => {
   const fetchUsersProductsCount = async () => {
     setLoading(true);
     await axios.get("/api/fetchUsersProductsCount").then((response) => {
-      // console.log(response.data)
-      console.log(response.data)
       setCount(response.data);
     }).finally(() => {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 5000)
     })
   };
 
+  const fetchRevenueTransaction = async () => {
+    setLoading(true);
+    await axios.get("/api/fetchRevenueTransaction").then((response) => {
+      let acc = {}
+      let calRevenue = []
+      let months = []
+      let totalTransaction = []
+      let totalRevenue = []
+      response.data.orders.filter((e) => {
+        const orderDate = new Date(e.orderedAt);
+        const monthKey = `${(orderDate.toLocaleString('default', { month: 'long' }))} ${orderDate.getFullYear()}`;
+        acc[monthKey] = (acc[monthKey] || 0) + 1;
+        calRevenue[monthKey] = (calRevenue[monthKey] || 0) + e.TotalAmountPayed;
+      })
+      let sortedKeys = Object.keys(acc).sort().reverse();
+      let sortedObject = sortedKeys.reduce((obj, key) => {
+        obj[key] = acc[key];
+        return obj;
+      }, {});
+      months = Object.keys(sortedObject);
+      totalRevenue = Object.values(sortedObject)
+
+      let sortedObject2 = sortedKeys.reduce((obj, key) => {
+        obj[key] = calRevenue[key];
+        return obj;
+      }, {});
+      totalTransaction = Object.values(sortedObject2)
+
+      setTransaction({
+        months: months, totalTransaction: totalTransaction
+      })
+
+      setRevenue({
+        months: months, totalRevenue: totalRevenue
+      })
+
+      // console.log(sortedKeys.reverse())
+    }).catch((err) => {
+      console.log(err)
+    }).finally(() => {
+      // setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000)
+    })
+  }
+
   useEffect(() => {
     fetchUsersProductsCount();
+    fetchRevenueTransaction();
   }, []);
 
   return (
@@ -85,24 +140,19 @@ const dashboard = () => {
             :
             <>
               <section className="widget-container">
-                <WidgetItem percent={count.percentage_revenue} amount={true} value={count.totalRevenue} heading="Revenue" color="rgb(0,115,255)" />
-                <WidgetItem percent={count.percentage_users} value={count.totalUsers} heading="Users" color="rgb(0 198 202)" />
-                <WidgetItem percent={count.percentage_transaction} value={count.TotalTransaction} heading="Transactions" color="rgb(255 196 0)" />
-                <WidgetItem percent={count.percentage_products} value={count.Totalproducts} heading="Products" color="rgb(76 0 255)" />
-
-                {/* <WidgetItem percent={((count.totalRevenue - count.totalTodayRevenue ) / count.totalTodayRevenue * 100).toFixed(1)} amount={true} value={count.totalRevenue} heading="Revenue" color="rgb(0,115,255)" />
-                <WidgetItem percent={((count.totalUsers - count.TotalAvailableUsers) / count.TotalAvailableUsers * 100).toFixed(1)} value={count.totalUsers} heading="Users" color="rgb(0 198 202)" />
-                <WidgetItem percent={((count.TotalTransaction - count.totalTodayTransaction) / count.totalTodayTransaction * 100).toFixed(1)} value={count.TotalTransaction} heading="Transactions" color="rgb(255 196 0)" />
-                <WidgetItem percent={(count.TotalAvailableproducts / count.Totalproducts * 100).toFixed(1)} value={count.Totalproducts} heading="Products" color="rgb(76 0 255)" /> */}
+                <WidgetItem percent={count.percentage_revenue} amount={true} value={count.totalRevenue} heading="Revenue" color="rgb(0,115,255)" labels={["Today Revenue"]} />
+                <WidgetItem percent={count.percentage_users} value={count.totalUsers} heading="Users" color="rgb(0 198 202)" labels={["New Users","New Users"]}/>
+                <WidgetItem percent={count.percentage_transaction} value={count.TotalTransaction} heading="Transactions" color="rgb(255 196 0)" labels={["TodayTransaction"]}/>
+                <WidgetItem percent={count.percentage_products} value={count.Totalproducts} heading="Products" color="rgb(76 0 255)" labels={["Available","Non-Available"]}/>
               </section>
 
-              {/* <section className="graph-container">
-                  <div className="revenue-chart">
-                    <h2>Revenue & Transaction</h2>
-                    Grapph here
-                    <BarChart data_2={[300, 144, 433, 655, 237, 755, 190]} data_1={[200, 444, 343, 556, 778, 455, 990]} title_1="Revenue" title_2="Transaction" bgColor_1="rgb(0,115,255)" bgColor_2="rgba(53,162,235,0.8)" />
-                    </div>
-                  </section> */}
+              <section className="graph-container">
+                <div className="revenue-chart">
+                  <h2>Revenue & Transaction</h2>
+                  {/* Grapph here */}
+                  <BarChart data_1={revenue.totalRevenue} data_2={Transaction.totalTransaction} title_1="Revenue" title_2="Transaction" bgColor_1="rgb(0,115,255)" bgColor_2="rgba(53,162,235,0.8)" labels={Transaction.months} />
+                </div>
+              </section>
             </>
         }
       </main>
@@ -110,12 +160,12 @@ const dashboard = () => {
   );
 };
 
-const WidgetItem = ({ heading, value, percent, color, amount = false }) => (
+const WidgetItem = ({ heading, value, percent, color, amount = false ,labels = ["Sunday", "Monday"]}) => (
   <article className="widget">
     <div className="widget-info">
       <p>{heading}</p>
       <h4>{amount ? `$${value}` : value}</h4>
-      {percent > 0 ? (
+      {percent >= 0 ? (
         <span className="green">
           <HiTrendingUp /> +{percent}%{" "}
         </span>
@@ -126,13 +176,13 @@ const WidgetItem = ({ heading, value, percent, color, amount = false }) => (
       )}
     </div>
 
-    <div
+    {/* <div
       className="widget-circle"
       style={{
         background: `conic-gradient(
-        ${color} ${(Math.abs(percent) / 100) * 360}deg,
-        rgb(0, 0, 0) 0
-        )`,
+          ${color} ${(Math.abs(percent) / 100) * 360}deg,
+          rgb(0, 0, 0) 0
+          )`,
       }}>
       <span
         style={{
@@ -140,8 +190,26 @@ const WidgetItem = ({ heading, value, percent, color, amount = false }) => (
         }}>
         {percent}%
       </span>
+    </div> */}
+    <div
+      className="widget-circle"
+    >
+      <DoughnutChart
+        labels={labels}
+        data={[percent, 100 - percent]}
+        backgroundColor={[color, "grey"]}
+        legends={false}
+        offset={[0, 0, 0, 80]}
+        cutout={"70%"}
+      />
+      <span
+        style={{
+          color,
+        }}>
+        {percent}%
+      </span>
     </div>
-  </article>
+  </article >
 );
 
 const CategoryItem = ({ color, value, heading }) => (

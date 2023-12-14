@@ -52,7 +52,7 @@ const AdminSidebar = () => {
           </NavLink>
         </h2>
         <DivOne location={location} />
-        {/* <DivTwo location={location} /> */}
+        <DivTwo location={location} />
         <DivThree location={location} />
 
         {phoneActive && (

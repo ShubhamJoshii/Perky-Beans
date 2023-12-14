@@ -18,7 +18,7 @@ const Orders = () => {
 
   const fetchAllOrders = async () => {
     await axios.get("/api/fetchAllOrders").then((response) => {
-      console.log(response.data.data)
+      // console.log(response.data.data)
       setOrdersData(response.data.data)
       fetchProducts();
       fetchUsers();

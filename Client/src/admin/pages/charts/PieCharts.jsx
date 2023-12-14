@@ -1,34 +1,91 @@
 import AdminSidebar from "../../components/AdminSidebar";
 import { DoughnutChart, PieChart } from "../../components/Charts";
 import { categories } from "../../assets/data.json";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const PieCharts = () => {
+  const [ordersPie, setOrderPie] = useState({});
+  const [categoryPie, setCategoryPie] = useState({});
+  const [usersRolePie, setusersRolePie] = useState({});
+  const [productAvailabilityPie, setProductAvailabilityPie] = useState({});
+
+  const fetchOrders = async () => {
+    let counts = {};
+    await axios.get('/api/fetchOrders').then((response) => {
+      response.data.data.filter(e => {
+        const { status } = e;
+        counts[status] = (counts[status] || 0) + 1;
+      })
+      setOrderPie(counts);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+  const fetchProduct = async () => {
+    let counts = {};
+    let countsAvailable = {};
+    await axios.post('/api/fetchProduct').then((response) => {
+      response.data.data.filter(e => {
+        const { Category, Available } = e;
+        counts[Category] = (counts[Category] || 0) + 1;
+        countsAvailable[Available ? "Available" : "Non-Available"] = (countsAvailable[Available ? "Available" : "Non-Available"] || 0) + 1;
+      })
+      // console.log(countsAvailable);
+      setCategoryPie(counts);
+      setProductAvailabilityPie(countsAvailable);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  const fetchUsers = async () => {
+    let counts = {};
+    await axios.get("/api/fetchUsers").then((response) => {
+      response.data.data.filter(e => {
+        const { Role } = e;
+        counts[Role] = (counts[Role] || 0) + 1;
+      })
+      setusersRolePie(counts);
+    }).catch((err) => {
+      console.log("Error")
+    })
+  }
+
+
+  useEffect(() => {
+    fetchOrders();
+    fetchProduct();
+    fetchUsers();
+  }, [])
   return (
     <div className="admin-container">
       <AdminSidebar />
       <main className="chart-container">
-        <h1>Pie & Doughnut Charts</h1>
+        <h2>Pie Representative</h2>
         <section>
           <div>
-            <PieChart
-              labels={["Processing", "Shipped", "Delivered"]}
-              data={[12, 9, 13]}
+            <h2>Order Fulfillment Ratio</h2>
+            <DoughnutChart
+              labels={Object.keys(ordersPie)}
+              data={Object.values(ordersPie)}
               backgroundColor={[
-                `hsl(110,80%, 80%)`,
-                `hsl(110,80%, 50%)`,
-                `hsl(110,40%, 50%)`,
+                `green`,
+                `blue`,
+                `yellow`,
+                `teal`,
+                `red`,
               ]}
+              legends={false}
               offset={[0, 0, 50]}
             />
           </div>
-          <h2>Order Fulfillment Ratio</h2>
-        </section>
 
-        <section>
           <div>
+            <h2>Product Categories Ratio</h2>
             <DoughnutChart
-              labels={categories.map((i) => i.heading)}
-              data={categories.map((i) => i.value)}
+              labels={Object.keys(categoryPie)}
+              data={Object.values(categoryPie)}
               backgroundColor={categories.map(
                 (i) => `hsl(${i.value * 4},${i.value}%, 50%)`
               )}
@@ -36,23 +93,20 @@ const PieCharts = () => {
               offset={[0, 0, 0, 80]}
             />
           </div>
-          <h2>Product Categories Ratio</h2>
-        </section>
 
-        <section>
           <div>
+            <h2>Products Availability</h2>
             <DoughnutChart
-              labels={["In Stock", "Out Of Stock"]}
-              data={[40, 20]}
+              labels={Object.keys(productAvailabilityPie)}
+              data={Object.values(productAvailabilityPie)}
               backgroundColor={["hsl(269,80%,40%)", "rgb(53, 162, 255)"]}
               legends={false}
               offset={[0, 80]}
-              cutout={"70%"}
+              cutout={"60%"}
             />
           </div>
-          <h2>Stock Availability</h2>
-        </section>
-        <section>
+
+          {/* 
           <div>
             <DoughnutChart
               labels={[
@@ -73,11 +127,10 @@ const PieCharts = () => {
               legends={false}
               offset={[20, 30, 20, 30, 80]}
             />
+            <h2>Revenue Distribution</h2>
           </div>
-          <h2>Revenue Distribution</h2>
-        </section>
-
-        <section>
+         */}
+          {/* 
           <div>
             <PieChart
               labels={[
@@ -93,19 +146,21 @@ const PieCharts = () => {
               ]}
               offset={[0, 0, 50]}
             />
+            <h2>Users Age Group</h2>
           </div>
-          <h2>Users Age Group</h2>
-        </section>
+          */}
 
-        <section>
           <div>
+            <h2>User-Admin Ratio</h2>
             <DoughnutChart
-              labels={["Admin", "Customers"]}
-              data={[40, 250]}
+              labels={Object.keys(usersRolePie)}
+              data={Object.values(usersRolePie)}
               backgroundColor={[`hsl(335, 100%, 38%)`, "hsl(44, 98%, 50%)"]}
-              offset={[0, 80]}
+              offset={[0, 20]}
+              legends={false}
             />
           </div>
+
         </section>
       </main>
     </div>

@@ -879,9 +879,10 @@ router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
     }
     return false;
   }).length;
+  let OldRevenue = totalRevenue - totalTodayRevenue || totalRevenue;
 
   let percentage_transaction = ((TotalTransaction - totalTodayTransaction)/totalTodayTransaction * 100).toFixed(1); 
-  let percentage_revenue = ((totalRevenue - totalRevenue + totalTodayRevenue)/totalTodayRevenue * 100).toFixed(1); 
+  let percentage_revenue = (( totalRevenue - OldRevenue)/OldRevenue * 100).toFixed(1) ; 
 
   res.send({
     totalUsers,
@@ -894,6 +895,15 @@ router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
     percentage_revenue,
   });
 });
+
+router.get(`${addRoute}fetchRevenueTransaction`, async (req, res) => {
+  try{
+    const fetchOrders = await OrdersModel.find();
+    res.send({orders:fetchOrders})
+  }catch(err){
+    console.log(err)
+  }
+})
 
 router.post(`${addRoute}deleteUser`, async (req, res) => {
   const { _id } = req.body;

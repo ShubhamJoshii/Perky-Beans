@@ -1,27 +1,110 @@
 import AdminSidebar from "../../components/AdminSidebar";
 import { LineChart } from "../../components/Charts";
 
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
+
+import React, { useEffect, useState } from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import axios from "axios";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+  );
+  
+  // const months = ["January","February","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
+
+  export const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+      position: 'bottom',
+      display: true,
+      text: 'Revenue & Discount Chart',
+    },
+  },
+};
 
 const BarCharts = () => {
+  const [orderDetails, setOrderDetails] = useState({Discount:0,TotalRevenue:0});
+  const fetchOrders = async () => {
+    let countsDiscount = {};
+    let countsTotalRevenue = {};
+    await axios.get('/api/fetchOrders').then((response) => {
+      response.data.data.filter(e => {
+        const { Discount,TotalAmountPayed } = e;
+        const orderDate = new Date(e.orderedAt);
+        const monthKey = `${(orderDate.toLocaleString('default', { month: 'long' }))} ${orderDate.getFullYear()}`;
+        countsDiscount[monthKey] = (countsDiscount[monthKey] || 0) + Discount;
+        countsTotalRevenue[monthKey] = (countsTotalRevenue[monthKey] || 0) + TotalAmountPayed;
+      })
+      let sortedKeys = Object.keys(countsDiscount).sort().reverse();
+      let sortedObjectDiscount = sortedKeys.reduce((obj, key) => {
+        obj[key] = countsDiscount[key];
+        return obj;
+      }, {});
+      let sortedKeysRevenue = Object.keys(countsDiscount).sort().reverse();
+      let sortedObjectRevenue = sortedKeysRevenue.reduce((obj, key) => {
+        obj[key] = countsTotalRevenue[key];
+        return obj;
+      }, {});
+
+      // months = Object.keys(sortedObject);
+      // totalTransaction = Object.values(sortedObject)
+
+      // console.log(sortedObjectDiscount, sortedObjectRevenue)
+      setOrderDetails({Discount:sortedObjectDiscount,TotalRevenue:sortedObjectRevenue})
+
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  useEffect(()=>{
+    fetchOrders();
+  },[])
+
   return (
     <div className="admin-container">
       <AdminSidebar />
       <main className="chart-container">
-        <h1>Line Charts</h1>
+        <h2>Line Charts</h2>
+        {/* Total Prodcutn Total Revenu/ Discount Allot */}
+        <Line options={options} data={{
+          labels: Object.keys(orderDetails?.TotalRevenue),
+          datasets: [
+            {
+              label: 'Total Revenue',
+              data: Object.values(orderDetails?.TotalRevenue),
+              borderColor: 'rgb(255, 99, 132)',
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            },
+            {
+              label: 'Discount Allot',
+              data: Object.values(orderDetails?.Discount),
+              borderColor: 'rgb(53, 162, 235)',
+              backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            },
+          ],
+        }} />
+        {/* 
         <section>
           <LineChart
             data={[
@@ -34,6 +117,7 @@ const BarCharts = () => {
           />
           <h2>Active Users</h2>
         </section>
+
         <section>
           <LineChart
             data={[40, 60, 244, 100, 143, 120, 41, 47, 50, 56, 32]}
@@ -71,7 +155,7 @@ const BarCharts = () => {
             labels={months}
           />
           <h2>Discount Allotted</h2>
-        </section>
+        </section> */}
       </main>
     </div>
   );
