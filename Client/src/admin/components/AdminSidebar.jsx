@@ -27,29 +27,32 @@ const AdminSidebar = () => {
 
   return (
     <>
-      {phoneActive && (
+      {/* {phoneActive && (
         <button id="hamburger" onClick={() => setShowModal(true)}>
           <HiMenuAlt4 />
         </button>
-      )}
+      )} */}
 
       <aside
+        className="SideBar"
         style={
-          phoneActive
-            ? {
-                width: "20rem",
-                height: "100vh",
-                position: "fixed",
-                top: 0,
-                left: showModal ? "0" : "-20rem",
-                transition: "all 0.5s",
-              }
-            : {}
-        }>
-        <h2>
+          // phoneActive  ?
+             {
+              left: showModal ? "0" : "-20rem",
+            }
+            // : {}
+        }
+        >
+
+        <h2 id="logo">
           <NavLink to="/">
             <img src={logo} alt="logo" />
           </NavLink>
+          {/* {phoneActive && ( */}
+            <button id="hamburger" onClick={() => setShowModal(!showModal)}>
+              <HiMenuAlt4 />
+            </button>
+          {/* )} */}
         </h2>
         <DivOne location={location} />
         <DivTwo location={location} />
@@ -65,7 +68,7 @@ const AdminSidebar = () => {
   );
 };
 
-const DivOne = ({location}) => (
+const DivOne = ({ location }) => (
   <div>
     <h5>Dashboard</h5>
     <ul>

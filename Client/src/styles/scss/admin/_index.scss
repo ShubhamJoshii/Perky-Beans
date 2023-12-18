@@ -29,15 +29,23 @@
   color: rgb(0, 195, 0);
 }
 
+.heading{
+  margin-left: 40px;
+}
+
 .admin-container {
-  @include grid(1fr 4fr, 2rem);
+  // @include grid(1fr 4fr, 2rem);
+  // grid-template-columns: 1fr 4fr;
+  display: flex;
   height: 100vh;
   background-color: rgb(247, 247, 247);
   color: black;
-  position: absolute;
-  top: 0;
+  // position: absolute;
   // z-index: 999999;
+  // width: calc(100vw - 50rem);
+  top: 0;
   width: 100%;
+  position: relative;
 
   .loading{
     svg{
@@ -49,13 +57,25 @@
     color: black;
   }
   > aside {
-    width: 100%;
+    // position: relative;
+    width: 20rem;
+    position: absolute;
+    height: 100vh;
+    top: 0;
+    transition: all 0.5s;
+    // width: 100%;
     background-color: white;
     padding: 1rem;
     z-index: 10;
+    font-size: 14px;
     overflow-y: auto;
+    box-shadow:  0 0 6px grey;
     &::-webkit-scrollbar {
       display: none;
+    }
+
+    #logo{
+      text-align: center;
     }
 
     > div {

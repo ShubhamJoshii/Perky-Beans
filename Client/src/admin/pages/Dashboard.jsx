@@ -141,7 +141,7 @@ const dashboard = () => {
             <>
               <section className="widget-container">
                 <WidgetItem percent={count.percentage_revenue} amount={true} value={count.totalRevenue} heading="Revenue" color="rgb(0,115,255)" labels={["Today Revenue"]} />
-                <WidgetItem percent={count.percentage_users} value={count.totalUsers} heading="Users" color="rgb(0 198 202)" labels={["New Users","New Users"]}/>
+                <WidgetItem percent={count.percentage_users} value={count.totalUsers} heading="Users" color="rgb(0 198 202)" labels={["New Users","Not New Users"]}/>
                 <WidgetItem percent={count.percentage_transaction} value={count.TotalTransaction} heading="Transactions" color="rgb(255 196 0)" labels={["TodayTransaction"]}/>
                 <WidgetItem percent={count.percentage_products} value={count.Totalproducts} heading="Products" color="rgb(76 0 255)" labels={["Available","Non-Available"]}/>
               </section>
@@ -164,7 +164,7 @@ const WidgetItem = ({ heading, value, percent, color, amount = false ,labels = [
   <article className="widget">
     <div className="widget-info">
       <p>{heading}</p>
-      <h4>{amount ? `$${value}` : value}</h4>
+      <h4>{amount ? `₹${value}` : value}</h4>
       {percent >= 0 ? (
         <span className="green">
           <HiTrendingUp /> +{percent}%{" "}
@@ -197,7 +197,7 @@ const WidgetItem = ({ heading, value, percent, color, amount = false ,labels = [
       <DoughnutChart
         labels={labels}
         data={[percent, 100 - percent]}
-        backgroundColor={[color, "grey"]}
+        backgroundColor={[color, "#80808070"]}
         legends={false}
         offset={[0, 0, 0, 80]}
         cutout={"70%"}

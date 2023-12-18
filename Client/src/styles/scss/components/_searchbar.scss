@@ -3,16 +3,19 @@
 #SearchBarContainer {
   position: sticky;
   // top: 70px;
-  top: 68px;
-  z-index: 99999;
+  top: 76px;
+  // z-index: 99999;
+  z-index: 2;
   width: 80vw;
   margin: auto;
 
   #SearchBar {
-    z-index: 999;
+    // z-index: 999;
+    // top: 59px;
+    // top: 76px;
+    // z-index: 9;
     // position: relative;
     position: sticky;
-    top: 59px;
     width: 100%;
     height: 42px;
     border-radius: 4px;
@@ -62,7 +65,7 @@
     }
   }
   @media (max-width: 840px) {
-    top: 59px;
+    top: 65px;
     #SearchBar {
       margin-top: 40px !important;
     }

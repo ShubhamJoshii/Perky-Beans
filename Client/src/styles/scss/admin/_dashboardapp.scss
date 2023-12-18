@@ -1,7 +1,18 @@
 .dashboard-app-container {
   background-color: white;
-  padding: 4rem;
+  padding: 2rem 2rem;
+  flex: 1;
+  // display: flex;
+  height: 100vh;
+  background-color: rgb(247, 247, 247);
+  color: black;
+  top: 0;
+  width: 100%;
+  position: relative;
 
+  h1{
+    margin-left: 40px;
+  }
   > section {
     @include flex(column, center, center, 2rem);
     height: 100%;

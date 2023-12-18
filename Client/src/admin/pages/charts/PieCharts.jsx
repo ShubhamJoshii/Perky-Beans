@@ -70,11 +70,11 @@ const PieCharts = () => {
               labels={Object.keys(ordersPie)}
               data={Object.values(ordersPie)}
               backgroundColor={[
-                `green`,
-                `blue`,
-                `yellow`,
                 `teal`,
                 `red`,
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)'
               ]}
               legends={false}
               offset={[0, 0, 50]}
@@ -86,9 +86,13 @@ const PieCharts = () => {
             <DoughnutChart
               labels={Object.keys(categoryPie)}
               data={Object.values(categoryPie)}
-              backgroundColor={categories.map(
-                (i) => `hsl(${i.value * 4},${i.value}%, 50%)`
-              )}
+              backgroundColor={[
+                'rgb(255, 205, 86)',
+                `teal`,
+                'rgb(255, 99, 132)',
+                `red`,
+                'rgb(54, 162, 235)',
+              ]}
               legends={false}
               offset={[0, 0, 0, 80]}
             />

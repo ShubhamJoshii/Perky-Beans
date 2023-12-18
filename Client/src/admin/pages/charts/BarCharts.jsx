@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import axios from "axios"
 import AdminSidebar from "../../components/AdminSidebar";
 import {
@@ -35,41 +35,67 @@ const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: 'right',
+      // position: 'top',
+      position: 'bottom',
     },
     title: {
-      position: 'bottom',
+      position: 'top',
       display: true,
-      text: 'Orders throughout the year Bar Chart',
+      text: 'Orders and Reservation throughout the Month Bar Chart',
     },
   },
 };
 
 const BarCharts = () => {
-  const [OrderDetails,setOrderDetails] = useState({Orders:""});
+  const [OrderDetails, setOrderDetails] = useState({ Orders: "", keys: "" });
+  const [ReservationDetails, setReservationDetails] = useState({ Reservation: "" });
   const fetchOrders = async () => {
     let countsOrders = {};
-    await axios.get('/api/fetchOrders').then((response) => {
+    await axios.get('/api/fetchOrders').then(async (response) => {
+      let countsReservations = {};
       response.data.data.filter(e => {
         const orderDate = new Date(e.orderedAt);
         const monthKey = `${(orderDate.toLocaleString('default', { month: 'long' }))} ${orderDate.getFullYear()}`;
         countsOrders[monthKey] = (countsOrders[monthKey] || 0) + 1;
       })
+
       let sortedKeys = Object.keys(countsOrders).sort().reverse();
       let sortedObjectDiscount = sortedKeys.reduce((obj, key) => {
         obj[key] = countsOrders[key];
         return obj;
       }, {});
+      await axios.get('/api/reserveSeats').then((response) => {
+        response.data.filter(e => {
+          const reservationDate = new Date(`${e.reservation_Date} ${e.reservation_Timing}`);
+          const monthKey = `${(reservationDate.toLocaleString('default', { month: 'long' }))} ${reservationDate.getFullYear()}`;
+          countsReservations[monthKey] = (countsReservations[monthKey] || 0) + 1;
+        })
+        // let sortedKeys = Object.keys(countsReservations).sort().reverse();
+        let sortedObjectDiscount = sortedKeys.reduce((obj, key) => {
+          obj[key] = countsReservations[key];
+          return obj;
+        }, {});
+
+        setReservationDetails({ Reservation: sortedObjectDiscount })
+      }).catch((err) => {
+        console.log(err);
+      })
+
+
       // console.log(sortedObjectDiscount)
-      setOrderDetails({Orders:sortedObjectDiscount})
+      setOrderDetails({ Orders: sortedObjectDiscount, keys: sortedKeys })
+      // fetchReserveSeats();
     }).catch((err) => {
       console.log(err);
     })
   }
+  // const fetchReserveSeats = async () => {
 
-  useEffect(()=>{
+  // }
+
+  useEffect(() => {
     fetchOrders();
-  },[])
+  }, [])
 
   return (
     <div className="admin-container">
@@ -88,18 +114,25 @@ const BarCharts = () => {
           <h2>Top Selling Products & Top Customers</h2>
         </section> */}
         <section>
-            <Bar options={options} data={{
-              labels:Object.keys(OrderDetails?.Orders),
-              datasets: [
-                {
-                  label: 'Products',
-                  data: Object.values(OrderDetails?.Orders),
-                  borderColor: 'rgb(53, 162, 235)',
-                  backgroundColor: 'hsl(180, 40%, 50%)',
-                },
-              ],
-            }} />
-            {/* <h2>Orders throughout the year</h2> */}
+          <Bar options={options} data={{
+            labels: Object.keys(OrderDetails?.Orders),
+            datasets: [
+              {
+                label: 'Total Orders',
+                data: Object.values(OrderDetails?.Orders),
+                // borderColor: 'rgb(53, 162, 235)',
+                borderColor: 'hsl(180, 40%, 50%)',
+                backgroundColor: 'hsl(180, 40%, 50%)',
+              },
+              {
+                label: 'Total Reservation Seats',
+                data: Object.values(ReservationDetails?.Reservation),
+                borderColor: 'lightgreen',
+                backgroundColor: 'lightgreen',
+              }
+            ],
+          }} />
+          {/* <h2>Orders throughout the year</h2> */}
         </section>
       </main>
     </div>

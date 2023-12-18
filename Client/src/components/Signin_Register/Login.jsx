@@ -43,7 +43,7 @@ const Login = () => {
       await axios
         .post("/api/login", loginData)
         .then((result) => {
-          if (result.data === "User Logined") {
+          if (result.data === "User logged in") {
             notification(result.data, "Success");
             setTimeout(() => {
               checkUserAlreadyLogin();

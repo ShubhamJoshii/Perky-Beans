@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa";
 import Switch from "react-switch";
 import Pagination from "../components/Pagination";
-import {Oval} from "react-loader-spinner"
+import { Oval } from "react-loader-spinner"
 import TableHOC from "../components/TableHOC"
 const Products = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const [productsData, setProductsData] = useState();
   const fetchProducts = async () => {
-    await axios.post("/api/fetchProduct",{Available:false}).then((result) => {
+    await axios.post("/api/fetchProduct", { Available: false }).then((result) => {
       // console.log(result.data.data);
       setProductsData(result.data.data);
     }).catch((err) => {
@@ -44,19 +44,34 @@ const Products = () => {
   };
 
   const displayedProducts = productsData?.slice((currentPage - 1) * productsPerPage, currentPage * productsPerPage);
+  
+  const sortinghandle = () => {
+    let sortedData = productsData.sort((a,b)=>{
+      let x = a.Product_Name.toLowerCase();
+      let y = b.Product_Name.toLowerCase();
+      if(x>y){return 1;} 
+      if(x<y){return -1;}
+      return 0;
+    })
+    setProductsData(sortedData);
+  }
+
+  useEffect(()=>{
+    setCurrentPage(1);
+  },[productsData])
 
   return (
     <div className="admin-container">
       <AdminSidebar />
-      {/* <TableHOC heading={["_id","Photo","Name","Description","Price","Rating","Category","Type","Action","Available"]} loading={loading}/> */}
       <div className='dashboard-product-box'>
+        {/* <TableHOC heading={["_id", "Photo", "Name", "Description", "Price", "Rating", "Category", "Type", "Action", "Available"]} loading={loading} /> */}
         <h2 className="heading">Products</h2>
         <table className="table" role="table">
           <thead>
             <tr>
               <th>_id</th>
               <th>Photo</th>
-              <th>Name</th>
+              <th onClick={sortinghandle}>Name</th>
               <th>Description</th>
               <th>Price</th>
               <th>Rating</th>

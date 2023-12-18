@@ -24,17 +24,17 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
-  );
-  
-  // const months = ["January","February","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
+);
 
-  export const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
+// const months = ["January","February","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
+
+export const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top',
+    },
+    title: {
       position: 'bottom',
       display: true,
       text: 'Revenue & Discount Chart',
@@ -43,13 +43,13 @@ ChartJS.register(
 };
 
 const BarCharts = () => {
-  const [orderDetails, setOrderDetails] = useState({Discount:0,TotalRevenue:0});
+  const [orderDetails, setOrderDetails] = useState({ Discount: 0, TotalRevenue: 0 });
   const fetchOrders = async () => {
     let countsDiscount = {};
     let countsTotalRevenue = {};
     await axios.get('/api/fetchOrders').then((response) => {
       response.data.data.filter(e => {
-        const { Discount,TotalAmountPayed } = e;
+        const { Discount, TotalAmountPayed } = e;
         const orderDate = new Date(e.orderedAt);
         const monthKey = `${(orderDate.toLocaleString('default', { month: 'long' }))} ${orderDate.getFullYear()}`;
         countsDiscount[monthKey] = (countsDiscount[monthKey] || 0) + Discount;
@@ -70,16 +70,16 @@ const BarCharts = () => {
       // totalTransaction = Object.values(sortedObject)
 
       // console.log(sortedObjectDiscount, sortedObjectRevenue)
-      setOrderDetails({Discount:sortedObjectDiscount,TotalRevenue:sortedObjectRevenue})
+      setOrderDetails({ Discount: sortedObjectDiscount, TotalRevenue: sortedObjectRevenue })
 
     }).catch((err) => {
       console.log(err);
     })
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchOrders();
-  },[])
+  }, [])
 
   return (
     <div className="admin-container">
@@ -87,23 +87,29 @@ const BarCharts = () => {
       <main className="chart-container">
         <h2>Line Charts</h2>
         {/* Total Prodcutn Total Revenu/ Discount Allot */}
-        <Line options={options} data={{
-          labels: Object.keys(orderDetails?.TotalRevenue),
-          datasets: [
-            {
-              label: 'Total Revenue',
-              data: Object.values(orderDetails?.TotalRevenue),
-              borderColor: 'rgb(255, 99, 132)',
-              backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            },
-            {
-              label: 'Discount Allot',
-              data: Object.values(orderDetails?.Discount),
-              borderColor: 'rgb(53, 162, 235)',
-              backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            },
-          ],
-        }} />
+        <section>
+
+          <Line options={options} data={{
+            labels: Object.keys(orderDetails?.TotalRevenue),
+            datasets: [
+              {
+                fill: true,
+                label: 'Discount Allot',
+                data: Object.values(orderDetails?.Discount),
+                borderColor: 'green',
+                backgroundColor: 'lightgreen',
+              },
+              {
+                fill: true,
+                label: 'Total Revenue',
+                data: Object.values(orderDetails?.TotalRevenue),
+                borderColor: 'blue',
+                backgroundColor: 'lightblue',
+              },
+            ],
+          }} />
+        </section>
+
         {/* 
         <section>
           <LineChart
