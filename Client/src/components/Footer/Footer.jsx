@@ -37,11 +37,11 @@ const HeaderData = [
       },
       {
         text: "Terms and Conditions",
-        link: "#",
+        link: "/Terms&Conditions",
       },
       {
         text: "Privacy Policy",
-        link: "#",
+        link: "/PrivacyPolicy",
       },
     ],
   },

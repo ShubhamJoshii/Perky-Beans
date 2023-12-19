@@ -35,7 +35,8 @@ const Preloader = lazy(() => import("../components/Common/Preloader"));
 const PageNotFound = lazy(() => import("../components/PageNotFound/PageNotFound"));
 const ForgotPassword = lazy(() => import("../components/Signin_Register/ForgotPassword"));
 const About_us = lazy(() => import("../components/About Us/About_us"));
-
+const TermsConditions = lazy (()=>import ("../routes/pages/TermsAndConditionsPage"))
+const PrivacyPolicy = lazy (()=>import ("../routes/pages/PrivacyAndPolicyPage"))
 const Loading = createContext();
 const UserData = createContext();
 const Notification = createContext();
@@ -130,6 +131,18 @@ const App = () => {
           // checkUserAlreadyLogin();
           fetchBag();
         });
+      }else{
+        await axios
+          .post("/api/addtoBag", {
+            productID: _id,
+            SmallCount,
+            MediumCount,
+            LargeCount,
+          })
+          .then((result) => {
+            // checkUserAlreadyLogin();
+            fetchBag();
+          });
       }
     }
   }
@@ -213,6 +226,8 @@ const App = () => {
 
               <Route exact path="/" element={<HomePage />} />
               <Route exact path="/Products" element={<ProductsPage />} />
+              <Route exact path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+              <Route exact path="/Terms&Conditions" element={<TermsConditions />} />
               <Route exact path="/AboutUs" element={<About_us />} />
               <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
               <Route exact path="/Products/:categoryID/:productID" element={<ProductDetailsPage />} />
