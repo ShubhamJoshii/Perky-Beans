@@ -4,6 +4,7 @@
   @include flexMixin();
   min-height: 100vh;
   margin-top: 10px;
+  color: white;
   flex-direction: column;
 
   h1 {
@@ -20,6 +21,7 @@
 
     label {
       font-weight: bold;
+      color: white;
       letter-spacing: 1px;
     }
 

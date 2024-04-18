@@ -10,6 +10,7 @@ footer {
     justify-content: space-evenly;
     flex-wrap: wrap;
     gap: 15px;
+    color: white;
     #footerMenu {
       a {
         &:hover {
@@ -65,6 +66,7 @@ footer {
     margin-left: 30px;
     margin-top: 40px;
     font-weight: bolder;
+    color: white;
     button {
       background-color: #ecb014;
       color: white;

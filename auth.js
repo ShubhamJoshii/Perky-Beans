@@ -19,7 +19,7 @@ const Mailgen = require("mailgen");
 const uploadImage = require("./uploadImage");
 
 // let addRoute = "/";
-let addRoute = "/api/";
+// let addRoute = "/api/";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.get(`${addRoute}home`, Authenication, async (req, res) => {
+router.get(`/home`, Authenication, async (req, res) => {
   if (req.rootUser) {
     res.send({ data: req.rootUser, status: true });
   } else {
@@ -36,10 +36,16 @@ router.get(`${addRoute}home`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}register`, async (req, res) => {
+router.post(`/register`, async (req, res) => {
   const { Full_Name, Email, Password, Confirm_Password } = req.body;
   console.log(req.body);
   let EmailToken = require("crypto").randomBytes(32).toString("hex");
+  const  env = process.env.NODE_ENV || 'DEVELOPMENT';
+  var VerfiedLink = `http://${req.headers.host}/api/user/verify-email?token=${EmailToken}`;
+  if(env === "DEVELOPMENT"){
+    VerfiedLink = `http://${req.headers.host}/user/verify-email?token=${EmailToken}`;
+  }
+
   try {
     const userExist = await DBModel.findOne({ Email });
     if (!userExist) {
@@ -67,7 +73,7 @@ router.post(`${addRoute}register`, async (req, res) => {
           intro: `
             <p>Congratulations! You're almost set to start using Perky Beans- Cafe Web</p>
             <p>Just click the button below to validate your email address</p>
-            <a href="http://${req.headers.host}/user/verify-email?token=${EmailToken}" style="padding: 5px;background-color: brown;color: white;font-size: 22px;text-decoration: none;padding: 6px 15px;"}>Verify Email</a>`,
+            <a href="${VerfiedLink}" style="padding: 5px;background-color: brown;color: white;font-size: 22px;text-decoration: none;padding: 6px 15px;"}>Verify Email</a>`,
           outro: "Looking forward",
         },
       };
@@ -123,7 +129,7 @@ router.get(`/user/verify-email`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}login`, async (req, res) => {
+router.post(`/login`, async (req, res) => {
   const { Email, Password, Login_Date } = req.body;
   try {
     const userExist = await DBModel.findOne({ Email });
@@ -150,13 +156,13 @@ router.post(`${addRoute}login`, async (req, res) => {
   } catch (err) {}
 });
 
-router.get(`${addRoute}logout`, Authenication, async (req, res) => {
+router.get(`/logout`, Authenication, async (req, res) => {
   res.clearCookie("perkyBeansToken", { path: "/" });
   res.status(200).send("User Logout");
   // res.send(req.rootUser);
 });
 
-router.post(`${addRoute}fetchProduct`, async (req, res) => {
+router.post(`/fetchProduct`, async (req, res) => {
   const { Available } = req.body;
   if (Available) {
     const products = await ProductsModel.find({ Available: true });
@@ -167,7 +173,7 @@ router.post(`${addRoute}fetchProduct`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}fetchProductDetails`, async (req, res) => {
+router.post(`/fetchProductDetails`, async (req, res) => {
   const { _id } = req.body;
   const productDetails = await ProductsModel.findOne({ _id });
   productDetails
@@ -175,7 +181,7 @@ router.post(`${addRoute}fetchProductDetails`, async (req, res) => {
     : res.send({ data: "Error", found: false });
 });
 
-router.post(`${addRoute}updateProduct`, async (req, res) => {
+router.post(`/updateProduct`, async (req, res) => {
   const {
     _id,
     Product_Photo,
@@ -206,7 +212,7 @@ router.post(`${addRoute}updateProduct`, async (req, res) => {
     : res.send({ message: "Product Not Updated Try Again" });
 });
 
-router.post(`${addRoute}deleteProduct`, async (req, res) => {
+router.post(`/deleteProduct`, async (req, res) => {
   // console.log(req.body);
   const { _id } = req.body;
   const deleteProduct = await ProductsModel.deleteOne({ _id });
@@ -215,7 +221,7 @@ router.post(`${addRoute}deleteProduct`, async (req, res) => {
     : res.send({ message: "Product Not Deleted Try Again" });
 });
 
-router.post(`${addRoute}contact`, async (req, res) => {
+router.post(`/contact`, async (req, res) => {
   const { _id, Name, Email, type, Contact_Number, Description, rating } =
     req.body;
   let UserRegistered = false;
@@ -261,7 +267,7 @@ router.get(`/booking/cancel`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}productReview`, Authenication, async (req, res) => {
+router.post(`/productReview`, Authenication, async (req, res) => {
   const { Description, rating, _id } = req.body;
   console.log(Description, rating, _id);
   try {
@@ -280,7 +286,7 @@ router.post(`${addRoute}productReview`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
+router.post(`/reserveSeat`, Authenication, async (req, res) => {
   const { Contact_Number, Person_Count, Date, Timing, Booking_DateTime } =
     req.body;
   let token = require("crypto").randomBytes(32).toString("hex");
@@ -369,7 +375,7 @@ router.post(`${addRoute}reserveSeat`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}seatAvailable`, async (req, res) => {
+router.post(`/seatAvailable`, async (req, res) => {
   const { time, date } = req.body;
   // const fetchSeats = await ReserveSeatModel.find({reservation_Date : date});
   const fetchSeats = await ReserveSeatModel.countDocuments({
@@ -386,7 +392,7 @@ router.post(`${addRoute}seatAvailable`, async (req, res) => {
 
 // Wishlist Routes
 
-router.get(`${addRoute}fetchWishlist`, Authenication, async (req, res) => {
+router.get(`/fetchWishlist`, Authenication, async (req, res) => {
   const fetchWishlist = await WishlistsModel.findOne({ user_id: req.userID });
   if (fetchWishlist) {
     res.send({ data: fetchWishlist.Wishlist, result: true });
@@ -395,7 +401,7 @@ router.get(`${addRoute}fetchWishlist`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
+router.post(`/addToWishlist`, Authenication, async (req, res) => {
   const { productID } = req.body;
   try {
     const wishlistExist = await WishlistsModel.findOne({ user_id: req.userID });
@@ -418,7 +424,7 @@ router.post(`${addRoute}addToWishlist`, Authenication, async (req, res) => {
 });
 
 router.post(
-  `${addRoute}removefromWishlist`,
+  `/removefromWishlist`,
   Authenication,
   async (req, res) => {
     const { productID } = req.body;
@@ -438,7 +444,7 @@ router.post(
 );
 
 // Bags Routes
-router.get(`${addRoute}fetchBag`, Authenication, async (req, res) => {
+router.get(`/fetchBag`, Authenication, async (req, res) => {
   const fetchBag = await BagsModel.findOne({ user_id: req.userID });
   // console.log(fetchBag.Bag);
   if (fetchBag) {
@@ -448,7 +454,7 @@ router.get(`${addRoute}fetchBag`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
+router.post(`/addtoBag`, Authenication, async (req, res) => {
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
     const bagExist = await BagsModel.findOne({ user_id: req.userID });
@@ -481,7 +487,7 @@ router.post(`${addRoute}addtoBag`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
+router.post(`/updateBag`, Authenication, async (req, res) => {
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
     const bagExist = await BagsModel.findOne({ user_id: req.userID });
@@ -513,7 +519,7 @@ router.post(`${addRoute}updateBag`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}removeFromBag`, Authenication, async (req, res) => {
+router.post(`/removeFromBag`, Authenication, async (req, res) => {
   const { productID } = req.body;
   try {
     const fetchBag = await BagsModel.findOne({ user_id: req.userID });
@@ -525,7 +531,7 @@ router.post(`${addRoute}removeFromBag`, Authenication, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}fetchOrders`, Authenication, async (req, res) => {
+router.get(`/fetchOrders`, Authenication, async (req, res) => {
   try {
     const fetchOrders = await OrdersModel.find({ user_id: req.userID });
     // console.log(fetchOrders);
@@ -536,7 +542,7 @@ router.get(`${addRoute}fetchOrders`, Authenication, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}fetchAllOrders`, Authenication, async (req, res) => {
+router.get(`/fetchAllOrders`, Authenication, async (req, res) => {
   try {
     if (req.rootUser.Role === "Admin") {
       const fetchOrders = await OrdersModel.find();
@@ -549,7 +555,7 @@ router.get(`${addRoute}fetchAllOrders`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
+router.post(`/orderNow`, Authenication, async (req, res) => {
   // let orderedAt = Date.now();
   // console.log(Date.now());
   const { Delivery_Charge, GST, Discount, TotalAmountPayed, Coupon_ID } =
@@ -593,7 +599,7 @@ router.post(`${addRoute}orderNow`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
+router.post(`/cancelOrder`, Authenication, async (req, res) => {
   const { _id } = req.body;
   try {
     const orderExist = await OrdersModel.updateOne(
@@ -610,7 +616,7 @@ router.post(`${addRoute}cancelOrder`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}changeStatus`, async (req, res) => {
+router.post(`/changeStatus`, async (req, res) => {
   const { _id, status } = req.body;
   // console.log(_id,status)
   try {
@@ -630,7 +636,7 @@ router.post(`${addRoute}changeStatus`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
+router.post(`/forgetPassword/sendOTP`, async (req, res) => {
   const { Email } = req.body;
   try {
     const userExist = await DBModel.findOne({ Email });
@@ -705,7 +711,7 @@ router.post(`${addRoute}forgetPassword/sendOTP`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
+router.post(`/forgetPassword/otpVerify`, async (req, res) => {
   const { Email, OTP } = req.body;
   try {
     const userExist = await DBModel.findOne({ Email });
@@ -734,7 +740,7 @@ router.post(`${addRoute}forgetPassword/otpVerify`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}forgetPassword/updatePassword`, async (req, res) => {
+router.post(`/forgetPassword/updatePassword`, async (req, res) => {
   const { Email, OTP, Password, Confirm_Password } = req.body;
   // console.log(req.body);
   try {
@@ -752,13 +758,13 @@ router.post(`${addRoute}forgetPassword/updatePassword`, async (req, res) => {
 
 // Admin Routes
 
-router.post(`${addRoute}uploadImage`, async (req, res) => {
+router.post(`/uploadImage`, async (req, res) => {
   uploadImage(req.body.image, req.body.folder)
     .then((url) => res.send(url))
     .catch((err) => res.send(500).send(err));
 });
 
-router.post(`${addRoute}saveProduct`, async (req, res) => {
+router.post(`/saveProduct`, async (req, res) => {
   const {
     Product_Name,
     Description,
@@ -788,7 +794,7 @@ router.post(`${addRoute}saveProduct`, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}fetchUsers`, async (req, res) => {
+router.get(`/fetchUsers`, async (req, res) => {
   // console.log("Hllo");
   const usersData = await DBModel.find();
   usersData
@@ -796,7 +802,7 @@ router.get(`${addRoute}fetchUsers`, async (req, res) => {
     : res.send({ message: "No User Found" });
 });
 
-router.post(`${addRoute}updateUserRole`, Authenication, async (req, res) => {
+router.post(`/updateUserRole`, Authenication, async (req, res) => {
   const { _id, Role } = req.body;
   // console.log(req.rootUser);
   // console.log(_id);
@@ -823,7 +829,7 @@ router.post(`${addRoute}updateUserRole`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
+router.post(`/updateProductAvailability`, async (req, res) => {
   const { _id, isAvailable } = req.body;
   // console.log(req.body);
   const productsData = await ProductsModel.updateOne(
@@ -838,7 +844,7 @@ router.post(`${addRoute}updateProductAvailability`, async (req, res) => {
     : res.send({ message: "Product Availability  Not Updated", result: false });
 });
 
-router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
+router.get(`/fetchUsersProductsCount`, async (req, res) => {
   // const users = await DBModel.countDocuments({Role:"Customer"});
   const users = await DBModel.find();
   let totalUsers = users.length;
@@ -896,7 +902,7 @@ router.get(`${addRoute}fetchUsersProductsCount`, async (req, res) => {
   });
 });
 
-router.get(`${addRoute}fetchRevenueTransaction`, async (req, res) => {
+router.get(`/fetchRevenueTransaction`, async (req, res) => {
   try{
     const fetchOrders = await OrdersModel.find();
     res.send({orders:fetchOrders})
@@ -905,7 +911,7 @@ router.get(`${addRoute}fetchRevenueTransaction`, async (req, res) => {
   }
 })
 
-router.post(`${addRoute}deleteUser`, async (req, res) => {
+router.post(`/deleteUser`, async (req, res) => {
   const { _id } = req.body;
   try {
     const findAdmins = await DBModel.countDocuments({ Role: "Admin" });
@@ -920,13 +926,13 @@ router.post(`${addRoute}deleteUser`, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}reserveSeats`, async (req, res) => {
+router.get(`/reserveSeats`, async (req, res) => {
   // console.log()
   const reserveSeats = await ReserveSeatModel.find();
   // co
   res.send(reserveSeats);
 });
-router.get(`${addRoute}fetchReview`, async (req, res) => {
+router.get(`/fetchReview`, async (req, res) => {
   const fetchReview = await ContactModel.find({ type: "Review" });
   if (fetchReview) {
     res.send(fetchReview);
@@ -935,7 +941,7 @@ router.get(`${addRoute}fetchReview`, async (req, res) => {
   }
 });
 
-router.get(`${addRoute}fetchCoupon`, async (req, res) => {
+router.get(`/fetchCoupon`, async (req, res) => {
   try {
     const fetchCoupon = await CouponModel.find();
     res.send({ Data: fetchCoupon });
@@ -944,7 +950,7 @@ router.get(`${addRoute}fetchCoupon`, async (req, res) => {
   }
 });
 
-router.post(`${addRoute}newCouponAdd`, Authenication, async (req, res) => {
+router.post(`/newCouponAdd`, Authenication, async (req, res) => {
   const { Code, Discount_Allot, Description } = req.body;
   var currDate = new Date();
   var result = currDate.setDate(currDate.getDate() + 10);

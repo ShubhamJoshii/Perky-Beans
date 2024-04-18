@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const  env = process.env.NODE_ENV || 'DEVELOPMENT';
 
 require("dotenv").config();
 
@@ -16,7 +17,13 @@ app.use(express.json({limit:"25mb"}));
 app.use(express.urlencoded({limit:"25mb"}));
 app.use(cookieParser());
 
-app.use(require("./auth"));
+// if(env === "DEVELOPMENT"){
+//   app.use(require("./auth"));
+// }else{
+  app.use(`/api`, require("./auth"));
+// }
+
+// app.use(require("./auth"));
 
 app.use(express.static(path.resolve(__dirname, "Client", "docs")));
 

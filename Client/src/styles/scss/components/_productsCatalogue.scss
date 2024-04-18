@@ -6,6 +6,7 @@
   align-items: center;
   flex-direction: column !important;
   gap: 0 !important;
+  color: white;
   button{
     background-color: #ecb014;
     padding: 4px 10px;
@@ -48,7 +49,7 @@
     padding-bottom: 30px;
     border-radius: 25px;
     position: relative;
-
+    
     #veg {
       width: 20px;
       height: 20px;
@@ -77,6 +78,7 @@
       position: absolute;
       top: 15px;
       right: 15px;
+      color: white;
 
       #onhover-showBTN1, #onhover-showBTN2 {
         @include flexMixin($JScontent: flex-end);
@@ -190,6 +192,7 @@
   position: relative;
   top: 8rem;
   gap: 10px;
+  color: white;
 
   .Pages {
     @include flexMixin();
