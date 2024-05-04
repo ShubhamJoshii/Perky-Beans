@@ -39,7 +39,7 @@ const CustomerReview = ({ Review }) => {
                       let count = ratings.filter((e) => e === curr).length;
                       let countPerc = count / ratings.length * 100;
                       return (
-                        <div id="rating-count">
+                        <div id="rating-count" key={curr}>
                           <div>
                             <p>{curr}</p>
                             <AiFillStar />

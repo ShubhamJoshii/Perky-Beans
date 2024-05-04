@@ -17,8 +17,6 @@
   box-sizing: border-box;
 }
 
-
-
 .red {
   color: red;
 }
@@ -29,7 +27,7 @@
   color: rgb(0, 195, 0);
 }
 
-.heading{
+.heading {
   margin-left: 40px;
 }
 
@@ -47,8 +45,8 @@
   width: 100%;
   position: relative;
 
-  .loading{
-    svg{
+  .loading {
+    svg {
       width: 100%;
     }
   }
@@ -69,12 +67,12 @@
     z-index: 10;
     font-size: 14px;
     overflow-y: auto;
-    box-shadow:  0 0 6px grey;
+    box-shadow: 0 0 6px grey;
     &::-webkit-scrollbar {
       display: none;
     }
 
-    #logo{
+    #logo {
       text-align: center;
     }
 
@@ -125,8 +123,19 @@
     tr {
       box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.093);
     }
-    #orders-table{
-      button{
+
+    .skeleton {
+      width: 4rem !important;
+      height: 4rem !important;
+      object-fit: contain;
+      border-radius: 10px !important;
+    }
+    
+    span {
+      height: 18px;
+    }
+    #orders-table {
+      button {
         padding: 4px;
         background-color: #ecb014;
         color: white;
@@ -134,33 +143,33 @@
         letter-spacing: 1px;
         font-size: 12px;
       }
-      #order-status-prepared{
+      #order-status-prepared {
         background-color: cyan;
       }
-      #order-status-pickup{
+      #order-status-pickup {
         background-color: green;
       }
-      #order-status-received{
+      #order-status-received {
         background-color: red;
       }
-      #order-complete{
+      #order-complete {
         background-color: #ecb014;
       }
     }
 
     td {
       padding: 1rem;
-      p{
+      p {
         padding: 2px;
         border-radius: 8px;
         font-weight: bolder;
         color: white;
         text-align: center;
       }
-      #verified{
+      #verified {
         background-color: rgba(36, 185, 36, 0.826);
       }
-      #not-verified{
+      #not-verified {
         background-color: rgba(255, 0, 0, 0.774);
         text-align: center;
       }

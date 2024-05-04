@@ -12,7 +12,7 @@ const ProductManagement = () => {
 
   const navigate = useNavigate();
   const fetchProductDetails = async () => {
-    await axios.post(`/api/fetchProductDetails`, { _id: productId }).then((result) => {
+    await axios.get(`/api/fetchProductDetails?_id=${productId}`).then((result) => {
       // console.log(result.data.data);
       result.data.found && setProductDetails(result.data.data)
     }).catch((err) => {

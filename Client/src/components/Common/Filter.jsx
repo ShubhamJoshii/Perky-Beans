@@ -67,7 +67,9 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
   const ref = useRef(null);
   const navigate = useNavigate();
   const showFilterProduct = () => {
-    navigate("/products", {state: showFilter});
+    let Category = showFilter.Category.map((item) => item.apiName)
+    let Ingredients = showFilter.Ingredients.map((item) => item.apiName)
+    navigate("/products", {state: {Category,Ingredients, PriceRange:showFilter.PriceRange, RatingUP:showFilter.RatingUP}});
     setShowFilterBox(false);
   };
 

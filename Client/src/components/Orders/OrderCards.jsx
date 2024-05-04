@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { Oval } from "react-loader-spinner";
 import axios from "axios";
 import { Notification } from "../../routes/App";
 import { Rate } from "antd";
 import { useNavigate } from "react-router-dom";
-const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProducts }) => {
+const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchOrders }) => {
   const [trackShow, setTrackShow] = useState(null);
   const [trackCount, setTrackCount] = useState(20);
   const [FeedBackShow, setFeedBackShow] = useState(null);
@@ -26,7 +26,7 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
         if (result.data === "Product Order Cancelled") {
           // checkUserAlreadyLogin();
           notification(result.data, "Success")
-          fetchProducts();
+          fetchOrders();
         }
       })
       .catch((err) => { console.log(err) })
@@ -49,7 +49,7 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
         // console.log(response.data);
         if (response.data.result) {
           notification(response.data.message, "Success")
-          fetchProducts();
+          fetchOrders();
         } else {
           notification(response.data.message, "Un-Success")
         }
@@ -91,22 +91,24 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
       </div>
       <div id="orders-Collection">
         {
-          orderData.Orders.map((curr) => {
-            const prd = product.find(e => e._id === curr.productID);
-            const Total = prd.Price * curr.LargeCount + prd.Price * curr.MediumCount + prd.Price * curr.SmallCount
+          orderData.Orders.map((curr,id) => {
+            // console.log(curr)
+            // const curr = product.find(e => e._id === curr.productID);
+            // const curr = {};
+            const Total = curr.Price * curr.LargeCount + curr.Price * curr.MediumCount + curr.Price * curr.SmallCount
             return (
-              <>
+              <Fragment key={id}>
                 <div id="orderCards">
-                  <img src={prd.Product_Photo} alt={prd.Product_Name} onClick={()=>navigate(`/products/${prd.Category}/${prd._id}`)}/>
+                  <img src={curr.Product_Photo} alt={curr.Product_Name} onClick={()=>navigate(`/products/${curr.Category}/${curr._id}`)}/>
                   <div>
                     <div id="product-name-pay">
-                      <h3>{prd.Product_Name}</h3>
+                      <h3>{curr.Product_Name}</h3>
                       <p>You Pay: &#x20B9;{Total} </p>
                     </div>
-                    <p>{prd.Description.slice(0, 200)}...</p>
+                    <p>{curr.Description.slice(0, 200)}...</p>
                   </div>
                   {
-                    (orderData.status === "ORDER RECEIVED" && !prd?.Reviews.find(e => e.user_id === userData._id)) &&
+                    (orderData.status === "ORDER RECEIVED" && !curr?.Reviews.find(e => e.user_id === userData._id)) &&
                     <button
                       onClick={() => {
                         curr._id === FeedBackShow ? setFeedBackShow(null) : setFeedBackShow(curr._id);
@@ -130,7 +132,7 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
                     {/* <Rate className="overall-rate-antd" allowHalf allowClear={false} tooltips={["Very Bad", "Bad", "Good", "Excellent", "Awesome"]} /> */}
                   </form>
                 )}
-              </>
+              </Fragment>
             )
           })
         }
@@ -140,13 +142,14 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
         <div id="order-summary">
           <h4>Order Summary</h4>
           <table>
+          <thead>
             {
-              orderData.Orders.map((curr) => {
-                const prd = product.find(e => e._id === curr.productID);
-                const Total = prd.Price * curr.LargeCount + prd.Price * curr.MediumCount + prd.Price * curr.SmallCount
+              orderData.Orders.map((curr,id) => {
+                // const curr = product.find(e => e._id === curr.productID);
+                const Total = curr.Price * curr.LargeCount + curr.Price * curr.MediumCount + curr.Price * curr.SmallCount
                 return (
-                  <tr>
-                    <td>{prd.Product_Name}:</td>
+                  <tr key={id}>
+                    <td>{curr.Product_Name}:</td>
                     <td>&#x20B9; {Total * (100 - 18) / 100}</td>
                   </tr>
                 )
@@ -171,6 +174,8 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchProdu
               <td>Order Total:</td>
               <td>&#x20B9; {orderData.TotalAmountPayed}</td>
             </tr>
+            </thead>
+          
           </table>
         </div>
       }

@@ -25,7 +25,7 @@ const PieCharts = () => {
   const fetchProduct = async () => {
     let counts = {};
     let countsAvailable = {};
-    await axios.post('/api/fetchProduct').then((response) => {
+    await axios.get('/api/fetchProduct').then((response) => {
       response.data.data.filter(e => {
         const { Category, Available } = e;
         counts[Category] = (counts[Category] || 0) + 1;

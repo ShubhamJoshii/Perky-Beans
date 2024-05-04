@@ -1,5 +1,9 @@
 @use "../abstracts" as *;
 
+html{
+  min-height: 100vh;
+}
+
 body {
   // font-family: $ff-sans;
   // background-color: var(--background-primary);

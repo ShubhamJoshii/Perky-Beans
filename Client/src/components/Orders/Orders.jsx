@@ -11,28 +11,27 @@ import { Oval } from "react-loader-spinner";
 
 const Orders = () => {
   const [orderShow, setOrderShow] = useState(true);
-  const { userData, setUserData, fetchBag, fetchWishList, addToBag, addToWishlist, bagData, wishlistData } = useContext(UserData);
-  const [Products, setProducts] = useState(null);
+  const { userData, setUserData, fetchWishList, wishlistData } = useContext(UserData);
   const [loading, setLoading] = useState("Show");
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
   const currRoute = useParams();
 
-  const fetchProducts = async () => {
+  const fetchFunction = async () => {
     setLoading("Show");
-    await axios.post("/api/fetchProduct", { Available: false }).then((result) => {
-      setProducts(result.data.data);
-      setLoading("Hide");
-      fetchWishList();
-      fetchOrders();
-    }).catch((err) => {
-      console.log("Error")
-      setLoading("LoadBtnShow");
+    await fetchWishList();
+    await fetchOrders();
+    setLoading("Hide");
+  }
+
+  const fetchOrders = async()=>{
+    await axios.get("/api/fetchOrders").then((response)=>{
+      setOrders(response.data.data);
     })
   }
 
   useEffect(() => {
-    fetchProducts();
+    fetchFunction();
   }, [])
 
   useEffect(() => {
@@ -42,14 +41,6 @@ const Orders = () => {
       setOrderShow(true);
     }
   }, [currRoute]);
-
-
-  const fetchOrders = async()=>{
-    await axios.get("/api/fetchOrders").then((response)=>{
-      // console.log(response.data.data);
-      setOrders(response.data.data);
-    })
-  }
 
   return (
     <>
@@ -81,9 +72,7 @@ const Orders = () => {
                       {orders?.length > 0 ? (
                         <div id="orderCardsContainer">
                           {orders?.toReversed().map((curr, ids) => {
-                            // const product = Products?.find((e) => e._id === curr.Orders[0].productID);
-                            // console.log(product)
-                            return <OrderCards product={Products} fetchProducts={fetchProducts} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
+                            return <OrderCards fetchOrders={fetchOrders} orderData={curr} key={curr + ids} ids={ids} userData={userData} setUserData={setUserData} />;
                           })}
                         </div>
                       ) : (
@@ -96,9 +85,7 @@ const Orders = () => {
                         <div id="wishlist">
                           <div id="orderCardsContainer">
                             {wishlistData?.toReversed().map((curr, ids) => {
-                              // console.log(curr);
-                              const product = Products?.find((e) => e._id === curr.productID);
-                              return <WishlistCards product={product} orderData={curr} key={curr + ids} userData={userData} setUserData={setUserData} />;
+                              return <WishlistCards product={curr}  key={curr + ids} userData={userData} setUserData={setUserData} />;
                             })}
                           </div>
                         </div>

@@ -15,7 +15,7 @@ const ProductDetailsPage = () => {
   let itemShow = useParams().productID;
 
   const fetchProductDetails = async () => {
-    await axios.post("/api/fetchProductDetails", { _id: itemShow }).then((response) => {
+    await axios.get(`/api/fetchProductDetails?_id=${itemShow}`).then((response) => {
       setItemDetails(response.data.data)
     }).catch((err) => {
       console.log(err);

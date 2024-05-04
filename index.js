@@ -17,11 +17,11 @@ app.use(express.json({limit:"25mb"}));
 app.use(express.urlencoded({limit:"25mb"}));
 app.use(cookieParser());
 
-// if(env === "DEVELOPMENT"){
-//   app.use(require("./auth"));
-// }else{
+if(env === "DEVELOPMENT"){
+  app.use(require("./auth"));
+}else{
   app.use(`/api`, require("./auth"));
-// }
+}
 
 // app.use(require("./auth"));
 

@@ -77,23 +77,6 @@
       .widget-circle {
         position: relative;
         width: 100px;
-        // @include square(5rem);
-        // border-radius: 50%;
-        // flex: none;
-        // display: grid;
-        // place-items: center;
-        // background-color: aquamarine;
-        // &::before {
-          //   content: "";
-          //   position: absolute;
-          //   @include square(4rem);
-          //   background-color: white;
-          //   border-radius: 100%;
-          // }
-          // canvas{
-            // margin: 10px;
-            // width: 120%;
-          // }
         span {
           position: absolute;
           left: 50%;

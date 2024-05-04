@@ -55,7 +55,7 @@ const Bags = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    await axios.post("/api/fetchProduct", { Available: true }).then((result) => {
+    await axios.get("/api/fetchProduct").then((result) => {
       setProductsData(result.data.data);
       fetchBag();
     }).catch((err) => {

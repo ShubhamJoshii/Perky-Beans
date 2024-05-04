@@ -1,5 +1,4 @@
 import {useState, useEffect} from "react";
-// import PropTypes from "prop-types";
 
 const Pagination = ({currentPage, totalPages, onPageChange}) => {
   const [pageNumber, setPageNumber] = useState(currentPage);

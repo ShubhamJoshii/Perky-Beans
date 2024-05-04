@@ -14,6 +14,8 @@ const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const {notification} = useContext(Notification);
 
+
+  
   const userRoleUpdate = async (_id, Role) => {
     setLoading(true);
     await axios.post("/api/updateUserRole", { _id, Role }).then((response) => {
@@ -96,10 +98,10 @@ const Users = () => {
           ) : (
             <tbody>
               {
-                displayedUsers?.map((curr) => {
+                displayedUsers?.map((curr,id) => {
                   const isAdmin = curr.Role === "Admin"
                   return (
-                    <tr>
+                    <tr key={id}>
                       <td>{curr.Full_Name}</td>
                       <td>{curr.Email}</td>
                       <td>{curr.Role}</td>

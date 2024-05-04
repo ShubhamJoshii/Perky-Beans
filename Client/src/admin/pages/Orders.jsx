@@ -28,7 +28,7 @@ const Orders = () => {
   }
 
   const fetchProducts = async () => {
-    await axios.post("/api/fetchProduct", { Available: false }).then((result) => {
+    await axios.get("/api/fetchProduct?Available=false").then((result) => {
       // console.log(result.data.data);
       setProductsData(result.data.data);
     }).catch((err) => {

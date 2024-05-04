@@ -122,13 +122,17 @@
     margin: 4px 1.5%;
     overflow-y: scroll;
     overflow-x: hidden;
+
+    .activeIndex{
+      background-color: #dddddd;
+    }
     #SearchProducts {
       @include flexMixin($JScontent: space-between);
       padding: 5px 20px;
       width: 100%;
       border-bottom: 2px solid rgba(0, 0, 0, 0.547);
       &:hover {
-        background-color: rgba(0, 0, 0, 0.16);
+        background-color: #dddddd;
       }
       a {
         flex: 1;

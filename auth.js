@@ -38,11 +38,11 @@ router.get(`/home`, Authenication, async (req, res) => {
 
 router.post(`/register`, async (req, res) => {
   const { Full_Name, Email, Password, Confirm_Password } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   let EmailToken = require("crypto").randomBytes(32).toString("hex");
-  const  env = process.env.NODE_ENV || 'DEVELOPMENT';
+  const env = process.env.NODE_ENV || "DEVELOPMENT";
   var VerfiedLink = `http://${req.headers.host}/api/user/verify-email?token=${EmailToken}`;
-  if(env === "DEVELOPMENT"){
+  if (env === "DEVELOPMENT") {
     VerfiedLink = `http://${req.headers.host}/user/verify-email?token=${EmailToken}`;
   }
 
@@ -113,7 +113,7 @@ router.get(`/user/verify-email`, async (req, res) => {
   try {
     const token = req.query.token;
     const user = await DBModel.findOne({ EmailToken: token });
-    console.log(user, "Hello WORLD");
+    // console.log(user, "Hello WORLD");
     if (user.isVerified) {
       res.send("Email Already Verfied");
     }
@@ -140,7 +140,7 @@ router.post(`/login`, async (req, res) => {
       } else if (password_Match) {
         userExist.Login = userExist.Login.concat({ Login_Date });
         const Token = await userExist.generateAuthToken();
-        console.log(Token);
+        // console.log(Token);
         res.cookie("perkyBeansToken", Token, {
           expires: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000),
           httpOnly: true,
@@ -162,22 +162,110 @@ router.get(`/logout`, Authenication, async (req, res) => {
   // res.send(req.rootUser);
 });
 
-router.post(`/fetchProduct`, async (req, res) => {
-  const { Available } = req.body;
-  if (Available) {
-    const products = await ProductsModel.find({ Available: true });
-    res.send({ data: products });
+router.get(`/fetchProduct`, async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const Available = req.query.Available;
+  const Category = req.query.Category || null;
+  const Ingredients = req.query.Ingredients || null;
+  const PriceRange = req.query.PriceRange || null;
+  const RatingUP = req.query.RatingUP || null;
+  const limit =
+    parseInt(req.query.limit) || (await ProductsModel.countDocuments());
+  const pageCount = (totalProduct) => {
+    const pages = [];
+    for (let i = 1; i <= Math.ceil(totalProduct / limit); i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  let totalProduct = (await ProductsModel.countDocuments()) || 1;
+  let pages = pageCount(totalProduct);
+  if (Available === "true") {
+    if (Category || Ingredients || PriceRange || RatingUP) {
+      let query = {};
+      query.Available = true;
+      if (Category) {
+        let Category1 = Category.split(",");
+        query.Category = { $in: Category1 };
+      }
+      if (Ingredients) {
+        let Ingredients1 = Ingredients.split(",");
+        query.type = { $in: Ingredients1 };
+      }
+      if (PriceRange) {
+        query.Price = { $lte: PriceRange };
+      }
+      if (RatingUP) {
+        query.Rating = { $gte: RatingUP };
+      }
+      const products = await ProductsModel.find(query)
+        .limit(limit)
+        .skip((page - 1) * limit);
+      let totalProduct = (await ProductsModel.countDocuments(query)) || 1;
+      let pages = pageCount(totalProduct);
+      return res.send({ data: products, TotalproductsPages: pages });
+    } else {
+      const products = await ProductsModel.find({ Available: true })
+        .limit(limit)
+        .skip((page - 1) * limit);
+      return res.send({ data: products, TotalproductsPages: pages });
+    }
   } else {
-    const products = await ProductsModel.find();
-    res.send({ data: products });
+    const products = await ProductsModel.find()
+      .limit(limit)
+      .skip((page - 1) * limit);
+    let totalProduct = (await ProductsModel.countDocuments()) || 1;
+    let pages = pageCount(totalProduct);
+    return res.send({ data: products, TotalproductsPages: pages });
   }
 });
 
-router.post(`/fetchProductDetails`, async (req, res) => {
-  const { _id } = req.body;
+router.get(`/fetchProductDetails`, async (req, res) => {
+  const _id = req.query._id;
+  const user_id = req.query.user_id || undefined;
   const productDetails = await ProductsModel.findOne({ _id });
-  productDetails
-    ? res.send({ data: productDetails, found: true })
+  let Sizes = [
+    {
+      name: "regular",
+      price: productDetails?.Price - 50,
+      counter: 0,
+    },
+    {
+      name: "medium",
+      price: productDetails?.Price,
+      counter: 0,
+    },
+    {
+      name: "large",
+      price: productDetails?.Price + 50,
+      counter: 0,
+    },
+  ];
+  let total =
+    Sizes[0].price * Sizes[0].counter +
+    Sizes[1].price * Sizes[1].counter +
+    Sizes[2].price * Sizes[2].counter;
+
+  if (user_id && productDetails) {
+    const bagData = await BagsModel.findOne({ user_id });
+    const bagDataProductFind = await bagData?.Bag.find(
+      (item) => item.productID === _id
+    );
+    if (bagDataProductFind) {
+      Sizes[0].counter = bagDataProductFind.SmallCount;
+      Sizes[1].counter = bagDataProductFind.MediumCount;
+      Sizes[2].counter = bagDataProductFind.LargeCount;
+      total =
+        Sizes[0].price * Sizes[0].counter +
+        Sizes[1].price * Sizes[1].counter +
+        Sizes[2].price * Sizes[2].counter;
+      // console.log(Sizes)
+      return res.send({ data: productDetails, Sizes, total, found: true });
+    }
+  }
+  return productDetails
+    ? res.send({ data: productDetails, Sizes, total, found: true })
     : res.send({ data: "Error", found: false });
 });
 
@@ -252,7 +340,6 @@ router.get(`/booking/cancel`, async (req, res) => {
   try {
     const token = req.query.token;
     const seatFind = await ReserveSeatModel.findOne({ token: token });
-    console.log(seatFind, "Hello WORLD");
     if (seatFind.status === "Cancelled") {
       res.send("Already Cancelled Reserved Seat");
     }
@@ -269,7 +356,6 @@ router.get(`/booking/cancel`, async (req, res) => {
 
 router.post(`/productReview`, Authenication, async (req, res) => {
   const { Description, rating, _id } = req.body;
-  console.log(Description, rating, _id);
   try {
     const findProduct = await ProductsModel.findOne({ _id: _id });
     findProduct.Reviews = await findProduct.Reviews.concat({
@@ -382,7 +468,6 @@ router.post(`/seatAvailable`, async (req, res) => {
     reservation_Date: date,
     reservation_Timing: time,
   });
-  console.log(fetchSeats);
   if (fetchSeats <= 10) {
     res.send({ message: "Seat Available", result: true });
   } else {
@@ -391,11 +476,30 @@ router.post(`/seatAvailable`, async (req, res) => {
 });
 
 // Wishlist Routes
-
+// "productID": "abfde642"
 router.get(`/fetchWishlist`, Authenication, async (req, res) => {
   const fetchWishlist = await WishlistsModel.findOne({ user_id: req.userID });
+  const products = await ProductsModel.find(
+    {},
+    {
+      productID: "$_id",
+      Product_Photo: 1,
+      Product_Name: 1,
+      Description: 1,
+      Price: 1,
+      type: 1,
+    }
+  );
+  const data = products.filter((item) => {
+    let temp = fetchWishlist.Wishlist.find((e) => item._id === e.productID);
+    if (temp) {
+      item._id = temp._id;
+      return true;
+    }
+    return false;
+  });
   if (fetchWishlist) {
-    res.send({ data: fetchWishlist.Wishlist, result: true });
+    res.send({ data, result: true });
   } else {
     res.send({ data: [], result: false });
   }
@@ -423,25 +527,21 @@ router.post(`/addToWishlist`, Authenication, async (req, res) => {
   }
 });
 
-router.post(
-  `/removefromWishlist`,
-  Authenication,
-  async (req, res) => {
-    const { productID } = req.body;
-    try {
-      const wishlistExist = await WishlistsModel.findOne({
-        user_id: req.userID,
-      });
-      wishlistExist.Wishlist = await wishlistExist.Wishlist.filter(
-        (e) => e.productID !== productID
-      );
-      wishlistExist.save();
-      res.send("Remove from Wishlist");
-    } catch (err) {
-      console.log(err);
-    }
+router.post(`/removefromWishlist`, Authenication, async (req, res) => {
+  const { productID } = req.body;
+  try {
+    const wishlistExist = await WishlistsModel.findOne({
+      user_id: req.userID,
+    });
+    wishlistExist.Wishlist = await wishlistExist.Wishlist.filter(
+      (e) => e.productID !== productID
+    );
+    wishlistExist.save();
+    res.send("Remove from Wishlist");
+  } catch (err) {
+    console.log(err);
   }
-);
+});
 
 // Bags Routes
 router.get(`/fetchBag`, Authenication, async (req, res) => {
@@ -454,18 +554,71 @@ router.get(`/fetchBag`, Authenication, async (req, res) => {
   }
 });
 
-router.post(`/addtoBag`, Authenication, async (req, res) => {
+// router.post(`/addtoBag`, Authenication, async (req, res) => {
+//   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
+//   try {
+//     const bagExist = await BagsModel.findOne({ user_id: req.userID });
+//     if (bagExist) {
+//       bagExist.Bag = await bagExist.Bag.concat({
+//         productID,
+//         SmallCount,
+//         MediumCount,
+//         LargeCount,
+//       });
+//       await bagExist.save();
+//     } else {
+//       const Bag = await BagsModel({
+//         user_id: req.userID,
+//         Bag: [
+//           {
+//             productID,
+//             SmallCount,
+//             MediumCount,
+//             LargeCount,
+//           },
+//         ],
+//       });
+//       await Bag.save();
+//     }
+//     res.send("Add to bag");
+//   } catch (err) {
+//     res.send("Please Login");
+//     console.log(err);
+//   }
+// });
+
+router.post(`/updateBag`, Authenication, async (req, res) => {
   const { productID, SmallCount, MediumCount, LargeCount } = req.body;
   try {
     const bagExist = await BagsModel.findOne({ user_id: req.userID });
     if (bagExist) {
-      bagExist.Bag = await bagExist.Bag.concat({
-        productID,
-        SmallCount,
-        MediumCount,
-        LargeCount,
-      });
-      await bagExist.save();
+      if (
+        bagExist.Bag.find((item) => item.productID !== productID) ||
+        bagExist.Bag.length === 0
+      ) {
+        bagExist.Bag = await bagExist.Bag.concat({
+          productID,
+          SmallCount,
+          MediumCount,
+          LargeCount,
+        });
+        await bagExist.save();
+      } else {
+        let bagData = bagExist.Bag.map((item) => {
+          if (item.productID === productID) {
+            return {
+              productID,
+              SmallCount,
+              MediumCount,
+              LargeCount,
+            };
+          } else {
+            return item;
+          }
+        });
+        bagExist.Bag = bagData;
+        await bagExist.save();
+      }
     } else {
       const Bag = await BagsModel({
         user_id: req.userID,
@@ -480,39 +633,7 @@ router.post(`/addtoBag`, Authenication, async (req, res) => {
       });
       await Bag.save();
     }
-    res.send("Add to bag");
-  } catch (err) {
-    res.send("Please Login");
-    console.log(err);
-  }
-});
-
-router.post(`/updateBag`, Authenication, async (req, res) => {
-  const { productID, SmallCount, MediumCount, LargeCount } = req.body;
-  try {
-    const bagExist = await BagsModel.findOne({ user_id: req.userID });
-    if (bagExist) {
-      let objIndex = await bagExist.Bag.findIndex(
-        (obj) => obj.productID === productID
-      );
-      console.log(productID, SmallCount, MediumCount, LargeCount);
-      bagExist.Bag[objIndex] = await {
-        productID,
-        SmallCount,
-        MediumCount,
-        LargeCount,
-        _id: bagExist.Bag[objIndex]._id,
-      };
-      // console.log(bagExist)
-      // bagExist.Bag = await bagExist.Bag.concat({
-      //   productID,
-      //   SmallCount,
-      //   MediumCount,
-      //   LargeCount,
-      // })
-      await bagExist.save();
-    }
-    res.send("Add to bag");
+    res.send("Added to bag");
   } catch (err) {
     res.send("Please Login");
     console.log(err);
@@ -534,8 +655,51 @@ router.post(`/removeFromBag`, Authenication, async (req, res) => {
 router.get(`/fetchOrders`, Authenication, async (req, res) => {
   try {
     const fetchOrders = await OrdersModel.find({ user_id: req.userID });
-    // console.log(fetchOrders);
-    res.send({ data: fetchOrders, result: true });
+    const products = await ProductsModel.find(
+      {},
+      "Product_Photo Reviews Description Product_Name Price type"
+    );
+
+    let data = await fetchOrders.map((curr, id) => {
+      let Orders2 = [];
+      curr.Orders.filter((order) => {
+        products.find((product) => {
+          if (product._id === order.productID) {
+            const temp = {
+              _id: order._id,
+              SmallCount: order.SmallCount,
+              MediumCount: order.MediumCount,
+              LargeCount: order.LargeCount,
+              productID: order.productID,
+              Product_Photo: product.Product_Photo,
+              Product_Name: product.Product_Name,
+              Price: product.Price,
+              type: product.type,
+              Description: product.Description,
+              Reviews: product.Reviews,
+            };
+            Orders2.push(temp);
+            return order;
+          }
+          return false;
+        });
+      });
+      return {
+        _id: curr._id,
+        user_id: curr.user_id,
+        Coupon_Used: curr.Coupon_Used,
+        TotalAmountPayed: curr.TotalAmountPayed,
+        GST: curr.GST,
+        Delivery_Charge: curr.Delivery_Charge,
+        Discount: curr.Discount,
+        status: curr.status,
+        orderedAt: curr.orderedAt,
+        Orders: Orders2,
+      };
+    });
+
+    // console.log(data);
+    res.send({ data: data, result: true });
   } catch (error) {
     console.log(error);
     res.send({ data: [], result: true });
@@ -641,7 +805,7 @@ router.post(`/forgetPassword/sendOTP`, async (req, res) => {
   try {
     const userExist = await DBModel.findOne({ Email });
     if (userExist) {
-      const otp = `${Math.floor(Math.random() * 900000) + 100000}`;
+      const otp = `${Math.floor(Math.random() * 90000) + 10000}`;
 
       // const transporter = await nodemailer.createTransport({
       //   service: "gmail",
@@ -713,6 +877,7 @@ router.post(`/forgetPassword/sendOTP`, async (req, res) => {
 
 router.post(`/forgetPassword/otpVerify`, async (req, res) => {
   const { Email, OTP } = req.body;
+  // console.log(OTP);
   try {
     const userExist = await DBModel.findOne({ Email });
     const userOTPFind = await OTPVerfication.find({ userID: userExist._id });
@@ -727,7 +892,7 @@ router.post(`/forgetPassword/otpVerify`, async (req, res) => {
     } else {
       // const password_Match = await bcrypt.compare(Password, userExist.Password);
       let validOTP = await bcrypt.compare(OTP, hashedOTP);
-      console.log(validOTP, hashedOTP, OTP);
+      // console.log(validOTP, hashedOTP, OTP);
       if (validOTP) {
         // await OTPVerfication.deleteMany({ userID: userExist._id });
         res.send({ status: true, message: "Valid OTP. Enter New Password" });
@@ -850,45 +1015,63 @@ router.get(`/fetchUsersProductsCount`, async (req, res) => {
   let totalUsers = users.length;
   let todayDay = new Date().toISOString();
   todayDay = todayDay.split("T")[0];
-  let OldTotalUsers = totalUsers - users.filter((e) => {
-    let time = e.RegisterDate.toISOString().split("T")[0];
-    if (time === todayDay) {
-      return true;
-    }
-    return false;
-  }).length;
-  let percentage_users = ((totalUsers - OldTotalUsers)/OldTotalUsers * 100).toFixed(1); 
-  
-  
+  let OldTotalUsers =
+    totalUsers -
+    users.filter((e) => {
+      let time = e.RegisterDate.toISOString().split("T")[0];
+      if (time === todayDay) {
+        return true;
+      }
+      return false;
+    }).length;
+  let percentage_users = (
+    ((totalUsers - OldTotalUsers) / OldTotalUsers) *
+    100
+  ).toFixed(1);
+
   const products = await ProductsModel.find();
   let Totalproducts = products.length;
-  let TotalAvailableproducts = Totalproducts - products.filter((e) => {
-    if (e.Available === false) {
-      return true;
-    }
-    return false;
-  }).length;
-  let percentage_products = 100 - ((Totalproducts - TotalAvailableproducts)/TotalAvailableproducts * 100).toFixed(1); 
-  
-  
+  let TotalAvailableproducts =
+    Totalproducts -
+    products.filter((e) => {
+      if (e.Available === false) {
+        return true;
+      }
+      return false;
+    }).length;
+  let percentage_products =
+    100 -
+    (
+      ((Totalproducts - TotalAvailableproducts) / TotalAvailableproducts) *
+      100
+    ).toFixed(1);
+
   const TotalOrder = await OrdersModel.find();
   let TotalTransaction = TotalOrder.length;
   let totalRevenue = 0;
   let totalTodayRevenue = 0;
-  
-  let totalTodayTransaction = TotalTransaction - TotalOrder.filter((e) => {
-    let time = e.orderedAt.toISOString().split("T")[0];
-    totalRevenue += e.TotalAmountPayed;
-    if (time === todayDay) {
-      totalTodayRevenue += e.TotalAmountPayed;
-      return true;
-    }
-    return false;
-  }).length;
+
+  let totalTodayTransaction =
+    TotalTransaction -
+    TotalOrder.filter((e) => {
+      let time = e.orderedAt.toISOString().split("T")[0];
+      totalRevenue += e.TotalAmountPayed;
+      if (time === todayDay) {
+        totalTodayRevenue += e.TotalAmountPayed;
+        return true;
+      }
+      return false;
+    }).length;
   let OldRevenue = totalRevenue - totalTodayRevenue || totalRevenue;
 
-  let percentage_transaction = ((TotalTransaction - totalTodayTransaction)/totalTodayTransaction * 100).toFixed(1); 
-  let percentage_revenue = (( totalRevenue - OldRevenue)/OldRevenue * 100).toFixed(1) ; 
+  let percentage_transaction = (
+    ((TotalTransaction - totalTodayTransaction) / totalTodayTransaction) *
+    100
+  ).toFixed(1);
+  let percentage_revenue = (
+    ((totalRevenue - OldRevenue) / OldRevenue) *
+    100
+  ).toFixed(1);
 
   res.send({
     totalUsers,
@@ -903,13 +1086,13 @@ router.get(`/fetchUsersProductsCount`, async (req, res) => {
 });
 
 router.get(`/fetchRevenueTransaction`, async (req, res) => {
-  try{
+  try {
     const fetchOrders = await OrdersModel.find();
-    res.send({orders:fetchOrders})
-  }catch(err){
-    console.log(err)
+    res.send({ orders: fetchOrders });
+  } catch (err) {
+    console.log(err);
   }
-})
+});
 
 router.post(`/deleteUser`, async (req, res) => {
   const { _id } = req.body;
@@ -955,7 +1138,7 @@ router.post(`/newCouponAdd`, Authenication, async (req, res) => {
   var currDate = new Date();
   var result = currDate.setDate(currDate.getDate() + 10);
   let ExpiredAt = new Date(result);
-  console.log(ExpiredAt);
+  // console.log(ExpiredAt);
   try {
     if (req.rootUser.Role === "Admin") {
       const findExist = await CouponModel.findOne({ Code });

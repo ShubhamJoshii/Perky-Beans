@@ -4,14 +4,13 @@ import {useContext, useEffect, useState} from "react";
 import {Oval} from "react-loader-spinner";
 import axios from "axios";
 import { UserData } from "../../routes/App";
-const WishlistCards = ({product, orderData, userData, setUserData}) => {
+const WishlistCards = ({product, userData, setUserData}) => {
   const [loadingShow, setloadingShow] = useState(false);
   const {checkUserAlreadyLogin} = useContext(Notification);
   const {fetchWishList,wishlistData,fetchBag} = useContext(UserData);
   
   const removeFromWishlist = async (_id) => {
     let b = wishlistData.find((e) => e.productID === _id);
-    console.log("Clicked",b)
     if (b) {
       await axios.post("/api/removefromWishlist", {productID: _id}).then((result) => {
         fetchWishList();
@@ -48,9 +47,9 @@ const WishlistCards = ({product, orderData, userData, setUserData}) => {
         <p>{product?.Description.slice(0, 180)}...</p>
       </div>
       <h1>₹{product?.Price}</h1>
-      <IoMdClose id="IconClose" onClick={() => removeFromWishlist(orderData.productID)} />
-      <button onClick={() => addToBag(orderData.productID)}>
-        {loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>{userData?.Bag.find((e) => e.productID === orderData.productID) ? <> Added </> : <>Add to Bag </>}</>}
+      <IoMdClose id="IconClose" onClick={() => removeFromWishlist(product.productID)} />
+      <button onClick={() => addToBag(product.productID)}>
+        {loadingShow ? <Oval height="14" width="14" color="white" wrapperStyle={{}} wrapperClass="" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={6} strokeWidthSecondary={6} /> : <>{userData?.Bag.find((e) => e.productID === product.productID) ? <> Added </> : <>Add to Bag </>}</>}
       </button>
     </div>
   );
