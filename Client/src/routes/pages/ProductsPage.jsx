@@ -1,4 +1,4 @@
-import Bags from "../../components/Common/Bags";
+import Bags from "../../components/Bag/Bags";
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import ProductsCatalogue from "../../components/Products/ProductsCatalogue";

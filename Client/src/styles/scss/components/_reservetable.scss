@@ -1,0 +1,277 @@
+@use "../abstracts/" as *;
+
+.ReserveTable {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  @include flexMixin();
+  transform: translate(-50%, -50%);
+  color: white;
+  height: calc(80vh - 50px);
+  background-color: rgba(255, 255, 255, 0.185);
+  border-radius: 30px;
+  // width: 100%;
+  // height: 100%;
+  // top: 0;
+  padding: 20px 50px;
+  // flex-wrap: wrap-reverse;
+  // gap: 40px;
+
+  #tableAvailable,
+  #tableNotAvailable {
+    @include flexMixin(center, flex-end);
+    gap: 5px;
+    font-size: 12px;
+    margin-top: 4px;
+    letter-spacing: 1.5px;
+  }
+  #tableAvailable {
+    color: #ecb014;
+  }
+  #tableNotAvailable {
+    color: red;
+  }
+  form {
+    @include flexMixin();
+    flex-direction: column;
+    flex: 1;
+    gap: 15px;
+    padding: 10px 40px;
+
+    #input-Cover-Wrong {
+      border: 2px solid red;
+    }
+
+    .input-Cover {
+      @include flexMixin();
+      padding: 5px 20px;
+      border-radius: 5px;
+      gap: 10px;
+      background-color: #ffffff;
+      border: 2px solid;
+
+      svg {
+        color: #5d0e07;
+      }
+
+      input {
+        // font-size: 14px;
+        border: none;
+        outline: none;
+        width: 350px;
+        font-size: 18px;
+      }
+
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      /* Firefox */
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+    }
+
+    button,
+    .loading {
+      @include flexMixin();
+      background-color: #ecb014;
+      cursor: pointer;
+      // margin-top: 50px;
+      color: white;
+      padding: 5px 25px;
+      min-width: 100px;
+      font-size: 20px;
+      font-weight: bolder;
+    }
+    .loading {
+      padding: 2px 5px !important;
+    }
+  }
+
+  h1 {
+    color: white;
+  }
+
+  #SecondHALF {
+    @include flexMixin();
+    flex: 1;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 40px;
+
+    h2 {
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.467);
+      padding: 10px 20px;
+    }
+
+    #img {
+      width: 500px;
+    }
+
+    #selectTable{
+      display: flex;
+      gap: 10px;
+      select{
+        width: 150px;
+      }
+    }
+
+    #tableSelection {
+      width: 500px;
+      aspect-ratio: 1;
+      background-color: white;
+      border-radius: 10px;
+      border-top: 15px solid brown;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      #row {
+        display: flex;
+        gap: 20px;
+        div {
+          display: flex;
+          transform: rotate(90deg);
+          gap: 10px;
+        }
+      }
+      .table {
+        object-fit: contain;
+        cursor: pointer;
+        border-radius: 2px;
+        &:hover{
+          background-color: rgba(0, 0, 0, 0.096);
+        }
+      }
+      #selected{
+        // background-color: rgba(0, 0, 0, 0.096) !important;
+        background-color: rgba(144, 238, 144, 0.637) !important;
+        transform: scale(1.05);
+      }
+      .already-Booked{
+        opacity: 0.5;
+        transform: scale(.9);
+        background-color: #ff1616c2 !important;
+      }
+      .table2 {
+        width: 30px;
+        // aspect-ratio: 1;
+      }
+      .table4 {
+        width: 95px;
+      }
+      .table6 {
+        width: 100px;
+      }
+      .table8 {
+        width: 100px;
+      }
+      .table10 {
+        width: 130px;
+      }
+    }
+  }
+}
+
+@media (max-width: 1224px) {
+  .ReserveTable {
+    gap: 0px;
+    flex-wrap: wrap-reverse;
+    height: 85%;
+    transform: translate(-50%);
+    top: 100px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    form button {
+      margin-top: 10px;
+    }
+
+    #SecondHALF h2 {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 910px) {
+  .ReserveTable {
+    form div input {
+      padding: 2px 0;
+      font-size: 14px;
+    }
+    #SecondHALF {
+      #img {
+        width: 20vh;
+      }
+    }
+  }
+}
+
+@media (max-width: 710px) {
+  .ReserveTable {
+    width: 95vw;
+    // height: 80vh;
+    form div input {
+      padding: 2px 0;
+      font-size: 14px;
+    }
+    #SecondHALF {
+      #img {
+        width: 20vh;
+      }
+      
+    }
+  }
+}
+@media (max-width: 600px) {
+  .ReserveTable {
+    form {
+      div {
+        width: 90vw;
+        .input-Cover{
+          width: 100%;
+        }
+        input{
+          flex: 1;
+          font-size: 14px !important;
+        }
+      }
+      
+      button {
+        margin-top: 10px;
+      }
+    }
+    
+    #SecondHALF {
+      h2 {
+        font-size: 15px;
+      }
+      #tableSelection{
+        overflow: scroll;
+        justify-content: center;
+        align-items: center;
+        width: 90vw;
+        .table2{
+          width: 20px;
+        }
+        .table4{
+          width: 70px;
+        }
+        .table6{
+          width: 70px;
+        }
+        .table8{
+          width: 80px;
+        }
+        .table10{
+          width: 90px;
+        }
+      }
+    }
+  }
+}

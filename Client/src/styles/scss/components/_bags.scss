@@ -42,8 +42,9 @@
 
 #BagSlider {
   @include flexMixin($direction: column);
-  min-width: 450px;
-  max-width: 100vh;
+  // min-width: 450px;
+  // max-width: 100vh;
+  width: 450px;
   height: 100vh;
   position: fixed;
   top: 0;
@@ -79,83 +80,88 @@
     border-bottom: 2px solid black;
   }
 
-  #productCart {
-    background-color: white;
-    margin: 10px 20px;
-    padding: 10px;
-    position: relative;
-
-    #productCartFront {
-      @include flexMixin();
-      gap: 22px;
-
-      img {
-        width: 60px;
-        height: 70px;
-        border-radius: 10px;
-      }
-
-      #productDetail {
-        @include flexMixin($JScontent: space-evenly);
-        flex: 1;
-
-        #productName {
-          flex: 1;
-        }
-
-        #Icons {
-          @include flexMixin($JScontent: space-between, $direction: column);
-          svg {
-            z-index: 999999;
-            border-radius: 50%;
-
-            &:hover {
-              background-color: rgba(0, 0, 0, 0.382);
-              color: white;
-            }
-          }
-
-          svg:first-child {
-            font-size: 22px;
-            position: absolute;
-            cursor: pointer;
-            right: 14px;
-            top: 10px;
-          }
-
-          svg:last-child {
-            cursor: pointer;
-            font-size: 25px;
-            position: absolute;
-            right: 12px;
-            bottom: 5px;
-          }
-        }
-      }
-    }
-
-    #Amount_Info_Show {
-      overflow: hidden;
-    }
-
-    #Amount_INFO {
-      @include flexMixin($ALItems: flex-start, $JScontent: space-between);
-      margin: 10px 20px;
-    }
-
-    #TotalAmt {
-      @include flexMixin($JScontent: space-between);
-      border-top: 1px solid black;
-      padding: 10px 20px;
-      font-weight: bold;
-    }
-  }
-
   #bagScroll {
     overflow: scroll;
     width: 100%;
     flex: 1;
+    display: flex;
+    flex-direction: column;
     // margin-bottom: 55px;
+
+    #orderProductDetails {
+      flex: 1;
+      #productCart {
+        background-color: white;
+        margin: 10px 20px;
+        padding: 10px;
+        position: relative;
+
+        #productCartFront {
+          @include flexMixin();
+          gap: 22px;
+
+          img {
+            width: 60px;
+            height: 70px;
+            border-radius: 10px;
+          }
+
+          #productDetail {
+            @include flexMixin($JScontent: space-evenly);
+            flex: 1;
+
+            #productName {
+              flex: 1;
+            }
+
+            #Icons {
+              @include flexMixin($JScontent: space-between, $direction: column);
+              svg {
+                z-index: 999999;
+                border-radius: 50%;
+
+                &:hover {
+                  background-color: rgba(0, 0, 0, 0.382);
+                  color: white;
+                }
+              }
+
+              svg:first-child {
+                font-size: 22px;
+                position: absolute;
+                cursor: pointer;
+                right: 14px;
+                top: 10px;
+              }
+
+              svg:last-child {
+                cursor: pointer;
+                font-size: 25px;
+                position: absolute;
+                right: 12px;
+                bottom: 5px;
+              }
+            }
+          }
+        }
+
+        #Amount_Info_Show {
+          overflow: hidden;
+        }
+
+        #Amount_INFO {
+          @include flexMixin($ALItems: flex-start, $JScontent: space-between);
+          margin: 10px 20px;
+        }
+
+        #TotalAmt {
+          @include flexMixin($JScontent: space-between);
+          border-top: 1px solid black;
+          padding: 10px 20px;
+          font-weight: bold;
+        }
+      }
+    }
     #Add-Coupon {
       display: flex;
       justify-content: end;
@@ -166,10 +172,10 @@
         font-size: 10px;
         background-color: #33200a;
       }
-      .Hide{
+      .Hide {
         bottom: -100px !important;
       }
-      .Show{
+      .Show {
         bottom: 60px !important;
       }
 
@@ -181,33 +187,283 @@
         width: 100%;
         right: 0;
         padding: 4px 10px;
-        .used_Coupon{
-          background-color: grey !important;
+        .used_Coupon {
+          background-color: rgba(128, 128, 128, 0.212) !important;
         }
         #coupons {
           margin-bottom: 4px;
-            td {
-              padding: 5px 4px;
-              button {
-                font-size: 12px;
-                letter-spacing: 1px;
-                &:hover:not([disabled]){
-                  background-color: #ecb014;
-                  transform: translate(1.05);
-                }
-              }
-              #active{
+          td {
+            border-radius: 5px;
+            padding: 5px 4px;
+            button {
+              font-size: 12px;
+              letter-spacing: 1px;
+              &:hover:not([disabled]) {
                 background-color: #ecb014;
-              }
-              p {
-                font-size: 10px;
+                transform: translate(1.05);
               }
             }
+            #active {
+              background-color: #ecb014;
+            }
+            p {
+              font-size: 10px;
+            }
           }
-        
+        }
+      }
+    }
+    #bag-order-detail {
+      // position: absolute;
+      background-color: white;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      gap: 20px;
+      width: 90%;
+      margin: 50px 5%;
+      border-radius: 10px;
+      transition: 1s;
+      h4 {
+        font-size: 18px;
+      }
+      table {
+        tr {
+          td {
+            padding-right: 15px;
+            &:last-child {
+              text-align: end;
+            }
+            font-size: 13px;
+          }
+          &:last-child {
+            font-weight: bolder;
+            td {
+              font-size: 16px;
+            }
+          }
+        }
       }
     }
   }
+
+  #Select_Address {
+    margin: 14px;
+    #Add-New-Address-Btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: green;
+      background-color: white;
+      padding: 10px;
+      border-radius: 4px;
+      font-weight: 900;
+      cursor: pointer;
+      p {
+        flex: 1;
+        font-size: 16px;
+      }
+      svg {
+        font-size: 22px;
+        &:last-child {
+          color: black;
+        }
+      }
+    }
+    h5 {
+      color: grey;
+      margin-top: 20px;
+    }
+    #saved-Address {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: white;
+      cursor: pointer;
+      img {
+        width: 50px;
+        aspect-ratio: 1;
+        background-color: rgba(0, 0, 0, 0.089);
+        border-radius: 4px;
+        padding: 5px;
+      }
+
+      div {
+        flex: 1;
+        h4 {
+          font-size: 16px;
+        }
+        p {
+          font-size: 11px;
+        }
+      }
+      &:hover {
+        background-color: rgba(128, 128, 128, 0.178);
+        transform: scale(1.01);
+      }
+    }
+    .selected-Address {
+      background-color: #ecb014 !important;
+      color: white;
+      transform: scale(1.02);
+      &:hover {
+        background-color: #ecaf14a2 !important;
+        transform: scale(1.01);
+      }
+    }
+  }
+
+  #Add-New-Address {
+    margin: 14px;
+    background-color: white;
+    // height: 100%;
+    padding: 10px 10px 50px 10px;
+    border-radius: 10px;
+    p {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      margin: 8px 0;
+      color: grey;
+    }
+    #SaveAddressAs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      .save-Address-As {
+        background: none;
+        font-size: 14px;
+        border: 1px solid rgba(128, 128, 128, 0.418);
+        padding: 4px 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        img {
+          width: 20px;
+        }
+        span {
+          letter-spacing: 1px;
+          font-weight: 600;
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.753);
+        }
+        &:hover {
+          border: 1px solid #3cc54a;
+          box-shadow: 0 0 20px #32e04394 inset;
+        }
+        &#active {
+          border: 1px solid #3cc54a;
+          box-shadow: 0 0 20px #32e04394 inset;
+        }
+      }
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      label {
+        font-size: 12px;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        margin-bottom: 2px;
+      }
+      input {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(128, 128, 128, 0.774);
+      }
+      input[type="submit"] {
+        background-color: #328616;
+        color: white;
+        border: none;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        padding: 8px;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  #PaymentOption {
+    margin: 14px;
+    padding: 10px;
+    #Payment-Options {
+      margin-top: 10px;
+      width: 100%;
+      background-color: white;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      padding: 10px 20px;
+      align-items: center;
+      gap: 30px;
+      text-align: start;
+      input[type="radio"] {
+        transform: scale(1.2);
+      }
+    }
+    label {
+      div {
+        flex: 1;
+        p {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        span {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+
+  #order-status {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    text-align: center;
+    #outer-tick-animation {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      padding: 20px;
+      animation: pulse 2s infinite alternate;
+      #tickGIF {
+        font-size: 140px;
+        color: white;
+        background-color: #4dd965;
+        padding: 20px;
+        border-radius: 50%;
+      }
+    }
+    #track-order{
+      margin-top: 20px;
+      background-color: #ecb014;
+      border-radius: 10px;
+      padding: 10px 30px;
+    }
+    #continue-ordering{
+      margin-top: 15px;
+      color: #ecb014;
+      border-radius: 10px;
+      border: 2px solid #ecb014;
+      font-size: 20px;
+      padding: 10px 30px;
+      
+    }
+  }
+
   .userNotLogin {
     margin-top: 25px !important;
     flex-direction: column !important;
@@ -241,36 +497,14 @@
     }
   }
 
-  .bag-order-detail-show {
-    bottom: 60px !important;
-  }
+  // .bag-order-detail-show {
+  //   bottom: 60px !important;
+  // }
 
-  .bag-order-detail-hide {
-    bottom: -100px !important;
-  }
+  // .bag-order-detail-hide {
+  //   bottom: -100px !important;
+  // }
 
-  #bag-order-detail {
-    position: absolute;
-    background-color: white;
-    padding: 10px;
-    bottom: -100px;
-    display: flex;
-    justify-content: end;
-    gap: 20px;
-    width: 100%;
-    transition: 1s;
-    h4 {
-      font-size: 14px;
-    }
-    table {
-      tr {
-        td {
-          padding-right: 15px;
-          font-size: 13px;
-        }
-      }
-    }
-  }
   #Bag-Total-Price {
     // position: fixed;
     @include flexMixin($JScontent: space-evenly);
@@ -296,18 +530,24 @@
     }
 
     button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       background-color: #ecb014;
-      padding: 10px 30px;
+      padding: 5px 20px;
       color: white;
       font-weight: bolder;
       font-size: 18px;
+      svg {
+        font-size: 30px;
+      }
     }
   }
 }
 
 @media (max-width: 500px) {
   #BagSlider {
-    min-width: 100vw;
+    width: 100vw;
     .userNotLogin p {
       max-width: 95vw;
       font-size: 10px !important;
@@ -325,5 +565,16 @@
   #bagBTN {
     right: 15px;
     bottom: 15px;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+    background-color: #90ee9085;
+    box-shadow: 0 0 100px #90ee9059;
   }
 }

@@ -99,7 +99,7 @@ const FrontJSON = [
 const Reviews = [
   {
     CustomerName: "SHUBHAM JOSHI",
-    Review: "I have booked seats in the PERKY BEANS to celebrate my birthday with my family. Everything is per the plan./n I enjoy my special day with nice and cool ambience.",
+    Review: "I have booked table in the PERKY BEANS to celebrate my birthday with my family. Everything is per the plan./n I enjoy my special day with nice and cool ambience.",
     CustomerImage: "https://res.cloudinary.com/dq309na14/image/upload/v1701348468/Frontpage/yzestoqo4cksn60o6y6n.png",
     Rating: 4.0,
     Date: "02/05/2022",

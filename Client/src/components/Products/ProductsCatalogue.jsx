@@ -21,19 +21,17 @@ const ProductsCatalogue = () => {
   const location = useLocation();
 
   const fetchProducts = async () => {
-    // setLoading("Show");
     setProducts(arr);
     let filterData = location.state;
     if (location.state !== null && (filterData.Category || filterData.Ingredients || filterData.PriceRange || filterData.RatingUP)) {
-      let Category = filterData.Category.toLocaleString();
-      let Ingredients = filterData.Ingredients.toLocaleString();
-      let PriceRange = filterData.PriceRange;
-      let RatingUP = filterData.RatingUP;
-      console.log(Category,Ingredients);
+      let Category = filterData?.Category?.toLocaleString();
+      let Ingredients = filterData?.Ingredients?.toLocaleString();
+      let PriceRange = filterData?.PriceRange;
+      let RatingUP = filterData?.RatingUP;
       await axios
         .get(`/api/fetchProduct?page=${currPage}&limit=${pageLimit}&Category=${Category}&Ingredients=${Ingredients}&PriceRange=${PriceRange}&RatingUP=${RatingUP}&Available=true`)
         .then((response) => {
-          // setProducts(response.data.data);
+          setProducts(response.data.data);
           setPages(response.data.TotalproductsPages);
           if(response.data.TotalproductsPages < pageLimit*currPage){
             setCurrPage(1)

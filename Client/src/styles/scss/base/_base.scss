@@ -11,3 +11,7 @@ body {
   background-color: #1e1e1e;
   color: var(--text-primary);
 }
+
+.Toastify__toast-container--bottom-right{
+  z-index: 9999999;
+}

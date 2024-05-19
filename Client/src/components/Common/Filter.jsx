@@ -63,15 +63,47 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
     PriceRange: 599,
     RatingUP: 1,
   });
-  const [priceSort,setPriceSort] = useState(false);
+  const [priceSort, setPriceSort] = useState(false);
   const ref = useRef(null);
   const navigate = useNavigate();
   const showFilterProduct = () => {
-    let Category = showFilter.Category.map((item) => item.apiName)
-    let Ingredients = showFilter.Ingredients.map((item) => item.apiName)
-    navigate("/products", {state: {Category,Ingredients, PriceRange:showFilter.PriceRange, RatingUP:showFilter.RatingUP}});
+    let Category = showFilter.Category.map((item) => item.apiName);
+    let Ingredients = showFilter.Ingredients.map((item) => item.apiName);
+    navigate("/products", {state: {Category, Ingredients, PriceRange: showFilter.PriceRange, RatingUP: showFilter.RatingUP}});
     setShowFilterBox(false);
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    let categoryTemp = [];
+    let ingredientsTemp = [];
+    if (location?.state?.Category) {
+      let arr = location.state.Category;
+      FilterData.map((curr) => {
+        if (curr.Topic === "Category") {
+          curr.subTopic.map((categories) => {
+            if (categories.apiName.includes(arr)) {
+              categoryTemp.push(categories);
+            }
+          });
+        }
+      });
+    }
+    if (location?.state?.Ingredients) {
+      let arr = location.state.Ingredients;
+      FilterData.map((curr) => {
+        if (curr.Topic === "Ingredients") {
+          curr.subTopic.map((ingredients) => {
+            if (ingredients.apiName.includes(arr)) {
+              ingredientsTemp.push(ingredients);
+            }
+          });
+        }
+      });
+    }
+    setshowFilter({...showFilter, Ingredients: ingredientsTemp, Category: categoryTemp});
+  }, [location]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -146,12 +178,21 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                 <h4>Price Range</h4>
                 <div>
                   <p>&#x20B9;80 - &#x20B9;{showFilter.PriceRange}</p>
-                  {
-                    priceSort ? 
-                    <RiArrowDropUpLine className="show-More" onClick={()=>{setPriceSort(!priceSort)}}/>:
-                    <RiArrowDropDownLine  className="show-More" onClick={()=>{setPriceSort(!priceSort)}}/>
-
-                  }
+                  {priceSort ? (
+                    <RiArrowDropUpLine
+                      className="show-More"
+                      onClick={() => {
+                        setPriceSort(!priceSort);
+                      }}
+                    />
+                  ) : (
+                    <RiArrowDropDownLine
+                      className="show-More"
+                      onClick={() => {
+                        setPriceSort(!priceSort);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
               <input
@@ -165,8 +206,7 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                   setshowFilter({...showFilter, PriceRange: e.target.value});
                 }}
               />
-              {
-                priceSort && 
+              {priceSort && (
                 <div id="furtherPrice">
                   <div>
                     <label htmlFor="PriceLow">Low to High</label>
@@ -177,7 +217,7 @@ const Filter = ({showFilterBox, setShowFilterBox}) => {
                     <input type="radio" name="Price" id="PriceHigh" />
                   </div>
                 </div>
-              }
+              )}
             </div>
 
             <div className="category">

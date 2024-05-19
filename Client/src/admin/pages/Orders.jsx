@@ -1,80 +1,65 @@
-import { Column } from "react-table";
+import {Column} from "react-table";
 import AdminSidebar from "../components/AdminSidebar";
-import { ReactElement, useState, useCallback } from "react";
+import {ReactElement, useState, useCallback} from "react";
 // import TableHOC from "../components/TableHOC";
-import { Link } from "react-router-dom";
-import { Oval } from "react-loader-spinner";
+import {Link} from "react-router-dom";
+import {Oval} from "react-loader-spinner";
 import axios from "axios";
-import { useEffect } from "react";
-import { Notification } from "../../routes/App"
-import { useContext } from "react";
+import {useEffect} from "react";
+import {Notification} from "../../routes/App";
+import {useContext} from "react";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Orders = () => {
-  const [OrdersData, setOrdersData] = useState([]);
-  const [productsData, setProductsData] = useState();
-  const [UsersData, setUsersData] = useState();
+  let arr = Array.from({length: 20}, (curr, id) => {
+    id: id + 1;
+  });
+
+  const [OrdersData, setOrdersData] = useState(arr);
   const [loading, setLoading] = useState(false);
-  const { notification } = useContext(Notification);
+  const {notification} = useContext(Notification);
 
   const fetchAllOrders = async () => {
-    await axios.get("/api/fetchAllOrders").then((response) => {
-      // console.log(response.data.data)
-      setOrdersData(response.data.data)
-      fetchProducts();
-      fetchUsers();
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
-
-  const fetchProducts = async () => {
-    await axios.get("/api/fetchProduct?Available=false").then((result) => {
-      // console.log(result.data.data);
-      setProductsData(result.data.data);
-    }).catch((err) => {
-      console.log("Error")
-    }).finally(() => {
-      setLoading(false);
-    })
-  }
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    await axios.get("/api/fetchUsers").then((result) => {
-      // console.log(result.data.data);
-      if (result.data?.data) {
-        setUsersData(result.data.data);
-      }
-    }).catch((err) => {
-      console.log("Error")
-    }).finally(() => {
-      setLoading(false);
-    })
-  }
+    await axios
+      .get("/api/fetchAllOrders")
+      .then((response) => {
+        setOrdersData(response.data.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
     fetchAllOrders();
-  }, [])
+  }, []);
 
   const changeStatus = async (status, _id) => {
-    await axios.post("/api/changeStatus", { _id, status }).then((response) => {
-      // console.log(response.data)
-      if (response.data.result) {
-        notification(response.data.message, "Success");
-        fetchAllOrders();
-      } else {
-        notification(response.data.message, "Un-Success");
-      }
-    }).catch((err) => {
-      console.log(err)
-    })
-  }
+    await axios
+      .post("/api/changeStatus", {_id, status})
+      .then((response) => {
+        // console.log(response.data)
+        if (response.data.result) {
+          notification(response.data.message, "Success");
+          fetchAllOrders();
+        } else {
+          notification(response.data.message, "Un-Success");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="admin-container">
       <AdminSidebar />
       {/* <main>{Table()}</main> */}
-      <div className='dashboard-product-box'>
+      <div className="dashboard-product-box">
         <h2 className="heading">Orders</h2>
         <table className="table" role="table">
           <thead>
@@ -94,49 +79,74 @@ const Orders = () => {
             </td>
           ) : (
             <tbody>
-              {
-                OrdersData && UsersData && productsData ?
-                  <>
-                    {
-                      OrdersData?.slice().reverse().map((curr) => {
-                        const userName = UsersData?.find(e => e._id === curr.user_id)
-                        const arr = ["ORDER PLACED", "ORDER PREPARED", "READY FOR PICKUP", "ORDER RECEIVED", "Order Cancelled"];
-                        const a = arr?.findIndex(e => e === curr.status);
-                        // console.log(a)
-                        return (
-                          <tr id="orders-table">
-                            <th>{userName.Full_Name}</th>
-                            <th>{new Date(curr.orderedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</th>
-                            <th>
+              {OrdersData ? (
+                <>
+                  {OrdersData?.slice()
+                    .reverse()
+                    .map((curr,ids) => {
+                      const arr = ["ORDER PLACED", "ORDER PREPARED", "READY FOR PICKUP", "ORDER RECEIVED", "Order Cancelled"];
+                      const a = arr?.findIndex((e) => e === curr?.status);
+                      return (
+                        <tr id="orders-table" key={ids}>
+                          <th>{curr?.Full_Name || <Skeleton />}</th>
+                          <th>{curr?.orderedAt ?  <>{new Date(curr?.orderedAt).toLocaleString("en-IN", {timeZone: "Asia/Kolkata"})}</> : <Skeleton />}</th>
+                          <th>
+                            {curr?.Orders ? (
                               <ul>
-                                {curr.Orders.map((product) => {
-                                  const currProduct = productsData.find(e => e._id === product.productID);
-                                  // console.log(product)
+                                {curr?.Orders.map((product,id) => {
                                   return (
-                                    <li>{currProduct.Product_Name} - {product.SmallCount > 0 && `${product.SmallCount}S`}{product.MediumCount > 0 && `${product.MediumCount}M`} {product.LargeCount > 0 && `${product.LargeCount}L`}</li>
-                                  )
+                                    <li key={id}>
+                                      {product.Product_Name} - {product.SmallCount > 0 && `${product.SmallCount}S`}
+                                      {product.MediumCount > 0 && `${product.MediumCount}M`} {product.LargeCount > 0 && `${product.LargeCount}L`}
+                                    </li>
+                                  );
                                 })}
                               </ul>
+                            ) : (
+                              <ul>
+                                <Skeleton count={2}/>
+                              </ul>
+                            )}
+                          </th>
+                          <th>{curr?.TotalAmountPayed ? <>&#x20B9; {curr?.TotalAmountPayed} </> : <Skeleton />}</th>
+                          <th> {curr?.status || <Skeleton />}</th>
+                          {curr?.status ? (
+                            <>
+                              {a === 0 && (
+                                <th>
+                                  <button id="order-status-prepared" onClick={() => changeStatus(arr[1], curr?._id)}>{arr[1]}</button></th>)}
+                                  {a === 1 && (<th><button id="order-status-pickup" onClick={() => changeStatus(arr[2], curr?._id)}>{arr[2]}</button></th>)}
+                                  {a === 2 && (
+                                <th>
+                                  <button id="order-status-received" onClick={() => changeStatus(arr[3], curr?._id)}>
+                                    {arr[3]}
+                                  </button>
+                                </th>
+                              )}
+                              {(a === -1 || a === 3) && (
+                                <th>
+                                  <button id="order-complete">ORDER COMPLETE </button>
+                                </th>
+                              )}
+                              {a === 4 && <th>Order Cancelled</th>}
+                            </>
+                          ) : (
+                            <th>
+                              <Skeleton />
                             </th>
-                            <th>&#x20B9; {curr.TotalAmountPayed}</th>
-                            {/* <th> &#8377; {curr.Discount}</th> */}
-                            <th> {curr.status}</th>
-                            {a === 0 && <th><button id="order-status-prepared" onClick={() => changeStatus(arr[1], curr._id)}> {arr[1]}</button></th>}
-                            {a === 1 && <th><button id="order-status-pickup" onClick={() => changeStatus(arr[2], curr._id)}>{arr[2]}</button></th>}
-                            {a === 2 && <th><button id="order-status-received" onClick={() => changeStatus(arr[3], curr._id)}>{arr[3]}</button></th>}
-                            {(a === -1 || a === 3) && <th><button id="order-complete">ORDER COMPLETE	</button></th>}
-                            {(a === 4) && <th>Order Cancelled</th>}
-                          </tr>
-                        )
-                      })
-                    }
-                  </> : <td colSpan="10">
-                    <Oval height="40" width="60" color="black" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
-                  </td>
-              }
-
+                          )}
+                        </tr>
+                      );
+                    })}
+                </>
+              ) : (
+                <td colSpan="10">
+                  <Oval height="40" width="60" color="black" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
+                </td>
+              )}
             </tbody>
-          )}</table>
+          )}
+        </table>
       </div>
     </div>
   );

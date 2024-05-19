@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 // import {Products} from "../../Data/ProductsJSON";
-import Bags from "../../components/Common/Bags";
+import Bags from "../../components/Bag/Bags";
 import ProductPage from "../../components/Products/ProductPage";
 import CustomerReview from "../../components/Landing/CustomerReview/CustomerReview";
 import Footer from "../../components/Footer/Footer";

@@ -9,8 +9,8 @@ import "react-loading-skeleton/dist/skeleton.css";
 import {Notification, UserData} from "../../routes/App";
 import axios from "axios";
 const ProductCard = ({product, category}) => {
-  const {fetchBag, fetchWishList, addToWishlist, bagData, wishlistData} = useContext(UserData);
-  const {notification, checkUserAlreadyLogin} = useContext(Notification);
+  const {fetchBag, addToWishlist, bagData, wishlistData} = useContext(UserData);
+  const {notification} = useContext(Notification);
 
   let link;
   if (category?.categoryID) {
@@ -20,20 +20,28 @@ const ProductCard = ({product, category}) => {
   }
 
   const addToBag = async (_id, SmallCount = 0, MediumCount = 1, LargeCount = 0) => {
-    await axios
-      .post("/api/updateBag", {
-        productID: _id,
-        SmallCount,
-        MediumCount,
-        LargeCount,
-      })
-      .then((result) => {
+    let a = bagData.find((temp) => temp.productID === _id);
+    if (a) {
+      await axios.post("/api/removeFromBag", {productID:_id}).then((result) => {
         notification(result.data, "Success");
         fetchBag();
-      })
-      .catch((err) => {
-        notification(err.response.data.msg2, "Warning");
       });
+    } else {
+      await axios
+        .post("/api/updateBag", {
+          productID: _id,
+          SmallCount,
+          MediumCount,
+          LargeCount,
+        })
+        .then((result) => {
+          notification(result.data, "Success");
+          fetchBag();
+        })
+        .catch((err) => {
+          notification(err.response.data.msg2, "Warning");
+        });
+    }
   };
 
   return (
@@ -65,16 +73,11 @@ const ProductCard = ({product, category}) => {
       </div>
 
       <NavLink to={link} id="Product-Image-Link" onClick={() => window.scrollTo({top: 0, left: 0, behavior: "smooth"})}>
-      {
-        product?.Product_Photo ?
-        <img src={product?.Product_Photo} alt={product?.Product_Name} className="product-image" />
-        :
-        <Skeleton className="skeleton"/>
-      }
+        {product?.Product_Photo ? <img src={product?.Product_Photo} alt={product?.Product_Name} className="product-image" /> : <Skeleton className="skeleton" />}
         <div className="product-info">
           <h5 className="product-name">{product?.Product_Name || <Skeleton />}</h5>
 
-          <p className="product-desc">{product?.Description ? <>{product?.Description.slice(0, 60)}...</> : <Skeleton count={3}/>}</p>
+          <p className="product-desc">{product?.Description ? <>{product?.Description.slice(0, 60)}...</> : <Skeleton count={3} />}</p>
           <p className="product-price">{product?.Price ? <>&#8377;{product?.Price}</> : <Skeleton />}</p>
           <div id="rating">
             {product?.Rating ? (

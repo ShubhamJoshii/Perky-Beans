@@ -67,8 +67,8 @@ const OrderCards = ({ product, orderData, ids, userData, setUserData, fetchOrder
 
   const styles = {
     line: {
-      background: `linear-gradient(to right, red ${trackCount}%, black ${100 - trackCount}%)`,
-      background: `-webkit-linear-gradient(360deg, red ${trackCount}%, black ${100 - trackCount}%)`
+      background: `linear-gradient(to right, red ${trackCount}%, black ${trackCount}%)`,
+      background: `-webkit-linear-gradient(360deg, red ${trackCount}%, black ${trackCount}%)`
     }
   }
 

@@ -32,7 +32,7 @@
       background-color: rgba(217, 217, 217, 0.044);
     }
     #BlurFORM {
-      z-index: 999;
+      z-index: 2;
       color: white;
       h2 {
         text-align: center;
@@ -129,7 +129,7 @@
           div {
             flex-direction: column;
             width: 100%;
-            input {
+            input, select {
               width: 100%;
             }
           }

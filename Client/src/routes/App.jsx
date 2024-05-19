@@ -12,7 +12,7 @@ const Orders = lazy(() => import("../admin/pages/Orders"));
 const Users = lazy(() => import("../admin/pages/Users"));
 const NewProduct = lazy(() => import("../admin/pages/management/NewProduct"));
 const ProductManagement = lazy(() => import("../admin/pages/management/ProductManagement"));
-const ReserveSeat = lazy(() => import("../admin/pages/ReserveSeat"));
+const ReserveTable = lazy(() => import("../admin/pages/ReserveTable"));
 const TransactionManagement = lazy(() => import("../admin/pages/management/TransactionManagement"));
 const Coupon = lazy(() => import("../admin/pages/apps/Coupon"));
 
@@ -28,7 +28,7 @@ const ProductsPage = lazy(() => import("./pages/ProductsPage"));
 const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
-const ReserveSeatPage = lazy(() => import("./pages/ReserveSeatPage"));
+const ReserveTablePage = lazy(() => import("./pages/ReserveTablePage"));
 const Login = lazy(() => import("../components/Signin_Register/Login"));
 const Register = lazy(() => import("../components/Signin_Register/Register"));
 const Preloader = lazy(() => import("../components/Common/Preloader"));
@@ -42,7 +42,6 @@ const UserData = createContext();
 const Notification = createContext();
 
 const App = () => {
-  // const [loadingScreen, setloadingScreen] = useState(true);
   const [userData, setUserData] = useState(null);
   const checkUserAlreadyLogin = async () => {
     await axios
@@ -112,17 +111,20 @@ const App = () => {
 
   const fetchBag = async () => {
     await axios.get("/api/fetchBag").then((response) => {
-      setBagData(response.data.data);
+      if(response.data.result){
+        setBagData(response.data.data);
+      }
     }).catch((err) => {
-      console.log("Error")
+      // console.log("Error")
     })
   }
+
 
   const fetchWishList = async () => {
     await axios.get("/api/fetchWishlist").then((response) => {
       setWishlistData(response.data.data);
     }).catch((err) => {
-      console.log("Error")
+      // console.log("Error")
     })
   }
 
@@ -147,19 +149,10 @@ const App = () => {
     }
   };
 
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setloadingScreen(false);
-  //   }, 1000);
-  // }, []);
-
   return (
-    // <Loading.Provider value={setloadingScreen}>
     <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
       <UserData.Provider value={{ userData,
-        // updateBag, 
-        setUserData, fetchBag, fetchWishList, addToWishlist, bagData, wishlistData }}>
+        setUserData, fetchBag, fetchWishList, addToWishlist, bagData, wishlistData, setBagData }}>
 
         <ToastContainer />
         <Router>
@@ -176,7 +169,7 @@ const App = () => {
               <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
               <Route exact path="/Products/:categoryID/:productID" element={<ProductDetailsPage />} />
               <Route exact path="/Orders/:orders" element={<OrdersPage />} />
-              <Route exact path="/ReserveSeat" element={<ReserveSeatPage />} />
+              <Route exact path="/ReserveTable" element={<ReserveTablePage />} />
               <Route exact path="/Contact" element={<ContactPage />} />
               <Route exact path="/auth/login" element={<Login />} />
               <Route exact path="/auth/Register" element={<Register />} />
@@ -191,7 +184,7 @@ const App = () => {
                   <Route path="/admin/product" element={<Products />} />
                   <Route path="/admin/users" element={<Users />} />
                   <Route path="/admin/Orders" element={<Orders />} />
-                  <Route path="/admin/reserve-seat" element={<ReserveSeat />} />
+                  <Route path="/admin/reserve-table" element={<ReserveTable />} />
                   {/* Charts */}
 
                   <Route path="/admin/chart/bar" element={<BarCharts />} />
@@ -217,7 +210,6 @@ const App = () => {
         </Router>
       </UserData.Provider>
     </Notification.Provider>
-    // </Loading.Provider>
   );
 };
 export default App;

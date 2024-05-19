@@ -7,7 +7,7 @@ import axios from "axios";
 import {useParams} from "react-router-dom";
 import {useEffect} from "react";
 import {useState} from "react";
-import Bags from "../Common/Bags";
+import Bags from "../Bag/Bags";
 import {Notification, UserData} from "../../routes/App";
 import {useContext} from "react";
 import {Oval} from "react-loader-spinner";
@@ -55,22 +55,25 @@ const ProductPage = () => {
   };
 
   const updateBag = async () => {
-    setAddToBag(true);
-    await axios
-    .post("/api/updateBag", {
-      productID: Products._id,
-      SmallCount:Products.Sizes[0].counter,
-      MediumCount:Products.Sizes[1].counter,
-      LargeCount:Products.Sizes[2].counter,
-    })
-    .then((result) => {
-      notification(result.data,"Success")
-      fetchBag();
-    }).catch((err)=>{
-      notification(err.response.data.msg2, "Warning")
-    }).finally(()=>{
-      setAddToBag(false);
-    });
+    if(Products.total > 0){
+      setAddToBag(true);
+      await axios
+      .post("/api/updateBag", {
+        productID: Products._id,
+        SmallCount:Products.Sizes[0].counter,
+        MediumCount:Products.Sizes[1].counter,
+        LargeCount:Products.Sizes[2].counter,
+      })
+      .then((result) => {
+        console.log(result.data)
+        notification(result.data,"Success")
+        fetchBag();
+      }).catch((err)=>{
+        notification(err.response.data.msg2, "Warning")
+      }).finally(()=>{
+        setAddToBag(false);
+      });
+    }
   };
 
   useEffect(() => {

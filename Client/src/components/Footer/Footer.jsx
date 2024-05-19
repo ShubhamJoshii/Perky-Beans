@@ -32,8 +32,8 @@ const HeaderData = [
         link: "/Orders",
       },
       {
-        text: "Reserve Seat",
-        link: "/ReserveSeat",
+        text: "Reserve TABLE",
+        link: "/ReserveTable",
       },
       {
         text: "Terms and Conditions",

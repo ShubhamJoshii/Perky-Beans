@@ -4,10 +4,10 @@
   overflow: auto;
   @include square(100%);
   height: 100vh;
-  #seatConfirmed{
+  #tableConfirmed{
     color: lime;
   }
-  #seatCancelled{
+  #tableCancelled{
     color: red;
   }
 }

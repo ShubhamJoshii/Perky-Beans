@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import SearchBar from "../Common/SearchBar";
 import OrderCards from "./OrderCards";
 import WishlistCards from "./WishlistCards";
-import Bags from "../Common/Bags";
+import Bags from "../Bag/Bags";
 import Scooter from "../../assets/scooter.png";
 import { UserData } from "../../routes/App";
 import { NavLink, useParams, useNavigate } from "react-router-dom";
@@ -23,13 +23,15 @@ const Orders = () => {
     await fetchOrders();
     setLoading("Hide");
   }
-
+  
   const fetchOrders = async()=>{
     await axios.get("/api/fetchOrders").then((response)=>{
       setOrders(response.data.data);
+    }).catch((err)=>{
+      console.log(err)
     })
   }
-
+  
   useEffect(() => {
     fetchFunction();
   }, [])
@@ -106,7 +108,6 @@ const Orders = () => {
                   </p>
                 </div>
               )}
-
             </>
             :
             <>

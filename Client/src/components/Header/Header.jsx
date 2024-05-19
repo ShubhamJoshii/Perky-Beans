@@ -55,8 +55,8 @@ const Header = () => {
           <NavLink to="/contact" ClassName="active">
             <li>CONTACT</li>
           </NavLink>
-          <NavLink to="/reserveseat" ClassName="active">
-            <li>RESERVE SEAT</li>
+          <NavLink to="/ReserveTable" ClassName="active">
+            <li>RESERVE TABLE</li>
           </NavLink>
           {
             userData?.Role === "Admin" &&
@@ -112,12 +112,12 @@ const Header = () => {
           <NavLink to="/contact" ClassName="active">
             <li>CONTACT</li>
           </NavLink>
-          <NavLink to="/reserveseat" ClassName="active">
-            <li>RESERVE SEAT</li>
+          <NavLink to="/ReserveTable" ClassName="active">
+            <li>RESERVE TABLE</li>
           </NavLink>
           {
             userData?.Role === "Admin" &&
-            <NavLink to="/admin" ClassName="active"> <li>Admin</li> </NavLink>
+            <NavLink to="/admin" ClassName="active"> <li>ADMIN</li> </NavLink>
           }
         </ol>
         {userData && (

@@ -64,7 +64,7 @@ const BarCharts = () => {
         obj[key] = countsOrders[key];
         return obj;
       }, {});
-      await axios.get('/api/reserveSeats').then((response) => {
+      await axios.get('/api/reserveTables').then((response) => {
         response.data.filter(e => {
           const reservationDate = new Date(`${e.reservation_Date} ${e.reservation_Timing}`);
           const monthKey = `${(reservationDate.toLocaleString('default', { month: 'long' }))} ${reservationDate.getFullYear()}`;
@@ -84,14 +84,10 @@ const BarCharts = () => {
 
       // console.log(sortedObjectDiscount)
       setOrderDetails({ Orders: sortedObjectDiscount, keys: sortedKeys })
-      // fetchReserveSeats();
     }).catch((err) => {
       console.log(err);
     })
   }
-  // const fetchReserveSeats = async () => {
-
-  // }
 
   useEffect(() => {
     fetchOrders();
@@ -125,7 +121,7 @@ const BarCharts = () => {
                 backgroundColor: 'hsl(180, 40%, 50%)',
               },
               {
-                label: 'Total Reservation Seats',
+                label: 'Total Reservation Tables',
                 data: Object.values(ReservationDetails?.Reservation),
                 borderColor: 'lightgreen',
                 backgroundColor: 'lightgreen',

@@ -76,7 +76,7 @@ const DivOne = ({ location }) => (
       <Li url="/admin/product" text="Products" Icon={RiShoppingBag3Fill} location={location} />
       <Li url="/admin/users" text="Users" Icon={IoIosPeople} location={location} />
       <Li url="/admin/Orders" text="Orders" Icon={AiFillFileText} location={location} />
-      <Li url="/admin/reserve-seat" text="Reserve Seat" Icon={AiFillFileText} location={location} />
+      <Li url="/admin/reserve-table" text="Reserve Table" Icon={AiFillFileText} location={location} />
     </ul>
   </div>
 );

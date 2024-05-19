@@ -100,9 +100,7 @@ const Products = () => {
           ) : (
             <tbody>
               {products?.map((curr, id) => {
-                console.log(curr);
                 const isAvailable = curr?.Available;
-                // console.log(curr);
                 return (
                   <tr key={id}>
                     <td>{curr?._id || <Skeleton />}</td>

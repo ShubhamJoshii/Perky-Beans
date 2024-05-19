@@ -23,7 +23,7 @@ const WishlistCards = ({product, userData, setUserData}) => {
     let b = userData.Bag.find((e) => e.productID === _id);
     if (!b) {
       await axios
-        .post("/api/addtoBag", {
+        .post("/api/updateBag", {
           productID: _id,
           SmallCount: 0,
           MediumCount: 1,
