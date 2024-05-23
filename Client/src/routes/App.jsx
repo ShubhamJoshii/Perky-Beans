@@ -41,6 +41,8 @@ const Loading = createContext();
 const UserData = createContext();
 const Notification = createContext();
 
+
+
 const App = () => {
   const [userData, setUserData] = useState(null);
   const checkUserAlreadyLogin = async () => {
@@ -153,7 +155,6 @@ const App = () => {
     <Notification.Provider value={{ notification: notification, checkUserAlreadyLogin }}>
       <UserData.Provider value={{ userData,
         setUserData, fetchBag, fetchWishList, addToWishlist, bagData, wishlistData, setBagData }}>
-
         <ToastContainer />
         <Router>
           <Suspense fallback={<Preloader />}>
@@ -163,18 +164,25 @@ const App = () => {
 
               <Route exact path="/" element={<HomePage />} />
               <Route exact path="/Products" element={<ProductsPage />} />
+              <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
+              <Route exact path="/Products/:categoryID/bag/:status" element={<ProductsPage />} />
+              <Route exact path="/Products/bag/:status" element={<ProductsPage />} />
+
               <Route exact path="/PrivacyPolicy" element={<PrivacyPolicy />} />
               <Route exact path="/Terms&Conditions" element={<TermsConditions />} />
               <Route exact path="/AboutUs" element={<About_us />} />
-              <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
               <Route exact path="/Products/:categoryID/:productID" element={<ProductDetailsPage />} />
+
+              <Route exact path="/Products/:categoryID/:productID/bag/:status" element={<ProductDetailsPage />} />
               <Route exact path="/Orders/:orders" element={<OrdersPage />} />
+              <Route exact path="/Products/:categoryID" element={<ProductsPage />} />
+              <Route exact path="/Orders/:orders/bag/:status" element={<OrdersPage />} />
               <Route exact path="/ReserveTable" element={<ReserveTablePage />} />
+              <Route exact path="/ReserveTable/status/:status" element={<ReserveTablePage />} />
               <Route exact path="/Contact" element={<ContactPage />} />
               <Route exact path="/auth/login" element={<Login />} />
               <Route exact path="/auth/Register" element={<Register />} />
               <Route exact path="/auth/login/forgetpassword" element={<ForgotPassword />} />
-
 
               {
                 userData?.Role === "Admin" &&

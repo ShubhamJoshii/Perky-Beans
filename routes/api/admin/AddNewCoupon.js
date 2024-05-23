@@ -1,7 +1,7 @@
 const express = require("express");
+const router = express.Router();
 const authMiddleware = require("../../../Middleware/authMiddleware");
 const CouponModel = require("../../../Models/coupon");
-const router = express.Router();
 
 router.post(`/newCouponAdd`, authMiddleware, async (req, res) => {
     const { Code, Discount_Allot, Description } = req.body;

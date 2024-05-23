@@ -6,7 +6,7 @@ const { default: mongoose } = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const env = process.env.NODE_ENV || "DEVELOPMENT";
+const env = process.env.NODE_ENV;
 
 require("dotenv").config();
 
@@ -23,6 +23,12 @@ mongoose
   });
 
 app.use(cors());
+
+if (env === "DEVELOPMENT") {
+app.use(require("./routes/gateway/webHook"));
+} else {
+  app.use('/api',require("./routes/gateway/webHook"));
+}
 
 // Cokkies Creation
 app.use(express.json({ limit: "25mb" }));

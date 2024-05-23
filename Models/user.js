@@ -63,6 +63,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         require: true,
       },
+      State:{
+        type: String,
+        require: true,
+      }
     },
   ],
   Login: [

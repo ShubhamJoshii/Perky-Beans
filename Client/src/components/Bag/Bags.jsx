@@ -6,7 +6,7 @@ import {Notification, UserData} from "../../routes/App";
 import {useContext} from "react";
 import {MdArrowRight} from "react-icons/md";
 
-import {NavLink, useNavigate, useParams} from "react-router-dom";
+import {NavLink, useLocation, useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import BagProductCard from "./BagProductCard";
 import SelectAddress from "./SelectAddress";
@@ -14,6 +14,9 @@ import AddNewAddress from "./AddNewAddress";
 import PaymentOption from "./PaymentOption";
 import OrderStatus from "./OrderStatus";
 import {OrderSummary} from "./OrderSummary";
+import {loadStripe} from "@stripe/stripe-js";
+
+const stripePromise = loadStripe("pk_test_51PIBzKBApeRXee97n2UpjWtEqJfL0P2djHw6aEtmkrEBtRlRKAEWBpTLBTrjtopfQqjK08pNnqMbWuwX48Xy6fEi00FUChBPSg");
 
 const Bags = () => {
   const [showBag, setShowBag] = useState(0);
@@ -40,6 +43,7 @@ const Bags = () => {
 
   const ref = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchGrandTotal = () => {
     let GST = 0,
@@ -56,6 +60,17 @@ const Bags = () => {
   useEffect(() => {
     fetchGrandTotal();
   }, [bagData]);
+
+  useEffect(() => {
+    let URL = location.pathname.split("/bag")[0];
+    if (location.pathname.split("/").slice(-1)[0] === "success") {
+      setShowBag("success");
+      navigate(`${URL}`);
+    }
+    if (location.pathname.split("/").slice(-1)[0] === "canceled") {
+      navigate(`${URL}`);
+    }
+  }, []);
 
   const fun = async () => {
     setLoading(true);
@@ -80,27 +95,45 @@ const Bags = () => {
     };
   }, [showBag]);
 
+  const stripePayment = async () => {
+    const stripe = await stripePromise;
+    await axios.post("/api/create-food-order-session", {...Charges, TotalAmountPayed: GrandTotal, ...Discount_Allot, Address: bagOption.address, paymentThrough: bagOption.paymentThrough, URL: location.pathname.split("/bag")[0], userID: userData._id, Full_Name: userData.Full_Name, Email: userData.Email}).then(async (response) => {
+      const sessionId = response.data.id;
+      const {error} = await stripe.redirectToCheckout({
+        sessionId: sessionId,
+      });
+
+      if (error) {
+        console.error("Stripe Checkout error:", error);
+      }
+    });
+  };
+
   const orderNow = async (_id) => {
     // let address = ""
     if (bagData.length > 0) {
-      setLoadingBtn(true);
-      await axios
-        .post("/api/orderNow", {...Charges, TotalAmountPayed: GrandTotal, ...Discount_Allot, Address: bagOption.address, paymentThrough: bagOption.paymentThrough})
-        .then((result) => {
-          console.log(result.data);
-          if (result.data === "Product Ordered") {
-            // notification(result.data, "Success");
-            // fetchBag();
-            setBagData([])
-            setShowBag(4);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          setLoadingBtn(false);
-        });
+      if (bagOption.paymentThrough !== "Paid Online") {
+        setLoadingBtn(true);
+        await axios
+          .post("/api/orderNow", {...Charges, TotalAmountPayed: GrandTotal, ...Discount_Allot, Address: bagOption.address, paymentThrough: bagOption.paymentThrough})
+          .then((result) => {
+            console.log(result.data);
+            if (result.data === "Product Ordered") {
+              // notification(result.data, "Success");
+              // fetchBag();
+              setBagData([]);
+              setShowBag("success");
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            setLoadingBtn(false);
+          });
+      } else {
+        stripePayment();
+      }
     }
   };
 
@@ -154,9 +187,13 @@ const Bags = () => {
               <MdOutlineArrowBackIos
                 onClick={() => {
                   let a = showBag - 1;
-                  if(showBag === 4){
-                    setShowBag(1);
-                  }else{
+                  if (showBag === "success") {
+                    if (location.pathname.includes("/bag")) {
+                      navigate(location.pathname.split("/bag")[0]);
+                    }
+                    setShowBag(0);
+                    console.log(location.pathname);
+                  } else {
                     showBag === "AddNewAddress" ? setShowBag(2) : setShowBag(a);
                   }
                 }}
@@ -244,7 +281,7 @@ const Bags = () => {
                     {showBag === 2 && <SelectAddress setShowBag={setShowBag} bagOption={bagOption} setBagOption={setBagOption} />}
                     {showBag === "AddNewAddress" && <AddNewAddress setShowBag={setShowBag} />}
                     {showBag === 3 && <PaymentOption bagOption={bagOption} setBagOption={setBagOption} />}
-                    {showBag === 4 && <OrderStatus setShowBag={setShowBag} />}
+                    {showBag === "success" && <OrderStatus setShowBag={setShowBag} />}
                   </div>
                 ) : (
                   <Oval height="40" width="60" color="black" wrapperStyle={{flex: 1, marginTop: "50px"}} wrapperClass="bagScroll loading" visible={true} ariaLabel="oval-loading" secondaryColor="black" strokeWidth={4} strokeWidthSecondary={4} />
@@ -262,7 +299,7 @@ const Bags = () => {
               </div>
             )}
 
-            {showBag !== "AddNewAddress" && userData && showBag !== 4 && bagData.length !== 0 && (
+            {showBag !== "AddNewAddress" && userData && showBag !== "success" && bagData.length !== 0 && (
               <div id="Bag-Total-Price">
                 <h4>Grand Total</h4>
                 <h4>&#x20B9; {GrandTotal}</h4>

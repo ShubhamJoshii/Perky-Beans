@@ -23,7 +23,7 @@ const ProductsCatalogue = () => {
   const fetchProducts = async () => {
     setProducts(arr);
     let filterData = location.state;
-    if (location.state !== null && (filterData.Category || filterData.Ingredients || filterData.PriceRange || filterData.RatingUP)) {
+    if (location.state !== null && (filterData?.Category || filterData?.Ingredients || filterData?.PriceRange || filterData?.RatingUP)) {
       let Category = filterData?.Category?.toLocaleString();
       let Ingredients = filterData?.Ingredients?.toLocaleString();
       let PriceRange = filterData?.PriceRange;

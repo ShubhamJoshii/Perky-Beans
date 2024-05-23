@@ -18,7 +18,7 @@ router.get(`/fetchAllOrders`, authMiddleware, async (req, res) => {
           let product = fetchProducts.find(e => e._id.toString() === order.productID)
           return {Product_Name:product.Product_Name,productID:order.productID, SmallCount:order.SmallCount, MediumCount:order.MediumCount, LargeCount:order.LargeCount}
         })
-        return {_id:curr._id, user_id:curr.user_id, Coupon_Used:curr.Coupon_Used ,Orders:a ,TotalAmountPayed:curr.TotalAmountPayed , GST:curr.GST ,Delivery_Charge:curr.Delivery_Charge, Discount:curr.Discount ,status:curr.status ,orderedAt:curr.orderedAt, Full_Name:user.Full_Name,Email:user.Email}
+        return {_id:curr._id, user_id:curr.user_id, Coupon_Used:curr.Coupon_Used ,Orders:a ,TotalAmountPayed:curr.TotalAmountPayed , GST:curr.GST ,Delivery_Charge:curr.Delivery_Charge, Discount:curr.Discount ,status:curr.status ,orderedAt:curr.orderedAt,paymentThrough:curr.paymentThrough, Address:curr.Address, Full_Name:user.Full_Name,Email:user.Email}
       })
       res.send({data, result: true });
     } 

@@ -5,10 +5,15 @@ import {BiCalendar, BiSolidTimeFive} from "react-icons/bi";
 import {FaUserAlt} from "react-icons/fa";
 import axios from "axios";
 import {Oval} from "react-loader-spinner";
-import {Notification} from "../../routes/App";
+import {Notification, UserData} from "../../routes/App";
 import {TbCircleCheck, TbCircle} from "react-icons/tb";
 import GroundFloor from "./groundFloor";
 import Floor1 from "./Floor1";
+
+import {loadStripe} from "@stripe/stripe-js";
+import {useLocation, useNavigate} from "react-router-dom";
+
+const stripePromise = loadStripe("pk_test_51PIBzKBApeRXee97n2UpjWtEqJfL0P2djHw6aEtmkrEBtRlRKAEWBpTLBTrjtopfQqjK08pNnqMbWuwX48Xy6fEi00FUChBPSg");
 
 const ReserveTable = () => {
   const [loadingShow, setloadingShow] = useState(false);
@@ -23,10 +28,14 @@ const ReserveTable = () => {
     Timing: undefined,
   });
 
+  const {userData} = useContext(UserData);
+  
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
 
   const {notification} = useContext(Notification);
+  const location = useLocation();
+  const navigate = useNavigate();
   const handleInput = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -67,6 +76,17 @@ const ReserveTable = () => {
     // console.log(reserveData);
   }, [reserveData]);
 
+  useEffect(() => {
+    if (location.pathname.split("/").slice(-1)[0] === "success") {
+      notification("Table Reserved. Check Mail!", "Success");
+      navigate("/ReserveTable")
+    }
+    if (location.pathname.split("/").slice(-1)[0] === "canceled") {
+      notification("Table Reserved Error", "Un-Success");
+      navigate("/ReserveTable")
+    }
+  }, []);
+
   const submitReseveTable = async (e) => {
     e.preventDefault();
     // console.log(reserveData);
@@ -81,31 +101,42 @@ const ReserveTable = () => {
         var currentdate = new Date();
         var Booking_DateTime = currentdate.getDate() + "/" + (currentdate.getMonth() + 1) + "/" + currentdate.getFullYear() + ", " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
 
-        await axios
-          .post("/api/ReserveTables", {...reserveData, Booking_DateTime, TableNumber: temp})
-          .then((result) => {
-            console.log(result);
-            notification(result.data.message, "Success");
-            setloadingShow(false);
-            fetchTableAvailable();
-          })
-          .catch(() => {
-            setTimeout(() => setloadingShow(false), [1000]);
-            notification("Please Login before Reserving Table", "Warning");
+        // await axios
+        //   .post("/api/ReserveTables", {...reserveData, Booking_DateTime, TableNumber: temp})
+        //   .then((result) => {
+        //     console.log(result);
+        //     notification(result.data.message, "Success");
+        //     setloadingShow(false);
+        //     fetchTableAvailable();
+        //   })
+        //   .catch(() => {
+        //     setTimeout(() => setloadingShow(false), [1000]);
+        //     notification("Please Login before Reserving Table", "Warning");
+        //   });
+
+        const stripe = await stripePromise;
+        await axios.post("/api/create-seat-reservation-session", {...reserveData, Booking_DateTime, TableNumber: temp, URL: location.pathname.split("/status")[0], userID: userData._id, Full_Name: userData.Full_Name, Email: userData.Email}).then(async (response) => {
+          const sessionId = response.data.id;
+          const {error} = await stripe.redirectToCheckout({
+            sessionId: sessionId,
           });
-      }else if (!reserveData.TableNumber) {
+
+          if (error) {
+            console.error("Stripe Checkout error:", error);
+          }
+        });
+      } else if (!reserveData.TableNumber) {
         notification("Please Select Table", "Warning");
       } else if (!reserveData.Floor) {
         notification("Please Select Floor", "Warning");
       } else if (reserveData.Contact_Number !== 10) {
         notification("Please Enter a Valid Contact Number", "Warning");
-      } 
+      }
     } else {
       notification("Table Not Avalable Change your Time", "Un-Success");
     }
-    setloadingShow(false)
+    setloadingShow(false);
   };
-
 
   const getFutureDate = (monthsToAdd) => {
     const currentDate = new Date();
@@ -135,14 +166,12 @@ const ReserveTable = () => {
               <BiSolidTimeFive />
               <input type="time" placeholder="SELECT TIME" name="Timing" value={reserveData.Timing} onChange={handleDateTimeInput} required min={new Date().toISOString().split("T")[0] === reserveData?.Date ? new Date().getHours() + 1 + ":" + new Date().getMinutes() : "11:00"} max="23:00" step="1800" />
             </div>
-            {bookedTable?.length  <= 26 && (
+            {bookedTable?.length <= 26 && (
               <span id="tableAvailable">
                 <TbCircleCheck /> Table Available
               </span>
             )}
-            {
-              bookedTable?.length > 26 &&
-             (
+            {bookedTable?.length > 26 && (
               <span id="tableNotAvailable">
                 <TbCircle /> Table Not Available
               </span>
@@ -155,7 +184,7 @@ const ReserveTable = () => {
               <Oval height="28" width="28" color="white" wrapperStyle={{}} wrapperClass="loading" visible={true} ariaLabel="oval-loading" secondaryColor="white" strokeWidth={8} strokeWidthSecondary={8} />
             </button>
           ) : (
-            <button>BOOK NOW</button>
+            <button>BOOK NOW @ &#8377; 500 </button>
           )}
         </form>
         <div id="SecondHALF">

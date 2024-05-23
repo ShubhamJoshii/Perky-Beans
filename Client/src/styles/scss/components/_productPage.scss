@@ -13,21 +13,33 @@
     padding-bottom: 40px;
     margin-top: 50px;
 
+    .Skeleton,
     .product-image {
-      width: 100%;
+      width: 350px;
       height: 400px;
       object-fit: cover;
       border: 2px solid white;
+      border-radius: 18px 18px 0 90px;
     }
 
     .product-info {
+      width: 100%;
       .product-name {
         font-size: 22px;
+        span {
+          width: 50%;
+          height: 24px;
+        }
       }
-
+      
       .product-price {
         font-size: 20px;
         margin: 0;
+        margin: auto;
+        span {
+          width: 80px;
+          height: 24px;
+        }
       }
 
       .product-star {
@@ -36,6 +48,11 @@
         position: absolute;
         bottom: 5px;
         right: 20px;
+
+        span {
+          width: 40px;
+          height: 14px;
+        }
 
         #A {
           color: #b89130;
@@ -48,9 +65,15 @@
     flex: 1;
 
     h1 {
+      @include flexMixin(flex-start, flex-start);
       font-size: 26px;
       font-weight: bolder;
-      @include flexMixin(flex-start, flex-start);
+      margin-bottom: 10px;
+
+      span{
+        width: 70%;
+        height: 24px;
+      }
 
       #veg {
         position: relative;
@@ -72,6 +95,10 @@
     p {
       font-size: 18px;
       margin-top: 20px;
+      span{
+        width: 100%;
+        height: 16px;
+      }
     }
 
     .product-board-sizes {
@@ -91,15 +118,27 @@
         div {
           @include flex-center(column);
 
-          img {
+          img, .SkeltonSizes {
             width: pxToRem(133);
             height: pxToRem(157);
             border-radius: 18px;
           }
 
+          p span{
+            span{
+              width: 80px;
+              height: 24px;
+            }
+          
+          }
+
           .product-price {
             font-size: 16px;
             font-weight: bold;
+            span{
+              width: 60px;
+              height: 20px;
+            }
           }
 
           .counter {

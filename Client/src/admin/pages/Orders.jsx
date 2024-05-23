@@ -67,7 +67,9 @@ const Orders = () => {
               <th>User Name</th>
               <th>Order At</th>
               <th>Order</th>
+              <th>Delivery Address</th>
               <th>Amount</th>
+              <th>Payment Status</th>
               {/* <th>Discount</th> */}
               <th>Status</th>
               <th>Manage</th>
@@ -108,7 +110,9 @@ const Orders = () => {
                               </ul>
                             )}
                           </th>
+                          <th>{curr?.Address || <Skeleton count={2}/>}</th>
                           <th>{curr?.TotalAmountPayed ? <>&#x20B9; {curr?.TotalAmountPayed} </> : <Skeleton />}</th>
+                          <th>{curr?.paymentThrough || <Skeleton count={1}/>}</th>
                           <th> {curr?.status || <Skeleton />}</th>
                           {curr?.status ? (
                             <>

@@ -43,4 +43,7 @@ router.use("/",require("./api/reserveTable/bookTable"));
 router.use("/",require("./api/reserveTable/cancelReservation"));
 router.use("/",require("./api/reserveTable/tableAvailable"));
 
+router.use("/",require("./gateway/create-food-order-session"));
+router.use("/",require("./gateway/create-seat-reservation-session"));
+
 module.exports = router;
